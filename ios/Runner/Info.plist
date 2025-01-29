@@ -5,7 +5,7 @@
 	<key>CFBundleDevelopmentRegion</key>
 	<string>$(DEVELOPMENT_LANGUAGE)</string>
 	<key>CFBundleDisplayName</key>
-	<string>Academy</string>
+	<string>ACAD</string>
 	<key>CFBundleExecutable</key>
 	<string>$(EXECUTABLE_NAME)</string>
 	<key>CFBundleIdentifier</key>
@@ -45,5 +45,26 @@
 	<true/>
 	<key>UIApplicationSupportsIndirectInputEvents</key>
 	<true/>
+
+    <key>NSCameraUsageDescription</key>
+    <string>Origami ขอสิทธิ์การเข้าถึงกล้องเพื่อสแกนเอกสารโครงการและถ่ายภาพสำหรับรายงาน</string>
+
+    <key>NSPhotoLibraryUsageDescription</key>
+    <string>Origami ขอสิทธิ์เข้าถึงคลังภาพของคุณเพื่อให้คุณอัปโหลดรูปภาพและเอกสารที่เกี่ยวข้องกับโครงการได้</string>
+
+    <key>NSMicrophoneUsageDescription</key>
+    <string>Origami ขอสิทธิ์เข้าถึงไมโครโฟนเพื่อเปิดใช้งานการบันทึกเสียงสำหรับการอัปเดตโครงการและการสื่อสารในทีม</string>
+
+    <key>NSLocationWhenInUseUsageDescription</key>
+    <string>Origami ใช้ตำแหน่งของคุณเพื่อนำทางและระบุไซต์โครงการอย่างแม่นยำระหว่าง การใช้งาน</string>
+
+    <key>NSLocationAlwaysUsageDescription</key>
+    <string>Origami ต้องขอสิทธิ์เข้าถึงตำแหน่งของคุณตลอดเวลาเพื่อตรวจสอบการอัปเดตโครงการอย่างต่อเนื่องและสร้างรายงานที่แม่นยำ</string>
+
+	<key>NSAppTransportSecurity</key>
+    <dict>
+        <key>NSAllowsArbitraryLoads</key>
+        <true/>
+    </dict>
 </dict>
 </plist>
