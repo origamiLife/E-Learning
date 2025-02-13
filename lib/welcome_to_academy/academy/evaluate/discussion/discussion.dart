@@ -97,7 +97,7 @@ class _DiscussionState extends State<Discussion> {
         } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
           return Center(
               child: Text(
-                'NOT FOUND DATA',
+                NotFoundData,
                 style: TextStyle(fontFamily: 'Arial',
                   fontSize: 16.0,
                   color: const Color(0xFF555555),
@@ -414,7 +414,7 @@ class _DiscussionState extends State<Discussion> {
                         } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
                           return Center(
                               child: Text(
-                                'NOT FOUND DATA',
+                                NotFoundData,
                                 style: TextStyle(fontFamily: 'Arial',
                                   fontSize: 16.0,
                                   color: const Color(0xFF555555),
@@ -784,13 +784,13 @@ class DiscussionData {
 
   factory DiscussionData.fromJson(Map<String, dynamic> json) {
     return DiscussionData(
-      discussion_id: json['discussion_id'],
-      discussion_subject: json['discussion_subject'],
-      discussion_description: json['discussion_description'],
-      disccusion_emp_name: json['disccusion_emp_name'],
-      disccusion_emp_image: json['disccusion_emp_image'],
-      disccusion_date: json['disccusion_date'],
-      dissussion_reply_count: json['dissussion_reply_count'],
+      discussion_id: json['discussion_id']??'',
+      discussion_subject: json['discussion_subject']??'',
+      discussion_description: json['discussion_description']??'',
+      disccusion_emp_name: json['disccusion_emp_name']??'',
+      disccusion_emp_image: json['disccusion_emp_image']??'',
+      disccusion_date: json['disccusion_date']??'',
+      dissussion_reply_count: json['dissussion_reply_count']??'',
     );
   }
 }
@@ -818,14 +818,14 @@ class ReplyData {
 
   factory ReplyData.fromJson(Map<String, dynamic> json) {
     return ReplyData(
-      reply_id: json['reply_id'],
-      reply_type: json['reply_type'],
-      reply_desc: json['reply_desc'],
-      reply_emp_name: json['reply_emp_name'],
-      reply_emp_image: json['reply_emp_image'],
-      reply_date: json['reply_date'],
-      can_edit: json['can_edit'],
-      can_delete: json['can_delete'],
+      reply_id: json['reply_id']??'',
+      reply_type: json['reply_type']??'',
+      reply_desc: json['reply_desc']??'',
+      reply_emp_name: json['reply_emp_name']??'',
+      reply_emp_image: json['reply_emp_image']??'',
+      reply_date: json['reply_date']??'',
+      can_edit: json['can_edit']??'',
+      can_delete: json['can_delete']??'',
     );
   }
 }

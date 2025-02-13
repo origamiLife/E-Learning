@@ -3,15 +3,39 @@ import 'package:academy/welcome_to_academy/academy/challeng/summary_scores.dart'
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:academy/welcome_to_academy/export.dart';
 import 'package:academy/main.dart';
+import 'package:http/http.dart' as http;
+import '../challenge_start.dart';
 
 class FinishedChoiceChallenge extends StatefulWidget {
   FinishedChoiceChallenge({
     super.key,
     required this.employee,
     required this.Authorization,
+    required this.duration,
+    required this.total_point,
+    required this.time_used,
+    required this.topChallenge,
+    required this.challengeData,
+    required this.total_point_all,
+    required this.challenge,
+    required this.questionList,
+    required this.isQuestion,
+    required this.question_no,
+    required this.Qno,
   });
   final Employee employee;
   final String Authorization;
+  final String duration;
+  final String total_point;
+  final String time_used;
+  final TopChallenge topChallenge;
+  final ChallengeData challengeData;
+  final String total_point_all;
+  final GetChallenge challenge;
+  final List<String> questionList;
+  final List<CheckAllChallenge> isQuestion;
+  final String question_no;
+  final String Qno;
   @override
   _FinishedChoiceChallengeState createState() =>
       _FinishedChoiceChallengeState();
@@ -19,7 +43,6 @@ class FinishedChoiceChallenge extends StatefulWidget {
 
 class _FinishedChoiceChallengeState extends State<FinishedChoiceChallenge> {
   final CarouselSliderController _controller = CarouselSliderController();
-  int _currentIndex = 0;
   String? _oneChoice;
 
   // กำหนดค่าตัวเลือกเริ่มต้นให้ติ๊กไว้ 2 ข้อ
@@ -30,20 +53,6 @@ class _FinishedChoiceChallengeState extends State<FinishedChoiceChallenge> {
   @override
   void initState() {
     super.initState();
-  }
-
-  void navigateToNextPage() {
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (context) => SummaryScores(
-          employee: widget.employee,
-          Authorization: widget.Authorization,
-        ),
-      ),
-    ).then((_) {
-      Navigator.pop(context);
-    });
   }
 
   @override
@@ -87,7 +96,7 @@ class _FinishedChoiceChallengeState extends State<FinishedChoiceChallenge> {
           children: [
             Flexible(
               child: Text(
-                'Q${'3'}.',
+                'Q${widget.Qno}. ',
                 style: TextStyle(
                   fontFamily: 'Arial',
                   fontSize: 24,
@@ -108,169 +117,193 @@ class _FinishedChoiceChallengeState extends State<FinishedChoiceChallenge> {
       child: Padding(
         padding: EdgeInsets.all(isIPad || isTablet ? 24 : 16),
         child: SingleChildScrollView(
-          child: Column(
-            children: [
-              Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    'Q${challengeData.challenge_id}. ',
-                    style: TextStyle(
-                      fontFamily: 'Arial',
-                      fontSize: (isIPad || isTablet) ? 32 : 18,
-                      color: Color(0xFF555555),
-                      fontWeight: FontWeight.w700,
-                    ),
-                  ),
-                  Flexible(
-                    child: Text(
-                      challengeData.challenge_hearder,
-                      style: TextStyle(
-                        fontFamily: 'Arial',
-                        fontSize: (isIPad || isTablet) ? 24 : 16,
-                        color: Color(0xFF555555),
-                        fontWeight: FontWeight.w700,
+          child: FutureBuilder<QuestionData>(
+            future: fetchQuestionData(),
+            builder: (context, snapshot) {
+              if (!snapshot.hasData) {
+                return Center(
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      CircularProgressIndicator(color: Color(0xFFFF9900)),
+                      SizedBox(width: 12),
+                      Text(
+                        'Loading...',
+                        style: TextStyle(
+                            fontFamily: 'Arial',
+                            fontSize: 16,
+                            fontWeight: FontWeight.w700,
+                            color: Color(0xFF555555)),
                       ),
-                      overflow: TextOverflow.ellipsis,
-                      maxLines: 10,
-                    ),
+                    ],
                   ),
-                ],
-              ),
-              SizedBox(height: 8),
-              if (isIPad || isTablet) SizedBox(height: 28),
-              if (challengeData.challenge_image.isNotEmpty)
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    IconButton(
-                      icon: Icon(Icons.arrow_back_ios,
-                          color: Colors.grey, size: 24),
-                      onPressed: () {
-                        _controller.previousPage();
-                      },
-                    ),
-                    Expanded(
-                      child: CarouselSlider.builder(
-                        itemCount: challengeData.challenge_image.length,
-                        carouselController: _controller,
-                        options: CarouselOptions(
-                          viewportFraction: 1, // ขนาดภาพใน Carousel
-                          autoPlay: false, // เลื่อนอัตโนมัติ
-                          autoPlayInterval: Duration(seconds: 5),
-                          enlargeCenterPage: true, // ขยายภาพตรงกลาง
-                          enableInfiniteScroll: false, // เลื่อนไม่มีสิ้นสุด
-                          onPageChanged: (index, reason) {
-                            setState(() {
-                              _currentIndex = index;
-                            });
-                          },
-                        ),
-                        itemBuilder: (context, index, realIndex) {
-                          return Padding(
-                            padding: (isIPad || isTablet)
-                                ? EdgeInsets.only(top: 24, bottom: 24)
-                                : EdgeInsets.only(top: 12, bottom: 12),
-                            child: GestureDetector(
-                              onTap: () {
-                                _showFullScreenImage(
-                                    challengeData.challenge_image[
-                                        index]); // เรียกฟังก์ชันเพื่อขยายภาพ
-                              },
-                              child: Image.network(
-                                challengeData.challenge_image[index],
-                                fit: BoxFit.contain,
-                                // width: double.infinity,
-                                errorBuilder: (context, error, stackTrace) {
-                                  return Icon(Icons.error);
-                                },
-                              ),
-                            ),
-                          );
-                        },
-                      ),
-                    ),
-                    IconButton(
-                      icon: Icon(Icons.arrow_forward_ios,
-                          color: Colors.grey, size: 24),
-                      onPressed: () {
-                        _controller.nextPage();
-                      },
-                    ),
-                  ],
-                ),
-              if (isIPad || isTablet) SizedBox(height: 20),
-              SizedBox(height: 8),
-              _choice(challengeData.challenge_testData),
-              SizedBox(height: 8),
-            ],
+                );
+              } else {
+                final questionList = snapshot.data!;
+                return _contentWidget(questionList);
+              }
+            },
           ),
         ),
       ),
     );
   }
 
-  Widget _choice(List<MultipleChoice> choiceList) {
+  Widget _contentWidget(QuestionData questionData) {
+    final isQuestion = widget.isQuestion;
+    return Column(
+      children: [
+        SingleChildScrollView(
+          child: Column(
+            children: [
+              _questionRow(questionData),
+              if (isIPad || isTablet) SizedBox(height: 28),
+              _imageCarousel(questionData),
+              SizedBox(height: 8),
+              _choice(questionData.question.choice, isQuestion,
+                  questionData.question.choice_choose),
+              SizedBox(height: 8),
+            ],
+          ),
+        ),
+        SizedBox(),
+        // _actionButtons(questionData, isQuestion),
+      ],
+    );
+  }
+
+  Widget _questionRow(QuestionData questionData) {
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          'Q${questionData.question.question_seq}. ',
+          style: TextStyle(
+              fontFamily: 'Arial',
+              fontSize: (isIPad || isTablet) ? 32 : 18,
+              color: Color(0xFF555555),
+              fontWeight: FontWeight.w700),
+        ),
+        Flexible(
+          child: Text(
+            questionData.question.question_text,
+            style: TextStyle(
+                fontFamily: 'Arial',
+                fontSize: (isIPad || isTablet) ? 24 : 16,
+                color: Color(0xFF555555),
+                fontWeight: FontWeight.w700),
+            overflow: TextOverflow.ellipsis,
+            maxLines: 10,
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _imageCarousel(QuestionData questionData) {
+    if (questionData.question.question_image.isNotEmpty) {
+      return Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          IconButton(
+            icon: Icon(Icons.arrow_back_ios, color: Colors.grey, size: 24),
+            onPressed: () {
+              _controller.previousPage();
+            },
+          ),
+          Expanded(
+            child: CarouselSlider.builder(
+              itemCount: questionData.question.question_image.length,
+              carouselController: _controller,
+              options: CarouselOptions(
+                viewportFraction: 1,
+                autoPlay: false,
+                autoPlayInterval: Duration(seconds: 5),
+                enlargeCenterPage: true,
+                enableInfiniteScroll: false,
+                onPageChanged: (index, reason) {
+                  int currentIndex = 0;
+                  setState(() {
+                    currentIndex = index;
+                  });
+                },
+              ),
+              itemBuilder: (context, index, realIndex) {
+                return Padding(
+                  padding: EdgeInsets.symmetric(
+                      vertical: isIPad || isTablet ? 24 : 12),
+                  child: GestureDetector(
+                    onTap: () {
+                      _showFullScreenImage(
+                          questionData.question.question_image[index]);
+                    },
+                    child: Image.network(
+                      questionData.question.question_image[index],
+                      fit: BoxFit.contain,
+                      errorBuilder: (context, error, stackTrace) {
+                        return Icon(Icons.error);
+                      },
+                    ),
+                  ),
+                );
+              },
+            ),
+          ),
+          IconButton(
+            icon: Icon(Icons.arrow_forward_ios, color: Colors.grey, size: 24),
+            onPressed: () {
+              _controller.nextPage();
+            },
+          ),
+        ],
+      );
+    }
+    return SizedBox();
+  }
+
+  Widget _actionButtons(
+      QuestionData questionData, List<CheckAllChallenge> isQuestion) {
+    return Container(
+      child: Column(
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            crossAxisAlignment: CrossAxisAlignment.end,
+            children: [
+              IconButton(
+                  onPressed: () {
+                    _showDialog(widget.isQuestion);
+                  },
+                  icon: Icon(Icons.window_sharp)),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  Set<String> _manyChoiceSet = {};
+  String choice_correct = '';
+
+  Widget _choice(
+      List<Choice> choiceList,
+      List<CheckAllChallenge> isQuestion,
+      List<ChoiceChoose> choice_choose) {
+
     return Card(
       elevation: 0,
       child: Column(
-        children: List.generate(choiceList.length, (index) {
-          final choice = challengeData.challenge_testData[index];
-          // กำหนดค่าตัวเลือกเริ่มต้นให้ติ๊กไว้ 2 ข้อ
-          final Set<String> _manyChoiceSet = {'1', '2'};
-          final isSelected = _manyChoiceSet.contains(choice.choice_id);
+        children: List.generate(choiceList.length, (index1) {
+          final isSelected = _manyChoiceSet.contains(choiceList[index1].choice_id);
+          final choice = choiceList[index1];
           return Row(
             children: [
               Expanded(
-                child: Container(
-                  decoration: BoxDecoration(
-                    color: Color(0xFFF1F7F0),
-                    borderRadius: BorderRadius.circular(4),
-                    border: Border.all(
-                      color: Colors.white, // สีขอบ
-                      width: 4, // ความหนาของขอบ
-                    ),
-                  ),
-                  child: Container(
-                    decoration: BoxDecoration(
-                      color: Color(0xFFF1F7F0),
-                      borderRadius: BorderRadius.circular(4),
-                      border: Border.all(
-                        color: (_oneChoice == choice.choice_id || isSelected)
-                            ? Color(0xFF00C789)
-                            : Colors.white, // สีขอบ
-                        width: 2, // ความหนาของขอบ
-                      ),
-                    ),
-                    child: ListTile(
-                      contentPadding:
-                          EdgeInsets.symmetric(vertical: 0, horizontal: 16),
-                      title: Text(
-                        choice.choice_name,
-                        style: TextStyle(
-                          fontFamily: 'Arial',
-                          fontSize: (isIPad || isTablet) ? 24 : 16,
-                          color: Color(0xFF555555),
-                          fontWeight: FontWeight.w500,
-                        ),
-                      ),
-                      leading: (choiceNo > 1)
-                          ? manyChoice(choice, isSelected)
-                          : Radio<String>(
-                              value: choice.choice_id,
-                              groupValue: _oneChoice,
-                              hoverColor: Color(0xFF555555),
-                              activeColor: Color(0xFF00C789),
-                              onChanged: (String? value) {
-                                setState(() {
-                                  _oneChoice = value;
-                                });
-                              },
-                            ),
-                    ),
-                  ),
-                ),
-              )
+                child: (choice_choose.isEmpty
+                    || choice_choose.first.choice_no.isEmpty)
+                    ? nChoice(choice, isSelected, isQuestion)
+                    : yChoice(choice, isSelected, isQuestion, choice_choose),
+              ),
             ],
           );
         }),
@@ -278,51 +311,376 @@ class _FinishedChoiceChallengeState extends State<FinishedChoiceChallenge> {
     );
   }
 
-  int choiceNo = 2;
 
-  Widget manyChoice(MultipleChoice choice, bool isSelected) {
-    return Icon(
-      isSelected ? Icons.radio_button_checked : Icons.radio_button_unchecked,
-      color: isSelected ? Color(0xFF00C789) : Color(0xFF555555),
+  bool isYChoice = false;
+  int choiceNo = 1;
+
+// ปรับปรุงฟังก์ชัน yChoice
+  Widget yChoice(Choice choice, bool isSelected,
+      List<CheckAllChallenge> isQuestion, List<ChoiceChoose> choice_choose ) {
+    isYChoice = true;
+    Color borderColor = Colors.white;
+    if (choice.choice_no == choice_choose.first.choice_no) {
+      if(choice_choose.first.choice_correct == "0"){
+        borderColor = const Color(0xFFEE546C); // สีแดง
+      }else{
+        borderColor = const Color(0xFF00C789); // สีเขียว
+      }
+    }
+    return Container(
+      decoration: BoxDecoration(
+        color: Color(0xFFF1F7F0),
+        borderRadius: BorderRadius.circular(4),
+        border: Border.all(color: borderColor, width: 2), // ใช้ borderColor ตามเงื่อนไข
+      ),
+      child: ListTile(
+        contentPadding: EdgeInsets.symmetric(vertical: 0, horizontal: 16),
+        title: Row(
+          children: [
+            Expanded(
+              child: Text(
+                choice.choice_text,
+                style: TextStyle(
+                  fontFamily: 'Arial',
+                  fontSize: (isIPad || isTablet) ? 24 : 16,
+                  color: Color(0xFF555555),
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+            ),
+            if(choice.choice_correct == "1")Icon(Icons.check_circle,color: Colors.green)
+          ],
+        ),
+        leading: (choiceNo > 1)
+            ? manyChoice(choice, isSelected, isQuestion)
+            : Radio<String>(
+          value: choice.choice_no,
+          groupValue: choice_choose.first.choice_no,
+          hoverColor: Color(0xFF555555),
+          activeColor: Color(0xFF555555),
+          onChanged: (String? value) {},
+        ),
+      ),
     );
   }
 
-  final ChallengeData challengeData = ChallengeData(
-    challenge_id: '3',
-    challenge_hearder:
-        'ในถุงมีลูกแก้วสีแดง 5 ลูก สีเขียว 3 ลูก และสีเหลือง 2 ลูก สุ่มหยิบลูกแก้วจากถุงใบนี้มา 3 ลูก ความน่าจะเป็นที่หยิบได้ลูกแก้วสีแดง 2 ลูกและสีเขียว 1 ลูกเท่ากับเท่าใด',
-    challenge_image: [
-      'https://www.shutterstock.com/image-vector/camera-photography-photo-picture-check-260nw-1168514233.jpg'
-    ],
-    challenge_only: '3',
-    challenge_max: '50',
-    challenge_subjective: '',
-    challenge_testData: [
-      MultipleChoice(
-        choice_id: '0',
-        choice_name: '0.25',
-        choice_image: '',
+  Widget nChoice(
+      Choice choice, bool isSelected, List<CheckAllChallenge> isQuestion) {
+    isYChoice = false;
+    Color borderColor = Colors.white;
+    return Container(
+      decoration: BoxDecoration(
+        color: Color(0xFFF1F7F0),
+        borderRadius: BorderRadius.circular(4),
+        border: Border.all(color: borderColor, width: 2), // ใช้ borderColor ตามเงื่อนไข
       ),
-      MultipleChoice(
-        choice_id: '1',
-        choice_name: '0.5',
-        choice_image: '',
+      child: ListTile(
+        contentPadding: EdgeInsets.symmetric(vertical: 0, horizontal: 16),
+        title: Row(
+          children: [
+            Expanded(
+              child: Text(
+                choice.choice_text,
+                style: TextStyle(
+                  fontFamily: 'Arial',
+                  fontSize: (isIPad || isTablet) ? 24 : 16,
+                  color: Color(0xFF555555),
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+            ),
+            if(choice.choice_correct == "1")Icon(Icons.check_circle,color: Colors.green)
+          ],
+        ),
+        leading: (choiceNo > 1)
+            ? manyChoice(choice, isSelected, isQuestion)
+            : Radio<String>(
+          value: choice.choice_id,
+          groupValue: _oneChoice,
+          hoverColor: Color(0xFF555555),
+          activeColor: Color(0xFF00C789),
+          onChanged: (String? value) {},
+        ),
       ),
-      MultipleChoice(
-        choice_id: '2',
-        choice_name: '0.3',
-        choice_image: '',
+    );
+  }
+
+  Widget manyChoice(
+      Choice choice, bool isSelected, List<CheckAllChallenge> isQuestion) {
+    isYChoice = false;
+    return GestureDetector(
+      onTap: () {
+        setState(() {
+          if (isSelected) {
+            // Remove the choice from the set when deselected
+            _manyChoiceSet.remove(choice.choice_id);
+          } else {
+            // Add the choice to the set if not selected and under the limit
+            if (_manyChoiceSet.length < choiceNo) {
+              _manyChoiceSet.add(choice.choice_id);
+            } else {
+              // Optional: Provide feedback if limit reached
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                    content: Text('You can select up to $choiceNo choices')),
+              );
+            }
+          }
+          print(choice.choice_id);
+          print(_manyChoiceSet);
+          print(_manyChoiceSet.isNotEmpty);
+        });
+      },
+      child: Icon(
+        isSelected ? Icons.radio_button_checked : Icons.radio_button_unchecked,
+        color: isSelected ? Color(0xFF00C789) : Color(0xFF555555),
       ),
-      MultipleChoice(
-        choice_id: '3',
-        choice_name: '0.06',
-        choice_image: '',
-      ),
-      MultipleChoice(
-        choice_id: '4',
-        choice_name: '0.13',
-        choice_image: '',
-      ),
-    ],
-  );
+    );
+  }
+
+  void _showDialog(List<CheckAllChallenge> isQuestion) {
+    showDialog(
+        context: context,
+        barrierDismissible: true,
+        builder: (BuildContext dialogContext) {
+          return Container(
+            decoration: BoxDecoration(
+              color: Colors.black54,
+            ),
+            child: AlertDialog(
+              contentPadding: EdgeInsets.zero, // ลบ Padding ด้านใน
+              content: Stack(
+                children: [
+                  SizedBox(
+                    width: double.infinity,
+                    child: SingleChildScrollView(
+                      child: Padding(
+                        padding: const EdgeInsets.only(
+                            left: 16, right: 16, top: 8, bottom: 16),
+                        child: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Text(
+                              "YOU ARE VIEWING CHALLENGE SECTION",
+                              style: TextStyle(
+                                fontFamily: 'Arial',
+                                fontSize: (isAndroid || isIPhone) ? 20 : 30,
+                                fontWeight: FontWeight.w700,
+                                color: Color(0xFF555555),
+                              ),
+                              textAlign: TextAlign.center,
+                            ),
+                            SizedBox(height: 16),
+                            Text(
+                              "$question: ${isQuestion.length}",
+                              style: TextStyle(
+                                fontFamily: 'Arial',
+                                fontSize: (isAndroid || isIPhone) ? 16 : 24,
+                                color: Color(0xFF555555),
+                              ),
+                              textAlign: TextAlign.center,
+                            ),
+                            SizedBox(height: 22),
+                            ConstrainedBox(
+                              constraints: BoxConstraints(
+                                maxWidth:
+                                    MediaQuery.of(context).size.width * 0.8,
+                              ),
+                              child: Wrap(
+                                  spacing: (isAndroid || isIPhone) ? 8 : 16,
+                                  runSpacing: (isAndroid || isIPhone) ? 8 : 16,
+                                  children:
+                                      List.generate(isQuestion.length, (index) {
+                                    final dataQ = isQuestion[index];
+                                    Color cardColor;
+                                    if (dataQ.question_status == 'Y') {
+                                      cardColor = Color(0xFF00C789);
+                                    } else if (dataQ.question_status == 'N') {
+                                      cardColor = Color(0xFFEE546C);
+                                    } else {
+                                      cardColor = Color(0xFFC0C4CC);
+                                    }
+                                    return InkWell(
+                                      onTap: () {
+                                        // question_no = questionList[index];
+                                        // fetchNextChallenge();
+                                        Navigator.pop(dialogContext);
+                                      },
+                                      child: Container(
+                                        height:
+                                            (isAndroid || isIPhone) ? 40 : 80,
+                                        width:
+                                            (isAndroid || isIPhone) ? 40 : 80,
+                                        alignment: Alignment.center,
+                                        decoration: BoxDecoration(
+                                          color: cardColor,
+                                          borderRadius:
+                                              BorderRadius.circular(10),
+                                        ),
+                                        child: Text(
+                                          '${index + 1}',
+                                          style: TextStyle(
+                                            fontFamily: 'Arial',
+                                            fontSize: (isAndroid || isIPhone)
+                                                ? 16
+                                                : 20,
+                                            color: Colors.white,
+                                            fontWeight: FontWeight.w700,
+                                          ),
+                                          overflow: TextOverflow.ellipsis,
+                                          maxLines: 2,
+                                        ),
+                                      ),
+                                    );
+                                  })),
+                            ),
+                            SizedBox(height: 22),
+                            // about => status
+                            Divider(),
+                            Row(
+                              children: [
+                                Expanded(
+                                  child: Row(
+                                    children: [
+                                      Container(
+                                        padding: EdgeInsets.all(8),
+                                        color: Color(0xFF00C789),
+                                      ),
+                                      SizedBox(width: 8),
+                                      Flexible(
+                                        child: Text(
+                                          '$correct',
+                                          style: TextStyle(
+                                            fontFamily: 'Arial',
+                                            fontSize: (isAndroid || isIPhone)
+                                                ? 14
+                                                : 20,
+                                            color: Color(0xFF555555),
+                                            fontWeight: FontWeight.w700,
+                                          ),
+                                          overflow: TextOverflow.ellipsis,
+                                          maxLines: 2,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                                Expanded(
+                                  child: Row(
+                                    children: [
+                                      Container(
+                                        padding: EdgeInsets.all(8),
+                                        color: Color(0xFFEE546C),
+                                      ),
+                                      SizedBox(width: 8),
+                                      Flexible(
+                                        child: Text(
+                                          '$incorrect',
+                                          style: TextStyle(
+                                            fontFamily: 'Arial',
+                                            fontSize: (isAndroid || isIPhone)
+                                                ? 14
+                                                : 20,
+                                            color: Color(0xFF555555),
+                                            fontWeight: FontWeight.w700,
+                                          ),
+                                          overflow: TextOverflow.ellipsis,
+                                          maxLines: 2,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                                Expanded(
+                                  child: Row(
+                                    children: [
+                                      Container(
+                                        padding: EdgeInsets.all(8),
+                                        color: Color(0xFFC0C4CC),
+                                      ),
+                                      SizedBox(width: 8),
+                                      Flexible(
+                                        child: Text(
+                                          'No Result',
+                                          style: TextStyle(
+                                            fontFamily: 'Arial',
+                                            fontSize: (isAndroid || isIPhone)
+                                                ? 14
+                                                : 20,
+                                            color: Color(0xFF555555),
+                                            fontWeight: FontWeight.w700,
+                                          ),
+                                          overflow: TextOverflow.ellipsis,
+                                          maxLines: 2,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
+                  Positioned(
+                    top: 10,
+                    right: 10,
+                    child: InkWell(
+                        onTap: () {
+                          Navigator.pop(dialogContext);
+                        },
+                        child: Padding(
+                          padding: const EdgeInsets.only(right: 4, top: 4),
+                          child: Icon(
+                            Icons.clear,
+                            size: (isAndroid || isIPhone) ? 22 : 45,
+                            color: Colors.red,
+                          ),
+                        )),
+                  ),
+                ],
+              ),
+            ),
+          );
+        });
+  }
+
+  Future<QuestionData> fetchQuestionData() async {
+    final uri = Uri.parse("$host/api/origami/challenge/get-question.php");
+    try {
+      final response = await http.post(
+        uri,
+        headers: {'Authorization': 'Bearer ${widget.Authorization}'},
+        body: {
+          'comp_id': widget.employee.comp_id,
+          'emp_id': widget.employee.emp_id,
+          'challenge_id': widget.challenge.challenge_id,
+          'request_id': widget.challenge.request_id,
+          'question_no': widget.question_no,
+        },
+      );
+
+      if (response.statusCode == 200) {
+        final jsonResponse = jsonDecode(response.body);
+
+        // Debug: ตรวจสอบ response
+        // print("Response: ${response.body}");
+
+        if (jsonResponse.containsKey('question_data') &&
+            jsonResponse['question_data'] != null) {
+          return QuestionData.fromJson(jsonResponse['question_data']);
+        } else {
+          throw Exception('No question data found in response.');
+        }
+      } else {
+        throw Exception(
+            'Failed to load question data, status code: ${response.statusCode}');
+      }
+    } catch (e) {
+      print('Error fetching question data: $e');
+      throw Exception('Error fetching question data: $e');
+    }
+  }
 }

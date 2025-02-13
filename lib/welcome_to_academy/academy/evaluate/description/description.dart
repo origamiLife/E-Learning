@@ -62,7 +62,7 @@ class _DescriptionState extends State<Description> {
         } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
           return Center(
               child: Text(
-                'NOT FOUND DATA',
+                NotFoundData,
                 style: TextStyle(fontFamily: 'Arial',
                   fontSize: 16.0,
                   color: const Color(0xFF555555),
@@ -207,6 +207,7 @@ class _DescriptionState extends State<Description> {
                                     maxLines: 1,
                                   ),
                                 ),
+                                SizedBox(height: 8),
                                 Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
@@ -241,7 +242,7 @@ class _DescriptionState extends State<Description> {
                                         crossAxisAlignment: CrossAxisAlignment.start,
                                         children: [
                                           Text(
-                                            "This course includes",
+                                            courseIncludes,
                                             style: TextStyle(fontFamily: 'Arial',
                                               // fontSize: 16.0,
                                               color: Color(0xFF555555),
@@ -309,7 +310,7 @@ class _DescriptionState extends State<Description> {
                                                         "${youtube_count} Video",
                                                         style: TextStyle(fontFamily: 'Arial',
                                                           color: Colors.grey,
-                                                          fontWeight: FontWeight.w700,
+                                                          fontWeight: FontWeight.w500,
                                                         ),
                                                       ),
                                                     ],
@@ -329,7 +330,7 @@ class _DescriptionState extends State<Description> {
                                                         "${challenge_count} Challenge",
                                                         style: TextStyle(fontFamily: 'Arial',
                                                           color: Colors.grey,
-                                                          fontWeight: FontWeight.w700,
+                                                          fontWeight: FontWeight.w500,
                                                         ),
                                                       ),
                                                     ],
@@ -349,7 +350,7 @@ class _DescriptionState extends State<Description> {
                                                         "${link_count} Link",
                                                         style: TextStyle(fontFamily: 'Arial',
                                                           color: Colors.grey,
-                                                          fontWeight: FontWeight.w700,
+                                                          fontWeight: FontWeight.w500,
                                                         ),
                                                       ),
                                                     ],
@@ -365,11 +366,13 @@ class _DescriptionState extends State<Description> {
                                                         color: Color(0xFF555555),
                                                       ),
                                                       SizedBox(width: 8,),
-                                                      Text(
-                                                        "${event_count} Event",
-                                                        style: TextStyle(fontFamily: 'Arial',
-                                                          color: Colors.grey,
-                                                          fontWeight: FontWeight.w700,
+                                                      Flexible(
+                                                        child: Text(
+                                                          "${event_count} Event",
+                                                          style: TextStyle(fontFamily: 'Arial',
+                                                            color: Colors.grey,
+                                                            fontWeight: FontWeight.w500,
+                                                          ),
                                                         ),
                                                       ),
                                                     ],
@@ -384,11 +387,13 @@ class _DescriptionState extends State<Description> {
                                                         color: Color(0xFF555555),
                                                       ),
                                                       SizedBox(width: 8,),
-                                                      Text(
-                                                        "Certificate of completion",
-                                                        style: TextStyle(fontFamily: 'Arial',
-                                                          color: Colors.grey,
-                                                          fontWeight: FontWeight.w700,
+                                                      Flexible(
+                                                        child: Text(
+                                                          "Certificate of completion",
+                                                          style: TextStyle(fontFamily: 'Arial',
+                                                            color: Colors.grey,
+                                                            fontWeight: FontWeight.w500,
+                                                          ),
                                                         ),
                                                       ),
                                                     ],
@@ -443,13 +448,13 @@ class DescriptionData {
 
   factory DescriptionData.fromJson(Map<String, dynamic> json) {
     return DescriptionData(
-      course_subject: json['course_subject'],
-      video_count: json['video_count'],
-      document_count: json['document_count'],
-      youtube_count: json['youtube_count'],
-      challenge_count: json['challenge_count'],
-      link_count: json['link_count'],
-      event_count: json['event_count'],
+      course_subject: json['course_subject']??'',
+      video_count: json['video_count']??'',
+      document_count: json['document_count']??'',
+      youtube_count: json['youtube_count']??'',
+      challenge_count: json['challenge_count']??'',
+      link_count: json['link_count']??'',
+      event_count: json['event_count']??'',
       topic_section: List<String>.from(json['topic_section']),
     );
   }

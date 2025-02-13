@@ -15,13 +15,16 @@ class EvaluateModule extends StatefulWidget {
     super.key,
     required this.employee,
     required this.academy,
-    this.callback, this.selectedPage, required this.Authorization,
+    this.callback,
+    this.selectedPage,
+    required this.Authorization,
   });
   final Employee employee;
   final AcademyRespond academy;
   final VoidCallback? callback;
   final int? selectedPage;
   final String Authorization;
+
   @override
   _EvaluateModuleState createState() => _EvaluateModuleState();
 }
@@ -29,8 +32,8 @@ class EvaluateModule extends StatefulWidget {
 class _EvaluateModuleState extends State<EvaluateModule>
     with SingleTickerProviderStateMixin {
   late TabController _tabController;
-  TextEditingController _commentControllerA = TextEditingController();
-  TextEditingController _commentControllerB = TextEditingController();
+  final TextEditingController _commentControllerA = TextEditingController();
+  final TextEditingController _commentControllerB = TextEditingController();
 
   bool isScrollable = true;
   bool showNextIcon = false;
@@ -41,10 +44,10 @@ class _EvaluateModuleState extends State<EvaluateModule>
 
   Future<Map<String, dynamic>> getAllAcademyData() async {
     try {
-      final uri =
-      Uri.parse("$host/api/origami/academy/academy.php");
+      final uri = Uri.parse("$host/api/origami/academy/academy.php");
       final response = await http.post(
-        uri, headers: {'Authorization': 'Bearer ${widget.Authorization}'},
+        uri,
+        headers: {'Authorization': 'Bearer ${widget.Authorization}'},
         body: {
           'comp_id': widget.employee.comp_id,
           'emp_id': widget.employee.emp_id,
@@ -60,7 +63,7 @@ class _EvaluateModuleState extends State<EvaluateModule>
 
         // ดึงข้อมูลจาก JSON
         HeaderData headerData =
-        HeaderData.fromJson(jsonResponse['header_data']);
+            HeaderData.fromJson(jsonResponse['header_data']);
         FastView fastView = FastView.fromJson(jsonResponse['fastview_data']);
 
         // ส่งข้อมูลกลับเป็น Map
@@ -81,25 +84,15 @@ class _EvaluateModuleState extends State<EvaluateModule>
   String URL = '';
   String imageUrl = '';
 
-  final List<String> _tabs = [
-    'Description',
-    'Curriculum',
-    'Instructors',
-    'Discussion',
-    // 'Announcements',
-    'Attach File',
-    'Certification',
-  ];
-
   @override
   void initState() {
     super.initState();
-    _selectedIndex = widget.selectedPage??0;
+    _selectedIndex = widget.selectedPage ?? 0;
     getAllAcademyData();
     _tabController = TabController(length: _tabs.length, vsync: this);
-    if(widget.academy.favorite == 1){
+    if (widget.academy.favorite == 1) {
       _isClick = true;
-    }else{
+    } else {
       _isClick = false;
     }
     _commentControllerA.addListener(() {
@@ -128,7 +121,8 @@ class _EvaluateModuleState extends State<EvaluateModule>
         backgroundColor: Color(0xFFFF9900),
         title: Text(
           'Academy',
-          style: TextStyle(fontFamily: 'Arial',
+          style: TextStyle(
+            fontFamily: 'Arial',
             fontSize: 24,
             color: Colors.white,
             fontWeight: FontWeight.w700,
@@ -151,8 +145,9 @@ class _EvaluateModuleState extends State<EvaluateModule>
                   width: 12,
                 ),
                 Text(
-                  'Loading...',
-                  style: TextStyle(fontFamily: 'Arial',
+                  '$loading...',
+                  style: TextStyle(
+                    fontFamily: 'Arial',
                     fontSize: 16,
                     fontWeight: FontWeight.w700,
                     color: Color(0xFF555555),
@@ -172,26 +167,27 @@ class _EvaluateModuleState extends State<EvaluateModule>
           } else {
             return Center(
                 child: Text(
-                  'NOT FOUND DATA',
-                  style: TextStyle(fontFamily: 'Arial',
-                    fontSize: 16.0,
-                    color: const Color(0xFF555555),
-                    fontWeight: FontWeight.w700,
-                  ),
-                  overflow: TextOverflow.ellipsis,
-                  maxLines: 1,
-                ));
+              NotFoundData,
+              style: TextStyle(
+                fontFamily: 'Arial',
+                fontSize: 16.0,
+                color: const Color(0xFF555555),
+                fontWeight: FontWeight.w700,
+              ),
+              overflow: TextOverflow.ellipsis,
+              maxLines: 1,
+            ));
           }
         },
       ),
     );
   }
 
-
-
   Widget _Head(HeaderData headerData, FastView fastView) {
     final document = parse(headerData.academy_description);
-    final plainText = parse(document.body?.text ?? '').documentElement?.text ?? '';
+    final plainText =
+        parse(document.body?.text ?? '').documentElement?.text ?? '';
+
     return Column(
       children: <Widget>[
         Padding(
@@ -199,141 +195,125 @@ class _EvaluateModuleState extends State<EvaluateModule>
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // Html(
-              //   data: "${headerData.academy_description}",
-              // ),
-              // Text(
-              //   '${headerData.academy_description.replaceAll(RegExp(r'</?p>'), '')}',
-              //   style: TextStyle(fontFamily: 'Arial',
-              //     color: Color(0xFF555555),
-              //   ),
-              // ),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Container(
-                    child: Text(
-                      'Allable On Boarding',
-                      style: TextStyle(fontFamily: 'Arial',
-                        fontSize: 20,
-                        fontWeight: FontWeight.w700,
-                        color: Color(0xFF555555),
+              Padding(
+                padding: const EdgeInsets.only(left: 16,top: 8),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Flexible(
+                      child: SingleChildScrollView(
+                        scrollDirection: Axis.horizontal,
+                        child: Text(
+                          widget.academy.academy_subject,
+                          style: TextStyle(
+                            fontFamily: 'Arial',
+                            fontSize: 20,
+                            fontWeight: FontWeight.w700,
+                            color: Color(0xFF555555),
+                          ),
+                          overflow: TextOverflow.ellipsis,
+                          maxLines: 1,
+                        ),
                       ),
-                      overflow: TextOverflow.ellipsis,
-                      maxLines: 1,
                     ),
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.only(right: 4),
-                    child: InkWell(
+                    SizedBox(width: 8),
+                    InkWell(
                       onTap: () {
                         setState(() {
                           widget.callback!();
-                          // widget.academy.favorite == 1
-                          (_isClick == true)
-                              ? _isClick = false
-                              : _isClick = true;
+                          _isClick = !_isClick;
                         });
                       },
                       child: Container(
-                        alignment: Alignment.center,
-                        padding: const EdgeInsets.all(4),
+                        padding: const EdgeInsets.all(8),
                         decoration: BoxDecoration(
-                          color: (_isClick != false)
-                              ? Colors.red.shade100
-                              : Color(0xFFE5E5E5),
+                          color: _isClick ? Colors.red.shade100 : Color(0xFFE5E5E5),
                           borderRadius: BorderRadius.circular(10),
                         ),
                         child: Row(
                           children: [
                             Icon(
                               Icons.favorite,
-                              color: (_isClick != false)
-                                  ? Colors.red
-                                  : Colors.grey,
+                              color: _isClick ? Colors.red : Colors.grey,
                             ),
-                            SizedBox(
-                              width: 2,
-                            ),
-                            Padding(
-                              padding: const EdgeInsets.all(2),
-                              child: Text(
-                                "Favorite",
-                                style: TextStyle(fontFamily: 'Arial',
-                                  color: (_isClick != false)
-                                      ? Colors.red
-                                      : Colors.grey,
-                                ),
+                            SizedBox(width: 4),
+                            Text(
+                              "Favorite",
+                              style: TextStyle(
+                                fontFamily: 'Arial',
+                                color: _isClick ? Colors.red : Colors.grey,
                               ),
                             ),
                           ],
                         ),
                       ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
-              SizedBox(
-                height: 8,
-              ),
+              SizedBox(height: 8),
               Card(
                 color: Colors.white,
-                elevation: 2,
+                elevation: 4,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(20),
+                ),
                 child: InkWell(
-                  onTap: _showDialogA,
+                  onTap: () {}, // Your tap handler here
                   child: Container(
-                    padding: EdgeInsets.all(20),
+                    padding: EdgeInsets.all(16),
                     decoration: BoxDecoration(
                       color: Colors.white,
                       borderRadius: BorderRadius.circular(20),
                     ),
                     child: Row(
                       children: [
-                        Container(
-                          width: 90,
-                          height: 80,
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(
-                                10), // กำหนดความโค้งของขอบ
-                            image: DecorationImage(
-                              image: NetworkImage("${fastView.fastview_cover}"),
-                              fit: BoxFit
-                                  .cover, // กำหนดให้รูปภาพครอบคลุมเต็มพื้นที่
-                            ),
+                        ClipRRect(
+                          borderRadius: BorderRadius.circular(10),
+                          child: Image.network(
+                            fastView.fastview_cover ?? '',
+                            width: 90,
+                            height: 80,
+                            fit: BoxFit.cover,
                           ),
                         ),
-                        SizedBox(
-                          width: 8,
-                        ),
+                        SizedBox(width: 12),
                         Expanded(
                           child: Column(
-                            mainAxisAlignment: MainAxisAlignment.start,
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text(
-                                "${fastView.fastview_text ?? ''}",
-                                style: TextStyle(fontFamily: 'Arial',
-                                  fontSize: 12,
+                                fastView.fastview_text ?? '',
+                                style: TextStyle(
+                                  fontFamily: 'Arial',
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.w600,
                                   color: Colors.grey,
-                                  fontWeight: FontWeight.w700,
                                 ),
+                                maxLines: 3,
+                                overflow: TextOverflow.ellipsis,
                               ),
+                              SizedBox(height: 2),
                               Row(
                                 children: [
                                   Text(
-                                    "Start : ",
-                                    style: TextStyle(fontFamily: 'Arial',
+                                    "Start: ",
+                                    style: TextStyle(
+                                      fontFamily: 'Arial',
                                       fontSize: 14,
+                                      fontWeight: FontWeight.w500,
                                       color: Colors.grey,
-                                      fontWeight: FontWeight.w700,
                                     ),
                                   ),
-                                  Text(
-                                    fastView.fastview_exp ?? '',
-                                    style: TextStyle(fontFamily: 'Arial',
-                                      fontSize: 12,
-                                      color: Colors.amber,
-                                      fontWeight: FontWeight.w700,
+                                  Flexible(
+                                    child: Text(
+                                      fastView.fastview_exp ?? '',
+                                      style: TextStyle(
+                                        fontFamily: 'Arial',
+                                        fontSize: 14,
+                                        fontWeight: FontWeight.w500,
+                                        color: Colors.amber,
+                                      ),
                                     ),
                                   ),
                                 ],
@@ -341,19 +321,23 @@ class _EvaluateModuleState extends State<EvaluateModule>
                               Row(
                                 children: [
                                   Text(
-                                    "Status : ",
-                                    style: TextStyle(fontFamily: 'Arial',
+                                    "Status: ",
+                                    style: TextStyle(
+                                      fontFamily: 'Arial',
                                       fontSize: 14,
+                                      fontWeight: FontWeight.w500,
                                       color: Colors.grey,
-                                      fontWeight: FontWeight.w700,
                                     ),
                                   ),
-                                  Text(
-                                    fastView.fastview_button ?? '',
-                                    style: TextStyle(fontFamily: 'Arial',
-                                      fontSize: 12,
-                                      color: Color(0xFFFF9900),
-                                      fontWeight: FontWeight.w700,
+                                  Flexible(
+                                    child: Text(
+                                      fastView.fastview_button ?? '',
+                                      style: TextStyle(
+                                        fontFamily: 'Arial',
+                                        fontSize: 14,
+                                        fontWeight: FontWeight.w500,
+                                        color: Color(0xFFFF9900),
+                                      ),
                                     ),
                                   ),
                                 ],
@@ -366,79 +350,15 @@ class _EvaluateModuleState extends State<EvaluateModule>
                   ),
                 ),
               ),
+              SizedBox(height: 12),
               Padding(
-                padding: const EdgeInsets.only(left: 8, right: 8),
+                padding: const EdgeInsets.symmetric(horizontal: 8),
                 child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Expanded(
-                      child: SingleChildScrollView(
-                        scrollDirection: Axis.horizontal,
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceAround,
-                          children: [
-                            Icon(
-                              Icons.people_alt_outlined,
-                              color: Colors.amber,
-                            ),
-                            SizedBox(
-                              width: 4,
-                            ),
-                            Text(
-                              '${headerData.student_number} student',
-                              style: TextStyle(fontFamily: 'Arial',
-                                color: Color(0xFF555555),
-                              ),
-                            )
-                          ],
-                        ),
-                      ),
-                    ),
-                    Expanded(
-                      child: SingleChildScrollView(
-                        scrollDirection: Axis.horizontal,
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceAround,
-                          children: [
-                            Icon(
-                              Icons.access_time,
-                              color: Colors.amber,
-                            ),
-                            SizedBox(
-                              width: 4,
-                            ),
-                            Text(
-                              '${headerData.video_number} Video : ${headerData.video_time}',
-                              style: TextStyle(fontFamily: 'Arial',
-                                color: Color(0xFF555555),
-                              ),
-                            )
-                          ],
-                        ),
-                      ),
-                    ),
-                    Expanded(
-                      child: SingleChildScrollView(
-                        scrollDirection: Axis.horizontal,
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceAround,
-                          children: [
-                            Icon(
-                              Icons.bookmark_border,
-                              color: Colors.amber,
-                            ),
-                            SizedBox(
-                              width: 4,
-                            ),
-                            Text(
-                              headerData.category_name ?? '',
-                              style: TextStyle(fontFamily: 'Arial',
-                                color: Color(0xFF555555),
-                              ),
-                            )
-                          ],
-                        ),
-                      ),
-                    ),
+                    _infoRow(Icons.people_alt_outlined, '${headerData.student_number} student'),
+                    _infoRow(Icons.access_time, '${headerData.video_number} Video : ${headerData.video_time}'),
+                    _infoRow(Icons.bookmark_border, headerData.category_name ?? ''),
                   ],
                 ),
               ),
@@ -455,7 +375,6 @@ class _EvaluateModuleState extends State<EvaluateModule>
                 setState(() {
                   _selectedIndex = index;
                 });
-                print(_selectedIndex);
               },
               controller: _tabController,
               isScrollable: true,
@@ -466,6 +385,100 @@ class _EvaluateModuleState extends State<EvaluateModule>
         Expanded(child: _bodyAcademy()),
       ],
     );
+  }
+
+  Widget _infoRow(IconData icon, String text) {
+    return Expanded(
+      child: SingleChildScrollView(
+        scrollDirection: Axis.horizontal,
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.start,
+          children: [
+            Icon(icon, color: Colors.amber),
+            SizedBox(width: 8),
+            Text(
+              text,
+              style: TextStyle(
+                fontFamily: 'Arial',
+                fontSize: 14,
+                color: Color(0xFF555555),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+
+  int _selectedIndex = 0;
+
+  final List<String> _tabs = [
+    '$DescriptionTS',
+    '$CurriculumTS',
+    '$InstructorsTS',
+    // 'Discussion',
+    // 'Announcements',
+    // 'Attach File',
+    '$CertificationTS',
+  ];
+
+  Widget _bodyAcademy() {
+    switch (_selectedIndex) {
+      case 0:
+        return Description(
+          employee: widget.employee,
+          academy: widget.academy,
+          Authorization: widget.Authorization,
+        );
+      case 1:
+        return Curriculum(
+          employee: widget.employee,
+          academy: widget.academy,
+          Authorization: widget.Authorization,
+        );
+      case 2:
+        return Instructors(
+          employee: widget.employee,
+          academy: widget.academy,
+          Authorization: widget.Authorization,
+        );
+      // case 3:
+      //   return Discussion(
+      //     employee: widget.employee,
+      //     academy: widget.academy,
+      //     Authorization: widget.Authorization,
+      //   );
+      // case 4:
+      //   return Announcements();
+      //   case 3:
+      //     return AttachFile(
+      //       employee: widget.employee,
+      //       academy: widget.academy,
+      //       Authorization: widget.Authorization,
+      //     );
+      case 3:
+        return Certification(
+          employee: widget.employee,
+          academy: widget.academy,
+          Authorization: widget.Authorization,
+        );
+      default:
+        return Container(
+          alignment: Alignment.center,
+          child: Text(
+            'ERROR!',
+            style: TextStyle(
+              fontFamily: 'Arial',
+              fontSize: 18.0,
+              color: Colors.white,
+              fontWeight: FontWeight.w700,
+            ),
+            overflow: TextOverflow.ellipsis,
+            maxLines: 1,
+          ),
+        );
+    }
   }
 
   void _showDialogA() {
@@ -486,7 +499,8 @@ class _EvaluateModuleState extends State<EvaluateModule>
                   ),
                   Text(
                     'Enroll form',
-                    style: TextStyle(fontFamily: 'Arial',
+                    style: TextStyle(
+                      fontFamily: 'Arial',
                       fontWeight: FontWeight.w700,
                       color: const Color(0xFF555555),
                     ),
@@ -509,15 +523,19 @@ class _EvaluateModuleState extends State<EvaluateModule>
                   maxLines: null,
                   keyboardType: TextInputType.text,
                   controller: _commentControllerA,
-                  style: TextStyle(fontFamily: 'Arial',
-                      color: const Color(0xFF555555), fontSize: 14),
+                  style: TextStyle(
+                      fontFamily: 'Arial',
+                      color: const Color(0xFF555555),
+                      fontSize: 14),
                   decoration: InputDecoration(
                     isDense: true,
                     filled: true,
                     fillColor: Colors.white,
                     hintText: '',
-                    hintStyle: TextStyle(fontFamily: 'Arial',
-                        fontSize: 14, color: const Color(0xFF555555)),
+                    hintStyle: TextStyle(
+                        fontFamily: 'Arial',
+                        fontSize: 14,
+                        color: const Color(0xFF555555)),
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(15),
                       borderSide: BorderSide.none,
@@ -532,13 +550,14 @@ class _EvaluateModuleState extends State<EvaluateModule>
             ],
           ),
           content: InkWell(
-            onTap: _showDialogB,
+            onTap: (){},//_showDialogB,
             child: Row(
               // mainAxisAlignment: MainAxisAlignment.end,
               children: [
                 Text(
                   'History request',
-                  style: TextStyle(fontFamily: 'Arial',
+                  style: TextStyle(
+                    fontFamily: 'Arial',
                     decoration: TextDecoration.underline,
                     // fontWeight: FontWeight.w700,
                     // color: Color(0xFF555555),
@@ -552,7 +571,8 @@ class _EvaluateModuleState extends State<EvaluateModule>
             TextButton(
               child: Text(
                 'Cancel',
-                style: TextStyle(fontFamily: 'Arial',
+                style: TextStyle(
+                  fontFamily: 'Arial',
                   color: const Color(0xFF555555),
                 ),
               ),
@@ -563,7 +583,8 @@ class _EvaluateModuleState extends State<EvaluateModule>
             TextButton(
               child: Text(
                 'Enroll',
-                style: TextStyle(fontFamily: 'Arial',
+                style: TextStyle(
+                  fontFamily: 'Arial',
                   fontWeight: FontWeight.w700,
                   color: Colors.green,
                 ),
@@ -599,7 +620,8 @@ class _EvaluateModuleState extends State<EvaluateModule>
                   ),
                   Text(
                     'History request',
-                    style: TextStyle(fontFamily: 'Arial',
+                    style: TextStyle(
+                      fontFamily: 'Arial',
                       fontWeight: FontWeight.w700,
                       color: const Color(0xFF555555),
                     ),
@@ -611,7 +633,8 @@ class _EvaluateModuleState extends State<EvaluateModule>
               ),
               Text(
                 'No data available in table',
-                style: TextStyle(fontFamily: 'Arial',
+                style: TextStyle(
+                  fontFamily: 'Arial',
                   color: Colors.grey,
                   fontSize: 14,
                 ),
@@ -622,7 +645,8 @@ class _EvaluateModuleState extends State<EvaluateModule>
             TextButton(
               child: Text(
                 'Cancel',
-                style: TextStyle(fontFamily: 'Arial',
+                style: TextStyle(
+                  fontFamily: 'Arial',
                   color: const Color(0xFF555555),
                 ),
               ),
@@ -635,68 +659,6 @@ class _EvaluateModuleState extends State<EvaluateModule>
       },
     );
   }
-
-  int _selectedIndex = 0;
-  String callImage = '';
-  String callUrl = '';
-
-  Widget _bodyAcademy() {
-    switch (_selectedIndex) {
-      case 0:
-        return Description(
-          employee: widget.employee,
-          academy: widget.academy,
-          Authorization: widget.Authorization,
-        );
-      case 1:
-        return Curriculum(
-          employee: widget.employee,
-          academy: widget.academy,
-          Authorization: widget.Authorization,
-        );
-      case 2:
-        return Instructors(
-          employee: widget.employee,
-          academy: widget.academy,
-          Authorization: widget.Authorization,
-        );
-      case 3:
-        return Discussion(
-          employee: widget.employee,
-          academy: widget.academy,
-          Authorization: widget.Authorization,
-        );
-      // case 4:
-      //   return Announcements();
-      case 4:
-        return AttachFile(
-          employee: widget.employee,
-          academy: widget.academy,
-          Authorization: widget.Authorization,
-        );
-      case 5:
-        return Certification(
-          employee: widget.employee,
-          academy: widget.academy,
-          Authorization: widget.Authorization,
-        );
-      default:
-        return Container(
-          alignment: Alignment.center,
-          child: Text(
-            'ERROR!',
-            style: TextStyle(fontFamily: 'Arial',
-              fontSize: 18.0,
-              color: Colors.white,
-              fontWeight: FontWeight.w700,
-            ),
-            overflow: TextOverflow.ellipsis,
-            maxLines: 1,
-          ),
-        );
-    }
-  }
-
 }
 
 class IDPlan {

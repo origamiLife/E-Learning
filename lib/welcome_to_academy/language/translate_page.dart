@@ -37,15 +37,15 @@ class _TranslatePageState extends State<TranslatePage> {
       selectedRadio = value!;
       prefs.setInt('selectedRadio', selectedRadio);
       allTranslate();
-      // Navigator.pushReplacement(
-      //   context,
-      //   MaterialPageRoute(
-      //     builder: (context) => LoginPage(
-      //       num: 0,
-      //       popPage: 0,
-      //     ),
-      //   ),
-      // );
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(
+          builder: (context) => LoginPage(
+            num: 0,
+            popPage: 0,
+          ),
+        ),
+      );
     });
   }
 
@@ -62,7 +62,7 @@ class _TranslatePageState extends State<TranslatePage> {
               ? Alignment.centerLeft
               : Alignment.center,
           child: Text(
-            'Translate',
+            language,
             style: TextStyle(
               fontFamily: 'Arial',
               color: Color(0xFFFF9900),

@@ -57,7 +57,7 @@ class _CurriculumState extends State<Curriculum> {
         } else if (!snapshot.hasData) {
           return Center(
               child: Text(
-            'NOT FOUND DATA',
+            NotFoundData,
             style: TextStyle(
               fontFamily: 'Arial',
               fontSize: 16.0,
@@ -87,29 +87,44 @@ class _CurriculumState extends State<Curriculum> {
         context,
         MaterialPageRoute(
             builder: (context) => YouTubePlayerWidget(
-              videoId: url,
-              employee: widget.employee,
-              academy: widget.academy,
-              Authorization: widget.Authorization,
-              topic: topic,
-              learning_seq: learning_seq,
-              courseId: courseId,
-            )),
+                  videoId: url,
+                  employee: widget.employee,
+                  academy: widget.academy,
+                  Authorization: widget.Authorization,
+                  topic: topic,
+                  learning_seq: learning_seq,
+                  courseId: courseId,
+                )),
       );
     } else if (type == 'video') {
-      Navigator.push(
+      Navigator.pushReplacement(
         context,
         MaterialPageRoute(
-            builder: (context) => NetworkVideoPlayer(
-              videoUrl: url,
-              employee: widget.employee,
-              academy: widget.academy,
-              Authorization: widget.Authorization,
-              topic: topic,
-              learning_seq: learning_seq,
-              courseId: courseId,
-            )),
+          builder: (context) => NetworkVideoPlayer(
+            videoUrl: url,
+            employee: widget.employee,
+            academy: widget.academy,
+            Authorization: widget.Authorization,
+            topic: topic,
+            learning_seq: learning_seq,
+            courseId: courseId,
+          ),
+        ),
       );
+    } else if (type == 'challenge') {
+      // Navigator.push(
+      //   context,
+      //   MaterialPageRoute(
+      //       builder: (context) => YouTubePlayerWidget(
+      //         videoId: url,
+      //         employee: widget.employee,
+      //         academy: widget.academy,
+      //         Authorization: widget.Authorization,
+      //         topic: topic,
+      //         learning_seq: learning_seq,
+      //         courseId: courseId,
+      //       )),
+      // );
     } else {
       final Uri _url = Uri.parse(url);
       setState(() {
@@ -264,63 +279,75 @@ class _CurriculumState extends State<Curriculum> {
                                   child: Padding(
                                     padding: const EdgeInsets.all(8.0),
                                     child: Row(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
                                       children: [
-                                        Stack(
-                                          children: [
-                                            Image.network(
-                                              topic.topicCover,
-                                              width: 110,
-                                              height: 100,
-                                              fit: BoxFit.cover,
-                                            ),
-                                            Padding(
-                                              padding: const EdgeInsets.all(2),
-                                              child: Container(
-                                                decoration: BoxDecoration(
-                                                  color: Colors.black26,
-                                                  // borderRadius:
-                                                  // BorderRadius.circular(
-                                                  //     10),
-                                                ),
-                                                child: Padding(
-                                                  padding:
-                                                      const EdgeInsets.all(4),
-                                                  child: Text(
-                                                    topic.topicButton,
-                                                    style: TextStyle(
-                                                      fontFamily: 'Arial',
-                                                      fontSize: 12.0,
-                                                      color: Colors.white,
+                                        Expanded(
+                                          flex: 2,
+                                          child: Stack(
+                                            children: [
+                                              Image.network(
+                                                topic.topicCover,
+                                                width: double
+                                                    .infinity, // ความกว้างเต็มจอ
+                                                fit: BoxFit.fitWidth,
+                                              ),
+                                              Padding(
+                                                padding:
+                                                    const EdgeInsets.all(2),
+                                                child: Container(
+                                                  decoration: BoxDecoration(
+                                                    color: Colors.black26,
+                                                    // borderRadius:
+                                                    // BorderRadius.circular(
+                                                    //     10),
+                                                  ),
+                                                  child: Padding(
+                                                    padding:
+                                                        const EdgeInsets.all(4),
+                                                    child: Text(
+                                                      topic.topicButton,
+                                                      style: TextStyle(
+                                                        fontFamily: 'Arial',
+                                                        fontSize: 12.0,
+                                                        color: Colors.white,
+                                                      ),
+                                                      overflow:
+                                                          TextOverflow.ellipsis,
+                                                      maxLines: 1,
                                                     ),
-                                                    overflow:
-                                                        TextOverflow.ellipsis,
-                                                    maxLines: 1,
                                                   ),
                                                 ),
                                               ),
-                                            ),
-                                          ],
+                                            ],
+                                          ),
                                         ),
                                         SizedBox(
                                           width: 8,
                                         ),
                                         Expanded(
+                                          flex: 3,
                                           child: Column(
                                             mainAxisAlignment:
                                                 MainAxisAlignment.start,
                                             crossAxisAlignment:
                                                 CrossAxisAlignment.start,
                                             children: [
-                                              Text(
-                                                topic.topicName,
-                                                style: TextStyle(
-                                                  fontFamily: 'Arial',
-                                                  fontSize: 16.0,
-                                                  color: Color(0xFF555555),
-                                                  fontWeight: FontWeight.w700,
+                                              SingleChildScrollView(
+                                                scrollDirection:
+                                                    Axis.horizontal,
+                                                child: Text(
+                                                  topic.topicName,
+                                                  style: TextStyle(
+                                                    fontFamily: 'Arial',
+                                                    fontSize: 14.0,
+                                                    color: Color(0xFF555555),
+                                                    fontWeight: FontWeight.w700,
+                                                  ),
+                                                  overflow:
+                                                      TextOverflow.ellipsis,
+                                                  maxLines: 1,
                                                 ),
-                                                overflow: TextOverflow.ellipsis,
-                                                maxLines: 1,
                                               ),
                                               SizedBox(height: 8),
                                               Row(
@@ -383,12 +410,19 @@ class _CurriculumState extends State<Curriculum> {
                                                         SizedBox(
                                                           width: 4,
                                                         ),
-                                                        Text(
-                                                          topic.topicView,
-                                                          style: GoogleFonts
-                                                              .nunito(
-                                                            color: Color(
-                                                                0xFF555555),
+                                                        Flexible(
+                                                          child:
+                                                              SingleChildScrollView(
+                                                            scrollDirection:
+                                                                Axis.horizontal,
+                                                            child: Text(
+                                                              topic.topicView,
+                                                              style: GoogleFonts
+                                                                  .nunito(
+                                                                color: Color(
+                                                                    0xFF555555),
+                                                              ),
+                                                            ),
                                                           ),
                                                         )
                                                       ],
@@ -405,12 +439,22 @@ class _CurriculumState extends State<Curriculum> {
                                                         SizedBox(
                                                           width: 4,
                                                         ),
-                                                        Text(topic.topicPercent,
-                                                            style: GoogleFonts
-                                                                .nunito(
-                                                              color: Color(
-                                                                  0xFF555555),
-                                                            ))
+                                                        Flexible(
+                                                          child:
+                                                              SingleChildScrollView(
+                                                            scrollDirection:
+                                                                Axis.horizontal,
+                                                            child: Text(
+                                                                topic
+                                                                    .topicPercent,
+                                                                style:
+                                                                    GoogleFonts
+                                                                        .nunito(
+                                                                  color: Color(
+                                                                      0xFF555555),
+                                                                )),
+                                                          ),
+                                                        )
                                                       ],
                                                     ),
                                                   ),
@@ -512,22 +556,22 @@ class _CurriculumState extends State<Curriculum> {
             final isWarning = lastPressed == null ||
                 now.difference(lastPressed!) > maxDuration;
 
-            if (isWarning) {
-              // ถ้ายังไม่ได้กดสองครั้งภายในเวลาที่กำหนด ให้แสดง SnackBar แจ้งเตือน
-              lastPressed = DateTime.now();
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(
-                  content: Text(
-                    'Press back again to exit the origami application.',
-                    style: TextStyle(
-                      fontFamily: 'Arial',
-                      color: Colors.white,
-                    ),
-                  ),
-                  duration: maxDuration,
-                ),
-              );
-            }
+            // if (isWarning) {
+            //   // ถ้ายังไม่ได้กดสองครั้งภายในเวลาที่กำหนด ให้แสดง SnackBar แจ้งเตือน
+            //   lastPressed = DateTime.now();
+            //   ScaffoldMessenger.of(context).showSnackBar(
+            //     SnackBar(
+            //       content: Text(
+            //         'Press back again to exit the origami application.',
+            //         style: TextStyle(
+            //           fontFamily: 'Arial',
+            //           color: Colors.white,
+            //         ),
+            //       ),
+            //       duration: maxDuration,
+            //     ),
+            //   );
+            // }
           }
           // print("message: true");
         } else {
@@ -598,11 +642,12 @@ class CurriculumData {
   // ฟังก์ชันสำหรับแปลงจาก JSON เป็น Dart Object
   factory CurriculumData.fromJson(Map<String, dynamic> json) {
     return CurriculumData(
-      status: json['status'],
-      curriculumExp: json['curriculum_exp'],
-      curriculumData: (json['curriculum_data'] as List)
-          .map((course) => Course.fromJson(course))
-          .toList(),
+      status: json['status'] ?? false,
+      curriculumExp: json['curriculum_exp'] ?? '',
+      curriculumData: (json['curriculum_data'] as List?)
+              ?.map((course) => Course.fromJson(course))
+              .toList() ??
+          [],
     );
   }
 
@@ -632,12 +677,13 @@ class Course {
 
   factory Course.fromJson(Map<String, dynamic> json) {
     return Course(
-      courseId: json['course_id'],
-      courseSubject: json['course_subject'],
-      coursePercent: json['course_percent'],
-      tcopicData: (json['tcopic_data'] as List)
-          .map((topic) => Topic.fromJson(topic))
-          .toList(),
+      courseId: json['course_id'] ?? '',
+      courseSubject: json['course_subject'] ?? '',
+      coursePercent: json['course_percent'] ?? '',
+      tcopicData: (json['tcopic_data'] as List?)
+              ?.map((topic) => Topic.fromJson(topic))
+              .toList() ??
+          [],
     );
   }
 
@@ -682,18 +728,18 @@ class Topic {
 
   factory Topic.fromJson(Map<String, dynamic> json) {
     return Topic(
-      topicId: json['topic_id'],
-      topicNo: json['topic_no'],
-      topicName: json['topic_name'],
-      topicOption: json['topic_option'],
-      topicItem: json['topic_item'],
-      topicCover: json['topic_cover'],
-      topicType: json['topic_type'],
-      topicDuration: json['topic_duration'],
-      topicView: json['topic_view'],
-      topicPercent: json['topic_percent'],
-      topicButton: json['topic_button'],
-      topicOpen: json['topic_open'],
+      topicId: json['topic_id'] ?? '',
+      topicNo: json['topic_no'] ?? '',
+      topicName: json['topic_name'] ?? '',
+      topicOption: json['topic_option'] ?? '',
+      topicItem: json['topic_item'] ?? '',
+      topicCover: json['topic_cover'] ?? '',
+      topicType: json['topic_type'] ?? '',
+      topicDuration: json['topic_duration'] ?? '',
+      topicView: json['topic_view'] ?? '',
+      topicPercent: json['topic_percent'] ?? '',
+      topicButton: json['topic_button'] ?? '',
+      topicOpen: json['topic_open'] ?? '',
     );
   }
 

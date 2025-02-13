@@ -80,7 +80,7 @@ class _AttachFileState extends State<AttachFile> {
         } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
           return Center(
               child: Text(
-                'NOT FOUND DATA',
+                NotFoundData,
                 style: TextStyle(fontFamily: 'Arial',
                   fontSize: 16.0,
                   color: const Color(0xFF555555),
@@ -287,15 +287,15 @@ class AttachFileData {
 
   factory AttachFileData.fromJson(Map<String, dynamic> json) {
     return AttachFileData(
-      files_id: json['files_id'],
-      files_name: json['files_name'],
-      course_name: json['course_name'],
-      course_id: json['course_id'],
-      files_date: json['files_date'],
-      files_path: json['files_path'],
-      files_ext: json['files_ext'],
-      count_view: json['count_view'],
-      count_down: json['count_down'],
+      files_id: json['files_id']??'',
+      files_name: json['files_name']??'',
+      course_name: json['course_name']??'',
+      course_id: json['course_id']??'',
+      files_date: json['files_date']??'',
+      files_path: json['files_path']??'',
+      files_ext: json['files_ext']??'',
+      count_view: json['count_view']??'',
+      count_down: json['count_down']??'',
     );
   }
 }

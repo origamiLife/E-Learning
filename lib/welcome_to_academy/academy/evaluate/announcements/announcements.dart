@@ -19,7 +19,7 @@
 //   Widget build(BuildContext context) {
 //     return Center(
 //         child: Text(
-//           'NOT FOUND DATA',
+//           'NotFoundData',
 //           style: TextStyle(fontFamily: 'Arial',
 //             fontSize: 16.0,
 //             color: const Color(0xFF555555),

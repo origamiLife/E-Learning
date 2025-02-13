@@ -12,13 +12,16 @@ class NetworkVideoPlayer extends StatefulWidget {
   final String Authorization;
   final Topic topic;
   final String learning_seq;
-  final  String courseId;
+  final String courseId;
   const NetworkVideoPlayer({
     Key? key,
     required this.videoUrl,
     required this.employee,
     required this.academy,
-    required this.Authorization, required this.topic, required this.learning_seq, required this.courseId,
+    required this.Authorization,
+    required this.topic,
+    required this.learning_seq,
+    required this.courseId,
   }) : super(key: key);
 
   @override
@@ -44,68 +47,179 @@ class _NetworkVideoPlayerState extends State<NetworkVideoPlayer> {
         });
       });
 
+    // เรียก API พร้อมข้อมูลเวลาที่ดูวิดีโอ
+    // fetchStatus(videoViewedInMillisec);
     // เพิ่ม listener เพื่อติดตามสถานะของวิดีโอ
     _videoPlayerController.addListener(() {
       if (_videoPlayerController.value.isPlaying) {
         setState(() {
+          // แปลงตำแหน่งปัจจุบันเป็นมิลลิวินาที
           _currentPosition = _videoPlayerController.value.position;
+          final int videoViewedInMillisec = _currentPosition.inMilliseconds;
+          print('Video at: $videoViewedInMillisec s');
         });
       }
 
       if (!_videoPlayerController.value.isPlaying &&
-          (_lastStopTime != _videoPlayerController.value.position?.inSeconds)) {
-        _lastStopTime = _videoPlayerController.value.position?.inSeconds ?? 0;
-        print('Video stopped at: $_lastStopTime');
+          (_lastStopTime != _videoPlayerController.value.position.inSeconds)) {
+        _lastStopTime = _videoPlayerController.value.position.inSeconds ?? 0;
+        final int videoViewedInMillisec = _currentPosition.inMilliseconds;
+        fetchStatus(videoViewedInMillisec);
+        print('Video stopped at: $_lastStopTime s');
       }
     });
   }
 
+  String _formatDuration(Duration duration) {
+    String twoDigits(int n) => n.toString().padLeft(2, '0');
+    String minutes = twoDigits(duration.inMinutes.remainder(60));
+    String seconds = twoDigits(duration.inSeconds.remainder(60));
+    return '$minutes:$seconds';
+  }
+
   @override
   void dispose() {
+    // แปลงตำแหน่งปัจจุบันเป็นมิลลิวินาที
+    final int videoViewedInMillisec = _currentPosition.inMilliseconds;
+
+    // เรียก API พร้อมข้อมูลเวลาที่ดูวิดีโอ
+    fetchStatus(videoViewedInMillisec);
     _videoPlayerController.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
+    return PopScope(
+      // canPop: true, // ป้องกันการออกจากหน้าก่อนเรียก fetchStatus()
+      onPopInvoked: (didPop) async {
+        if (!didPop) {
+          final int videoViewedInMillisec = _currentPosition.inMilliseconds;
+          fetchStatus(videoViewedInMillisec);
+        }
+      },
+      child: Scaffold(
         backgroundColor: Colors.black,
         appBar: AppBar(
           foregroundColor: Colors.white,
           backgroundColor: Color(0xFFFF9900),
           title: Text(
-            'Video',
-            style: TextStyle(fontFamily: 'Arial',
+            'Video Player',
+            style: TextStyle(
+              fontFamily: 'Arial',
               fontSize: 24,
               color: Colors.white,
               fontWeight: FontWeight.w700,
             ),
           ),
+          leading: IconButton(
+            icon: Icon(Icons.arrow_back_ios_new), // ใช้ไอคอนย้อนกลับแบบ iOS
+            onPressed: () => Navigator.pop(context),
+          ),
         ),
-      body: _videoPlayerController.value.isInitialized
-          ? Stack(
-        children: [
-          Center(
-            child: VideoPlayer(_videoPlayerController), // แสดง VideoPlayer
-          ),
-          Positioned(
-            bottom: 20,
-            right: 20,
-            child: Text(
-              'Current Position: ${_currentPosition.inSeconds}s',
-              style: const TextStyle(color: Colors.white),
-            ),
-          ),
-        ],
-      )
-          : Center(
-        child: CircularProgressIndicator(),
+        body: _videoPlayerController.value.isInitialized
+            ? Stack(
+                children: [
+                  Stack(
+                    children: [
+                      Center(
+                        child: AspectRatio(
+                          aspectRatio: _videoPlayerController
+                              .value.aspectRatio, // ✅ อัตราส่วนอัตโนมัติ
+                          child: VideoPlayer(_videoPlayerController),
+                        ),
+                      ),
+                      Positioned(
+                        bottom: 20,
+                        left: 20,
+                        right: 20,
+                        child: Column(
+                          children: [
+                            Row(
+                              children: [
+                                IconButton(
+                                  icon: Icon(
+                                    _videoPlayerController.value.isPlaying
+                                        ? Icons.pause
+                                        : Icons.play_arrow,
+                                    color: Colors.white,
+                                    size: 30,
+                                  ),
+                                  onPressed: () {
+                                    setState(() {
+                                      if (_videoPlayerController
+                                          .value.isPlaying) {
+                                        _videoPlayerController
+                                            .pause(); // ✅ หยุดวิดีโอ
+                                      } else {
+                                        _videoPlayerController
+                                            .play(); // ✅ เล่นวิดีโอ
+                                      }
+                                    });
+                                  },
+                                ),
+                                Expanded(
+                                  child: Slider(
+                                    value: _currentPosition.inMilliseconds
+                                        .toDouble(),
+                                    min: 0,
+                                    max: _videoPlayerController
+                                        .value.duration.inMilliseconds
+                                        .toDouble(),
+                                    activeColor: Colors.orange,
+                                    inactiveColor: Colors.white54,
+                                    onChanged: (value) {
+                                      setState(() {
+                                        _videoPlayerController.seekTo(Duration(
+                                            milliseconds: value.toInt()));
+                                      });
+                                    },
+                                  ),
+                                ),
+                              ],
+                            ),
+                            // แสดงเวลาเริ่มต้น / ความยาววิดีโอ
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Text(
+                                  _formatDuration(_currentPosition),
+                                  style: TextStyle(
+                                      fontFamily: 'Arial',
+                                      color: Colors.white,
+                                      fontSize: 14),
+                                ),
+                                Text(
+                                  _formatDuration(
+                                      _videoPlayerController.value.duration),
+                                  style: TextStyle(
+                                      fontFamily: 'Arial',
+                                      color: Colors.white,
+                                      fontSize: 14),
+                                ),
+                              ],
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                  // Positioned(
+                  //   bottom: 20,
+                  //   right: 20,
+                  //   child: Text(
+                  //     'Current Position: ${_currentPosition.inSeconds}s',
+                  //     style: const TextStyle(color: Colors.white),
+                  //   ),
+                  // ),
+                ],
+              )
+            : Center(child: CircularProgressIndicator()),
       ),
-      );
+    );
   }
 
-
-  Future<void> fetchStatus() async {
+  Future<void> fetchStatus(int videoViewedInMillisec) async {
     final int videoViewedInMillisec = _currentPosition.inMilliseconds;
 
     // ตัวอย่างการเรียก API กับเวลา
@@ -130,11 +244,21 @@ class _NetworkVideoPlayerState extends State<NetworkVideoPlayer> {
       },
     );
     if (response.statusCode == 200) {
-      final Map<String, dynamic> jsonResponse = json.decode(response.body);
-      final List<dynamic> dataJson = jsonResponse['status'];
-      print('status $dataJson');
+      try {
+        final jsonResponse = json.decode(response.body);
+
+        if (jsonResponse is List) {
+          print('Status List: $jsonResponse');
+        } else if (jsonResponse is Map<String, dynamic>) {
+          print('Status Map: $jsonResponse');
+        } else {
+          print('Unexpected response type: ${jsonResponse.runtimeType}');
+        }
+      } catch (e) {
+        print('JSON decode error: $e');
+      }
     } else {
-      throw Exception('Failed to load status data');
+      print('Failed to load status data: ${response.statusCode}');
     }
   }
 }
