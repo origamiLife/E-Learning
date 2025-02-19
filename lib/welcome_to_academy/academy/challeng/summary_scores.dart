@@ -6,27 +6,18 @@ import 'challenge_start.dart';
 import 'challenge_test.dart';
 
 class SummaryScores extends StatefulWidget {
-  SummaryScores({
+  const SummaryScores({
     super.key,
     required this.employee,
     required this.Authorization,
     required this.initialMinutes,
-    required this.total_point,
-    required this.time_used,
-    required this.topChallenge,
-    required this.challengeData,
-    required this.total_point_all,
     required this.challenge,
-    required this.questionList, required this.isQuestion,
+    required this.questionList,
+    required this.isQuestion,
   });
   final Employee employee;
   final String Authorization;
   final double initialMinutes;
-  final String total_point;
-  final String time_used;
-  final TopChallenge topChallenge;
-  final ChallengeData challengeData;
-  final String total_point_all;
   final GetChallenge challenge;
   final List<String> questionList;
   final List<CheckAllChallenge> isQuestion;
@@ -44,19 +35,10 @@ class _SummaryScoresState extends State<SummaryScores> {
     });
   }
 
-  TopChallenge? topChallenge;
-  ChallengeData? challengeData;
-  String total_point = '';
-  String time_used = '';
-
   @override
   void initState() {
     super.initState();
     minutes();
-    topChallenge = widget.topChallenge;
-    challengeData = widget.challengeData;
-    total_point = widget.total_point;
-    time_used = widget.time_used;
   }
 
   void minutes() {
@@ -83,7 +65,7 @@ class _SummaryScoresState extends State<SummaryScores> {
         foregroundColor: Colors.white,
         backgroundColor: Color(0xFFFF9900),
         title: Text(
-          summary,
+          summaryTS,
           style: TextStyle(
             fontFamily: 'Arial',
             fontSize: 28,
@@ -105,10 +87,10 @@ class _SummaryScoresState extends State<SummaryScores> {
               child: TabBar(
                 tabs: [
                   Tab(
-                    text: myChallenge,
+                    text: myChallengeTS,
                   ),
                   Tab(
-                    text: finishedChallenge,
+                    text: finishedChallengeTS,
                   ),
                 ],
                 labelColor: Color(0xFF555555),
@@ -133,13 +115,9 @@ class _SummaryScoresState extends State<SummaryScores> {
                     employee: widget.employee,
                     Authorization: widget.Authorization,
                     duration: _duration,
-                    total_point: total_point,
-                    time_used: time_used,
-                    topChallenge: topChallenge!,
-                    challengeData: challengeData!,
-                    total_point_all: widget.total_point_all,
                     challenge: widget.challenge,
-                    questionList: widget.questionList, isQuestion: widget.isQuestion,
+                    questionList: widget.questionList,
+                    isQuestion: widget.isQuestion,
                   )
                 : FinishedChallenge(
                     employee: widget.employee,

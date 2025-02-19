@@ -7,7 +7,8 @@ class Discussion extends StatefulWidget {
   Discussion({
     super.key,
     required this.employee,
-    required this.academy, required this.Authorization,
+    required this.academy,
+    required this.Authorization,
   });
   final Employee employee;
   final AcademyRespond academy;
@@ -17,11 +18,14 @@ class Discussion extends StatefulWidget {
 }
 
 class _DiscussionState extends State<Discussion> {
+  TextEditingController _commentControllerA = TextEditingController();
+  TextEditingController _commentControllerB = TextEditingController();
+
   Future<List<DiscussionData>> fetchDiscussion() async {
-    final uri = Uri.parse(
-        "$host/api/origami/academy/discussion.php");
+    final uri = Uri.parse("$host/api/origami/academy/discussion.php");
     final response = await http.post(
-      uri, headers: {'Authorization': 'Bearer ${widget.Authorization}'},
+      uri,
+      headers: {'Authorization': 'Bearer ${widget.Authorization}'},
       body: {
         'comp_id': widget.employee.comp_id,
         'emp_id': widget.employee.emp_id,
@@ -46,17 +50,17 @@ class _DiscussionState extends State<Discussion> {
 
   String discussionId = "";
   Future<List<ReplyData>> fetchReply() async {
-    final uri = Uri.parse(
-        "$host/api/origami/academy/discussionReply.php");
+    final uri = Uri.parse("$host/api/origami/academy/discussionReply.php");
     final response = await http.post(
-      uri, headers: {'Authorization': 'Bearer ${widget.Authorization}'},
+      uri,
+      headers: {'Authorization': 'Bearer ${widget.Authorization}'},
       body: {
         'comp_id': widget.employee.comp_id,
         'emp_id': widget.employee.emp_id,
         'Authorization': widget.Authorization,
         'academy_id': widget.academy.academy_id,
         'academy_type': widget.academy.academy_type,
-        'discussion_id':discussionId,
+        'discussion_id': discussionId,
       },
     );
 
@@ -88,7 +92,14 @@ class _DiscussionState extends State<Discussion> {
     // fetchDiscussion();
   }
 
-  Widget loading() {
+  @override
+  void dispose() {
+    _commentControllerA.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
     return FutureBuilder<List<DiscussionData>>(
       future: fetchDiscussion(),
       builder: (context, snapshot) {
@@ -97,25 +108,21 @@ class _DiscussionState extends State<Discussion> {
         } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
           return Center(
               child: Text(
-                NotFoundData,
-                style: TextStyle(fontFamily: 'Arial',
-                  fontSize: 16.0,
-                  color: const Color(0xFF555555),
-                  fontWeight: FontWeight.w700,
-                ),
-                overflow: TextOverflow.ellipsis,
-                maxLines: 1,
-              ));
+            NotFoundDataTS,
+            style: TextStyle(
+              fontFamily: 'Arial',
+              fontSize: 16.0,
+              color: const Color(0xFF555555),
+              fontWeight: FontWeight.w700,
+            ),
+            overflow: TextOverflow.ellipsis,
+            maxLines: 1,
+          ));
         } else {
           return _getContentWidget(snapshot.data!);
         }
       },
     );
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return loading();
   }
 
   Widget _getContentWidget(List<DiscussionData> discussion) {
@@ -130,8 +137,7 @@ class _DiscussionState extends State<Discussion> {
               return Column(
                 children: [
                   Card(
-                    color: Colors.white,
-                    // elevation: 0,
+                    color: Color(0xFFF5F5F5),
                     child: InkWell(
                       onTap: () {
                         setState(() {
@@ -150,104 +156,122 @@ class _DiscussionState extends State<Discussion> {
                         );
                       },
                       child: Container(
-                        padding: EdgeInsets.all(20),
                         decoration: BoxDecoration(
                           color: Colors.white,
-                          borderRadius: BorderRadius.circular(20),
-                        ),
-                        child: Row(
-                          children: [
-                            Image.network(
-                              disc.disccusion_emp_image,
-                              height: 100,
-                              fit: BoxFit.fill,
-                            ),
-                            SizedBox(
-                              width: 8,
-                            ),
-                            Expanded(
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    disc.discussion_subject,
-                                    style: TextStyle(fontFamily: 'Arial',
-                                      fontSize: 18.0,
-                                      color: Color(0xFF555555),
-                                      fontWeight: FontWeight.w700,
-                                    ),
-                                    overflow: TextOverflow.ellipsis,
-                                    maxLines: 1,
-                                  ),
-                                  SizedBox(height: 8),
-                                  Row(
-                                    children: [
-                                      Icon(
-                                        Icons.people_alt_outlined,
-                                        color: Colors.amber,
-                                        size: 22,
-                                      ),
-                                      SizedBox(
-                                        width: 4,
-                                      ),
-                                      Expanded(
-                                        child: Text(
-                                          disc.disccusion_emp_name,
-                                          style: TextStyle(fontFamily: 'Arial',
-                                            color: Color(0xFF555555),
-                                          ),
-                                          overflow: TextOverflow.ellipsis,
-                                          maxLines: 1,
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                  SizedBox(height: 4),
-                                  Row(
-                                    children: [
-                                      Icon(
-                                        Icons.calendar_month,
-                                        color: Colors.amber,
-                                        size: 22,
-                                      ),
-                                      SizedBox(
-                                        width: 8,
-                                      ),
-                                      Expanded(
-                                        child: Text(
-                                          disc.disccusion_date,
-                                          style: TextStyle(fontFamily: 'Arial',
-                                            color: Color(0xFF555555),
-                                          ),
-                                          overflow: TextOverflow.ellipsis,
-                                          maxLines: 2,
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                  SizedBox(height: 4),
-                                  Text(
-                                    disc.discussion_description,
-                                    style: TextStyle(fontFamily: 'Arial',
-                                      fontSize: 16,
-                                      color: Color(0xFF555555),
-                                    ),
-                                    overflow: TextOverflow.ellipsis,
-                                    maxLines: 1,
-                                  ),
-                                ],
-                              ),
-                            ),
-                            IconButton(
-                              onPressed: () {},
-                              icon: Icon(
-                                Icons.comment_outlined,
-                                size: 30,
-                                color: Colors.amber,
-                              ),
-                              tooltip: '',
+                          borderRadius: BorderRadius.circular(15),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.grey.withOpacity(0.5),
+                              spreadRadius: 0,
+                              blurRadius: 2,
+                              offset: Offset(0, 3), // x, y
                             ),
                           ],
+                        ),
+                        child: Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: Row(
+                            children: [
+                              Expanded(
+                                flex: 1,
+                                child: Image.network(
+                                  disc.disccusion_emp_image,
+                                  width: double.infinity,
+                                  fit: BoxFit.contain,
+                                  errorBuilder: (context, error, stackTrace) {
+                                    return Icon(Icons.info, size: 40);
+                                  },
+                                ),
+                              ),
+                              SizedBox(
+                                width: 8,
+                              ),
+                              Expanded(
+                                flex: 2,
+                                child: Column(
+                                  mainAxisAlignment: MainAxisAlignment.start,
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      disc.discussion_subject,
+                                      style: TextStyle(
+                                        fontFamily: 'Arial',
+                                        fontSize: 16.0,
+                                        color: Color(0xFF555555),
+                                        fontWeight: FontWeight.w700,
+                                      ),
+                                      overflow: TextOverflow.ellipsis,
+                                      maxLines: 2,
+                                    ),
+                                    SizedBox(height: 8),
+                                    Row(
+                                      children: [
+                                        Icon(
+                                          Icons.people_alt_outlined,
+                                          color: Colors.amber,
+                                          size: 20,
+                                        ),
+                                        SizedBox(
+                                          width: 8,
+                                        ),
+                                        Flexible(
+                                          child: Text(
+                                            disc.disccusion_emp_name,
+                                            style: TextStyle(
+                                              fontFamily: 'Arial',
+                                              fontSize: 14.0,
+                                              color: Color(0xFF555555),
+                                              fontWeight: FontWeight.w500,
+                                            ),
+                                            maxLines: 2,
+                                            overflow: TextOverflow.ellipsis,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                    SizedBox(height: 8),
+                                    Row(
+                                      children: [
+                                        Icon(
+                                          Icons.calendar_month,
+                                          color: Colors.amber,
+                                          size: 20,
+                                        ),
+                                        SizedBox(
+                                          width: 8,
+                                        ),
+                                        Flexible(
+                                          child: Text(
+                                            disc.disccusion_date,
+                                            style: TextStyle(
+                                              fontFamily: 'Arial',
+                                              fontSize: 14.0,
+                                              color: Color(0xFF555555),
+                                              fontWeight: FontWeight.w500,
+                                            ),
+                                            maxLines: 2,
+                                            overflow: TextOverflow.ellipsis,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                    SizedBox(height: 8),
+                                    Text(
+                                      disc.discussion_description,
+                                      style: TextStyle(
+                                        fontFamily: 'Arial',
+                                        fontSize: 14.0,
+                                        color: Color(0xFF555555),
+                                        fontWeight: FontWeight.w500,
+                                      ),
+                                      // overflow: TextOverflow.ellipsis,
+                                      // maxLines: 1,
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ],
+                          ),
                         ),
                       ),
                     ),
@@ -268,9 +292,6 @@ class _DiscussionState extends State<Discussion> {
     );
   }
 
-  TextEditingController _commentControllerA = TextEditingController();
-  TextEditingController _commentControllerB = TextEditingController();
-
   Widget _Reply(DiscussionData disc) {
     return Container(
       color: Colors.white,
@@ -279,164 +300,185 @@ class _DiscussionState extends State<Discussion> {
         child: MaterialApp(
           debugShowCheckedModeBanner: false,
           home: Scaffold(
-              backgroundColor: Colors.grey.shade50,
-              appBar: AppBar(
-                backgroundColor: Colors.white,
-                title: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text(
-                      'Comments',
-                      style: TextStyle(fontFamily: 'Arial',
-                        color: Color(0xFF555555),
-                      ),
+            backgroundColor: Colors.grey.shade50,
+            appBar: AppBar(
+              backgroundColor: Colors.white,
+              title: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(
+                    '$commentsTS',
+                    style: TextStyle(
+                      fontFamily: 'Arial',
+                      color: Color(0xFF555555),
                     ),
-                  ],
-                ),
+                  ),
+                  Spacer(),
+                  InkWell(
+                    onTap: () => Navigator.pop(context),
+                    child: Icon(Icons.close),
+                  ),
+                ],
               ),
-              body: SingleChildScrollView(
-                child: Column(
-                  children: [
-                    Padding(
-                      padding: const EdgeInsets.all(16),
-                      child: Stack(
-                        children: [
-                          Container(
+            ),
+            body: SingleChildScrollView(
+              child: Column(
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.all(16),
+                    child: Stack(
+                      children: [
+                        Container(
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(15),
+                            border: Border.all(
+                              color: Colors.grey,
+                              width: 2.0,
+                            ),
+                          ),
+                          child: TextFormField(
+                            minLines: 5,
+                            maxLines: null,
+                            keyboardType: TextInputType.text,
+                            controller: _commentControllerA,
+                            style: TextStyle(
+                                fontFamily: 'Arial',
+                                color: const Color(0xFF555555),
+                                fontSize: 14),
+                            decoration: InputDecoration(
+                              isDense: true,
+                              filled: true,
+                              fillColor: Colors.white,
+                              hintText: '',
+                              hintStyle: TextStyle(
+                                  fontFamily: 'Arial',
+                                  fontSize: 14,
+                                  color: const Color(0xFF555555)),
+                              border: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(15),
+                                borderSide: BorderSide.none,
+                              ),
+                              focusedBorder: UnderlineInputBorder(
+                                borderSide:
+                                    BorderSide(color: Color(0xFF555555)),
+                              ),
+                            ),
+                            onChanged: (value) {},
+                          ),
+                        ),
+                        Positioned(
+                          bottom: 6,
+                          right: 6,
+                          child: Container(
                             decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(15),
-                              border: Border.all(
-                                color: Colors.grey,
-                                width: 2.0,
-                              ),
+                              color: Colors.amber,
+                              borderRadius: BorderRadius.circular(10),
                             ),
-                            child: TextFormField(
-                              minLines: 5,
-                              maxLines: null,
-                              keyboardType: TextInputType.text,
-                              controller: _commentControllerA,
-                              style: TextStyle(fontFamily: 'Arial',
-                                  color: const Color(0xFF555555), fontSize: 14),
-                              decoration: InputDecoration(
-                                isDense: true,
-                                filled: true,
-                                fillColor: Colors.white,
-                                hintText: '',
-                                hintStyle: TextStyle(fontFamily: 'Arial',
-                                    fontSize: 14, color: const Color(0xFF555555)),
-                                border: OutlineInputBorder(
-                                  borderRadius: BorderRadius.circular(15),
-                                  borderSide: BorderSide.none,
-                                ),
-                                focusedBorder: UnderlineInputBorder(
-                                  borderSide: BorderSide(color: Color(0xFF555555)),
-                                ),
-                              ),
-                              onChanged: (value) {},
-                            ),
-                          ),
-                          Positioned(
-                            bottom: 6,
-                            right: 6,
-                            child: Container(
-                              decoration: BoxDecoration(
-                                color: Colors.amber,
-                                borderRadius:
-                                BorderRadius.circular(
-                                    10),
-                              ),
-                              child: InkWell(
-                                onTap: (){
-                                  setState(() {
-                                    if(_commentA != ""){
-                                      DiscussionSave(
-                                        discussionId,
-                                        "save",
-                                        "",
-                                        _commentA,
-                                      );
-                                    }
-                                    _commentControllerA.clear();
-                                  });
-                                },
-                                child: Padding(
-                                  padding: const EdgeInsets.only(left: 8,right: 8,top: 4,bottom: 4),
-                                  child: Center(
-                                    child: Text("Post",style: TextStyle(fontFamily: 'Arial',
+                            child: InkWell(
+                              onTap: () {
+                                setState(() {
+                                  if (_commentA != "") {
+                                    DiscussionSave(
+                                      discussionId,
+                                      "$SaveTS",
+                                      "",
+                                      _commentA,
+                                    );
+                                  }
+                                  _commentControllerA.clear();
+                                });
+                              },
+                              child: Padding(
+                                padding: const EdgeInsets.only(
+                                    left: 8, right: 8, top: 2, bottom: 2),
+                                child: Center(
+                                  child: Text(
+                                    "$postTS",
+                                    style: TextStyle(
+                                      fontFamily: 'Arial',
                                       fontSize: 18.0,
-                                      color: Color(0xFF555555),
-                                      fontWeight: FontWeight.w700,
-                                    ),),
-                                  ),
-                                ),
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                    SizedBox(height: 8),
-                    Padding(
-                      padding: const EdgeInsets.only(left: 8.0),
-                      child: Container(
-                        alignment: Alignment.centerLeft,
-                        child: Text("comment: ${disc.dissussion_reply_count}",style: TextStyle(fontFamily: 'Arial',
-                          fontSize: 18.0,
-                          color: Color(0xFF555555),
-                        ),),
-                      ),
-                    ),
-                    FutureBuilder<List<ReplyData>>(
-                      future: fetchReply(),
-                      builder: (context, snapshot) {
-                        if (snapshot.connectionState == ConnectionState.waiting) {
-                          return Center(
-                              child: Row(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  CircularProgressIndicator(
-                                    color: Color(0xFFFF9900),
-                                  ),
-                                  SizedBox(
-                                    width: 12,
-                                  ),
-                                  Text(
-                                    'Loading...',
-                                    style: TextStyle(fontFamily: 'Arial',
-                                      fontSize: 16,
-                                      fontWeight: FontWeight.w700,
-                                      color: Color(0xFF555555),
+                                      color: Colors.white,
+                                      fontWeight: FontWeight.w500,
                                     ),
                                   ),
-                                ],
-                              ));
-                        } else if (snapshot.hasError) {
-                          return Center(child: Text('Error: ${snapshot.error}'));
-                        } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
-                          return Center(
-                              child: Text(
-                                NotFoundData,
-                                style: TextStyle(fontFamily: 'Arial',
-                                  fontSize: 16.0,
-                                  color: const Color(0xFF555555),
-                                  fontWeight: FontWeight.w700,
                                 ),
-                                overflow: TextOverflow.ellipsis,
-                                maxLines: 1,
-                              ));
-                        } else {
-                          return _bodyReply(snapshot.data!);
-                        }
-                      },
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
                     ),
-                  ],
-                ),
-              ),),
+                  ),
+                  SizedBox(height: 8),
+                  Padding(
+                    padding: const EdgeInsets.only(left: 8.0),
+                    child: Container(
+                      alignment: Alignment.centerLeft,
+                      child: Text(
+                        "$commentsTS: ${disc.dissussion_reply_count}",
+                        style: TextStyle(
+                          fontFamily: 'Arial',
+                          fontSize: 18.0,
+                          color: Color(0xFF555555),
+                        ),
+                      ),
+                    ),
+                  ),
+                  FutureBuilder<List<ReplyData>>(
+                    future: fetchReply(),
+                    builder: (context, snapshot) {
+                      if (snapshot.connectionState == ConnectionState.waiting) {
+                        return Center(
+                            child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            CircularProgressIndicator(
+                              color: Color(0xFFFF9900),
+                            ),
+                            SizedBox(
+                              width: 12,
+                            ),
+                            Text(
+                              '$loadingTS...',
+                              style: TextStyle(
+                                fontFamily: 'Arial',
+                                fontSize: 16,
+                                fontWeight: FontWeight.w700,
+                                color: Color(0xFF555555),
+                              ),
+                            ),
+                          ],
+                        ));
+                      } else if (snapshot.hasError) {
+                        return Center(child: Text('Error: ${snapshot.error}'));
+                      } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+                        return Center(
+                            child: Text(
+                          NotFoundDataTS,
+                          style: TextStyle(
+                            fontFamily: 'Arial',
+                            fontSize: 16.0,
+                            color: const Color(0xFF555555),
+                            fontWeight: FontWeight.w700,
+                          ),
+                          overflow: TextOverflow.ellipsis,
+                          maxLines: 1,
+                        ));
+                      } else {
+                        return _bodyReply(snapshot.data!);
+                      }
+                    },
+                  ),
+                ],
+              ),
+            ),
+          ),
         ),
       ),
     );
   }
 
-  Widget _bodyReply(List<ReplyData> replyData,){
+  Widget _bodyReply(List<ReplyData> replyData) {
     return Padding(
       padding: const EdgeInsets.all(8.0),
       child: Column(
@@ -467,7 +509,8 @@ class _DiscussionState extends State<Discussion> {
                       children: [
                         Text(
                           reply.reply_emp_name,
-                          style: TextStyle(fontFamily: 'Arial',
+                          style: TextStyle(
+                            fontFamily: 'Arial',
                             fontSize: 18.0,
                             color: Color(0xFF555555),
                             fontWeight: FontWeight.w700,
@@ -490,7 +533,8 @@ class _DiscussionState extends State<Discussion> {
                             Expanded(
                               child: Text(
                                 reply.reply_date,
-                                style: TextStyle(fontFamily: 'Arial',
+                                style: TextStyle(
+                                  fontFamily: 'Arial',
                                   color: Color(0xFF555555),
                                 ),
                                 overflow: TextOverflow.ellipsis,
@@ -502,7 +546,8 @@ class _DiscussionState extends State<Discussion> {
                         SizedBox(height: 4),
                         Text(
                           reply.reply_desc,
-                          style: TextStyle(fontFamily: 'Arial',
+                          style: TextStyle(
+                            fontFamily: 'Arial',
                             fontSize: 16,
                             color: Color(0xFF555555),
                           ),
@@ -512,45 +557,45 @@ class _DiscussionState extends State<Discussion> {
                       ],
                     ),
                   ),
-                  SingleChildScrollView(
-                    scrollDirection: Axis.horizontal,
-                    child: Row(
-                      children: [
-                        IconButton(
-                          onPressed: () {
-                            if(reply.can_edit == "N") {
-                              return ;
-                            }else{
-                              setState(() {
-                                _showDialogB(reply);
-                              });
-                            }
-                          },
-                          icon: Icon(
-                            (reply.can_edit == "N")?null:Icons.edit_note_outlined,
-                            color: Colors.amber,
-                            size: 32,
-                          ),
-                          tooltip: '',
-                        ),
-                        IconButton(
-                          onPressed: () {
-                            if(reply.can_delete == "N") {
-                              return ;
-                            }else{
-                              setState(() {
-                                _showDialogC(reply);
-                              });
-                            }
-                          },
-                          icon: FaIcon(FontAwesomeIcons.trashAlt,
-                            color: (reply.can_delete == "N")?Colors.transparent:Colors.redAccent,
-                          ),
-                          tooltip: '',
-                        ),
-                      ],
-                    ),
-                  ),
+                  // SingleChildScrollView(
+                  //   scrollDirection: Axisx.horizontal,
+                  //   child: Row(
+                  //     children: [
+                  //       IconButton(
+                  //         onPressed: () {
+                  //           if(reply.can_edit == "N") {
+                  //             return ;
+                  //           }else{
+                  //             setState(() {
+                  //               _showDialogB(reply);
+                  //             });
+                  //           }
+                  //         },
+                  //         icon: Icon(
+                  //           (reply.can_edit == "N")?null:Icons.edit_note_outlined,
+                  //           color: Colors.amber,
+                  //           size: 32,
+                  //         ),
+                  //         tooltip: '',
+                  //       ),
+                  //       IconButton(
+                  //         onPressed: () {
+                  //           if(reply.can_delete == "N") {
+                  //             return ;
+                  //           }else{
+                  //             setState(() {
+                  //               _showDialogC(reply);
+                  //             });
+                  //           }
+                  //         },
+                  //         icon: FaIcon(FontAwesomeIcons.trashAlt,
+                  //           color: (reply.can_delete == "N")?Colors.transparent:Colors.redAccent,
+                  //         ),
+                  //         tooltip: '',
+                  //       ),
+                  //     ],
+                  //   ),
+                  // ),
                 ],
               ),
             ),
@@ -572,13 +617,17 @@ class _DiscussionState extends State<Discussion> {
             children: [
               Row(
                 children: [
-                  const Icon(Icons.edit,color: Color(0xFF555555),),
+                  const Icon(
+                    Icons.edit,
+                    color: Color(0xFF555555),
+                  ),
                   const SizedBox(
                     width: 4,
                   ),
                   Text(
-                    'Edit Discussion',
-                    style: TextStyle(fontFamily: 'Arial',
+                    '$editDiscussionTS',
+                    style: TextStyle(
+                      fontFamily: 'Arial',
                       fontWeight: FontWeight.w700,
                       color: const Color(0xFF555555),
                     ),
@@ -601,15 +650,19 @@ class _DiscussionState extends State<Discussion> {
                   maxLines: null,
                   keyboardType: TextInputType.text,
                   controller: _commentControllerB,
-                  style: TextStyle(fontFamily: 'Arial',
-                      color: const Color(0xFF555555), fontSize: 14),
+                  style: TextStyle(
+                      fontFamily: 'Arial',
+                      color: const Color(0xFF555555),
+                      fontSize: 14),
                   decoration: InputDecoration(
                     isDense: true,
                     filled: true,
                     fillColor: Colors.white,
                     hintText: '',
-                    hintStyle: TextStyle(fontFamily: 'Arial',
-                        fontSize: 14, color: const Color(0xFF555555)),
+                    hintStyle: TextStyle(
+                        fontFamily: 'Arial',
+                        fontSize: 14,
+                        color: const Color(0xFF555555)),
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(15),
                       borderSide: BorderSide.none,
@@ -626,8 +679,9 @@ class _DiscussionState extends State<Discussion> {
           actions: <Widget>[
             TextButton(
               child: Text(
-                'Cancel',
-                style: TextStyle(fontFamily: 'Arial',
+                '$CancelTS',
+                style: TextStyle(
+                  fontFamily: 'Arial',
                   color: const Color(0xFF555555),
                 ),
               ),
@@ -637,16 +691,17 @@ class _DiscussionState extends State<Discussion> {
             ),
             TextButton(
               child: Text(
-                'Edit',
-                style: TextStyle(fontFamily: 'Arial',
+                '$editTS',
+                style: TextStyle(
+                  fontFamily: 'Arial',
                   color: const Color(0xFF555555),
                   fontWeight: FontWeight.w700,
                 ),
               ),
               onPressed: () {
-                if(_commentB == ""){
-                  return ;
-                }else{
+                if (_commentB == "") {
+                  return;
+                } else {
                   DiscussionSave(
                     discussionId,
                     "edit",
@@ -656,7 +711,6 @@ class _DiscussionState extends State<Discussion> {
                   Navigator.pop(dialogContext);
                   Navigator.pop(context);
                 }
-
               },
             ),
           ],
@@ -674,23 +728,26 @@ class _DiscussionState extends State<Discussion> {
           elevation: 0,
           backgroundColor: Colors.white,
           title: Text(
-            'Warning!',
-            style: TextStyle(fontFamily: 'Arial',
+            '$warningTS',
+            style: TextStyle(
+              fontFamily: 'Arial',
               fontWeight: FontWeight.w700,
               color: const Color(0xFF555555),
             ),
           ),
           content: Text(
-            'Are you sure you want to delete?',
-            style: TextStyle(fontFamily: 'Arial',
+            '$areYouDeleteTS',
+            style: TextStyle(
+              fontFamily: 'Arial',
               color: const Color(0xFF555555),
             ),
           ),
           actions: <Widget>[
             TextButton(
               child: Text(
-                'Cancel',
-                style: TextStyle(fontFamily: 'Arial',
+                '$CancelTS',
+                style: TextStyle(
+                  fontFamily: 'Arial',
                   color: const Color(0xFF555555),
                 ),
               ),
@@ -700,8 +757,9 @@ class _DiscussionState extends State<Discussion> {
             ),
             TextButton(
               child: Text(
-                'Delete',
-                style: TextStyle(fontFamily: 'Arial',
+                '$deleteTS',
+                style: TextStyle(
+                  fontFamily: 'Arial',
                   color: const Color(0xFF555555),
                   fontWeight: FontWeight.w700,
                 ),
@@ -731,8 +789,7 @@ class _DiscussionState extends State<Discussion> {
   ) async {
     try {
       final response = await http.post(
-        Uri.parse(
-            '$host/api/origami/academy/discussionSave.php'),
+        Uri.parse('$host/api/origami/academy/discussionSave.php'),
         body: {
           'comp_id': widget.employee.comp_id,
           'emp_id': widget.employee.emp_id,
@@ -784,13 +841,13 @@ class DiscussionData {
 
   factory DiscussionData.fromJson(Map<String, dynamic> json) {
     return DiscussionData(
-      discussion_id: json['discussion_id']??'',
-      discussion_subject: json['discussion_subject']??'',
-      discussion_description: json['discussion_description']??'',
-      disccusion_emp_name: json['disccusion_emp_name']??'',
-      disccusion_emp_image: json['disccusion_emp_image']??'',
-      disccusion_date: json['disccusion_date']??'',
-      dissussion_reply_count: json['dissussion_reply_count']??'',
+      discussion_id: json['discussion_id'] ?? '',
+      discussion_subject: json['discussion_subject'] ?? '',
+      discussion_description: json['discussion_description'] ?? '',
+      disccusion_emp_name: json['disccusion_emp_name'] ?? '',
+      disccusion_emp_image: json['disccusion_emp_image'] ?? '',
+      disccusion_date: json['disccusion_date'] ?? '',
+      dissussion_reply_count: json['dissussion_reply_count'] ?? '',
     );
   }
 }
@@ -818,14 +875,14 @@ class ReplyData {
 
   factory ReplyData.fromJson(Map<String, dynamic> json) {
     return ReplyData(
-      reply_id: json['reply_id']??'',
-      reply_type: json['reply_type']??'',
-      reply_desc: json['reply_desc']??'',
-      reply_emp_name: json['reply_emp_name']??'',
-      reply_emp_image: json['reply_emp_image']??'',
-      reply_date: json['reply_date']??'',
-      can_edit: json['can_edit']??'',
-      can_delete: json['can_delete']??'',
+      reply_id: json['reply_id'] ?? '',
+      reply_type: json['reply_type'] ?? '',
+      reply_desc: json['reply_desc'] ?? '',
+      reply_emp_name: json['reply_emp_name'] ?? '',
+      reply_emp_image: json['reply_emp_image'] ?? '',
+      reply_date: json['reply_date'] ?? '',
+      can_edit: json['can_edit'] ?? '',
+      can_delete: json['can_delete'] ?? '',
     );
   }
 }

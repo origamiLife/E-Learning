@@ -29,7 +29,7 @@ class _AcademyPageState extends State<AcademyPage> {
   bool _isMenu = false;
   bool _change = false;
   String _comment = '';
-  final List<String> itemsLogo = [language, logout];
+  final List<String> itemsLogo = [languageTS, logoutTS];
   String? selectedValue;
 
   @override
@@ -301,7 +301,7 @@ class _AcademyPageState extends State<AcademyPage> {
   void _onDropdownChanged(String? value) {
     setState(() {
       selectedValue = value;
-      if (value == language) {
+      if (value == languageTS) {
         Navigator.push(
           context,
           MaterialPageRoute(
@@ -397,7 +397,7 @@ class _AcademyPageState extends State<AcademyPage> {
         } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
           return Center(
               child: Text(
-            NotFoundData,
+            NotFoundDataTS,
             style: TextStyle(
               fontFamily: 'Arial',
               fontSize: 16.0,
@@ -442,7 +442,7 @@ class _AcademyPageState extends State<AcademyPage> {
     return Container(
       alignment: Alignment.center,
       child: Text(
-        NotFoundData, // You can replace this with a constant if needed.
+        NotFoundDataTS, // You can replace this with a constant if needed.
         style: TextStyle(
           fontFamily: 'Arial',
           fontSize: 16.0,
@@ -475,7 +475,7 @@ class _AcademyPageState extends State<AcademyPage> {
                 fillColor: Colors.white,
                 contentPadding:
                     const EdgeInsets.symmetric(horizontal: 24, vertical: 14),
-                hintText: '$Search...',
+                hintText: '$SearchTS...',
                 hintStyle: TextStyle(
                     fontFamily: 'Arial',
                     fontSize: 14,

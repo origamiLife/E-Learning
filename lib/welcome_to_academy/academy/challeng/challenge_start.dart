@@ -81,7 +81,10 @@ class _ChallengeStartTimeState extends State<ChallengeStartTime>
       color: Colors.white,
       child: Column(
         children: [
-          _buildSearchField(),
+          Padding(
+            padding: const EdgeInsets.all(8),
+            child: _buildSearchField(),
+          ),
           Expanded(
             child: Padding(
               padding: const EdgeInsets.only(left: 8, right: 8),
@@ -100,7 +103,7 @@ class _ChallengeStartTimeState extends State<ChallengeStartTime>
                           width: 12,
                         ),
                         Text(
-                          'Loading...',
+                          '$loadingTS...',
                           style: TextStyle(
                             fontFamily: 'Arial',
                             fontSize: 16,
@@ -115,7 +118,7 @@ class _ChallengeStartTimeState extends State<ChallengeStartTime>
                   } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
                     return Center(
                         child: Text(
-                      NotFoundData,
+                      NotFoundDataTS,
                       style: TextStyle(
                         fontFamily: 'Arial',
                         fontSize: 16.0,
@@ -129,15 +132,15 @@ class _ChallengeStartTimeState extends State<ChallengeStartTime>
                             ? Container(
                                 child: _challengeTable(filteredChallenges))
                             : Padding(
-                              padding: const EdgeInsets.all(8.0),
-                              child: (isAndroid || isIPhone)
-                                  ? Container(
-                                      child:
-                                          _challengeListSlim(filteredChallenges))
-                                  : Container(
-                                      child:
-                                          _challengeListBig(filteredChallenges)),
-                            ));
+                                padding: const EdgeInsets.all(8.0),
+                                child: (isAndroid || isIPhone)
+                                    ? Container(
+                                        child: _challengeListSlim(
+                                            filteredChallenges))
+                                    : Container(
+                                        child: _challengeListBig(
+                                            filteredChallenges)),
+                              ));
                   }
                 },
               ),
@@ -150,51 +153,71 @@ class _ChallengeStartTimeState extends State<ChallengeStartTime>
 
   Widget _buildSearchField() {
     return Padding(
-      padding: const EdgeInsets.only(left: 16,right: 16,top: 8,bottom: 8),
-      child: TextFormField(
-        controller: _searchController,
-        keyboardType: TextInputType.text,
-        style: TextStyle(
-          fontFamily: 'Arial',
-          color: Color(0xFF555555),
-          fontSize: 14,
-        ),
-        decoration: InputDecoration(
-          isDense: true,
-          filled: true,
-          fillColor: Colors.white,
-          contentPadding:
-          const EdgeInsets.symmetric(horizontal: 24, vertical: 14),
-          hintText: '$Search...',
-          hintStyle: TextStyle(
-              fontFamily: 'Arial', fontSize: 14, color: Color(0xFF555555)),
-          border: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(10),
+        padding: const EdgeInsets.only(left: 8, right: 8),
+        child: Container(
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(100),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withOpacity(0.2), // สีเงา
+                blurRadius: 8, // ความฟุ้งของเงา
+                offset: Offset(0, 4), // การเยื้องของเงา (แนวแกน X, Y)
+              ),
+            ],
           ),
-          suffixIcon: Padding(
-            padding: const EdgeInsets.only(right: 8.0),
-            child: Icon(
-              Icons.search,
-              // color: Colors.red, // สีไอคอน
-              size: 24, // ขนาดไอคอน
-            ),
-          ),
-          enabledBorder: OutlineInputBorder(
-            borderSide: BorderSide(
+          child: TextFormField(
+            controller: _searchController,
+            keyboardType: TextInputType.text,
+            style: TextStyle(
+              fontFamily: 'Arial',
               color: Color(0xFF555555),
-              width: 1,
+              fontSize: 14,
             ),
-            borderRadius: BorderRadius.circular(10),
-          ),
-          focusedBorder: OutlineInputBorder(
-            borderSide: BorderSide(
-              color: Color(0xFF555555),
-              width: 1,
+            decoration: InputDecoration(
+              isDense: true,
+              filled: true,
+              fillColor: Colors.white,
+              contentPadding: EdgeInsets.symmetric(horizontal: 24, vertical: 14),
+              hintText: '$SearchTS...',
+              hintStyle: TextStyle(
+                  fontFamily: 'Arial', fontSize: 14, color: Color(0xFF555555)),
+              border: InputBorder.none, // เอาขอบปกติออก
+              suffixIcon: Padding(
+                padding: EdgeInsets.only(right: 8.0),
+                child: Icon(
+                  Icons.search,
+                  size: 24,
+                ),
+              ),
+              // border: OutlineInputBorder(
+              //   borderRadius: BorderRadius.circular(100),
+              // ),
+              // suffixIcon: Padding(
+              //   padding: const EdgeInsets.only(right: 8.0),
+              //   child: Icon(
+              //     Icons.search,
+              //     // color: Colors.red, // สีไอคอน
+              //     size: 24, // ขนาดไอคอน
+              //   ),
+              // ),
+              enabledBorder: OutlineInputBorder(
+                borderSide: BorderSide(
+                  color: Colors.black38,
+                  width: 1,
+                ),
+                borderRadius: BorderRadius.circular(50),
+              ),
+              focusedBorder: OutlineInputBorder(
+                borderSide: BorderSide(
+                  color: Colors.black38,
+                  width: 1,
+                ),
+                borderRadius: BorderRadius.circular(50),
+              ),
             ),
-            borderRadius: BorderRadius.circular(10),
           ),
-        ),
-      ),
+        )
     );
   }
 
@@ -218,8 +241,15 @@ class _ChallengeStartTimeState extends State<ChallengeStartTime>
               QuickAlert.show(
                 context: context,
                 type: QuickAlertType.confirm,
-                title: 'Are you ready?',
+                title: '$AreYouReadyTS',
                 width: MediaQuery.of(context).size.width > 600 ? 590 : 400,
+                confirmBtnText: '$startTS',
+                confirmBtnColor: Colors.blue,
+                confirmBtnTextStyle: const TextStyle(
+                  color: Colors.white,
+                  fontWeight: FontWeight.w700,
+                ),
+                customAsset:'assets/images/learning/student.png',
                 onCancelBtnTap: () => Navigator.pop(context),
                 onConfirmBtnTap: () {
                   Navigator.push(
@@ -228,10 +258,10 @@ class _ChallengeStartTimeState extends State<ChallengeStartTime>
                       builder: (context) => ChallengePage(
                         employee: widget.employee,
                         Authorization: widget.Authorization,
-                        initialMinutes:
-                            double.tryParse(getChallenges[index].challenge_duration) ?? 0,
-                        challenge: getChallenges[index],
-                        timer_end: (String value) {},
+                        initialMinutes: double.tryParse(
+                                getChallenges[index].challenge_duration) ??
+                            0,
+                        getchallenge: getChallenges[index],
                       ),
                     ),
                   ).then((_) {
@@ -244,22 +274,21 @@ class _ChallengeStartTimeState extends State<ChallengeStartTime>
                         filteredChallenges = challenges;
                       });
                     });
-
                   });
                 },
                 widget: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     SizedBox(height: 8),
-                    _textWidget('Challenge:', challenge.challenge_name),
+                    _textWidget('$challengeTS:', challenge.challenge_name),
                     _textWidget(
-                        'Description:', challenge.challenge_description),
+                        '$DescriptionTS:', challenge.challenge_description),
                     _textWidget('Rule:', challenge.challenge_rule),
                     _textWidget(
-                        'Duration (Min):', challenge.challenge_duration),
-                    _textWidget('Part:', challenge.challenge_question_part),
-                    _textWidget('Number of questions:',
-                        '${challenge.challenge_point_value} $question'),
+                        '$Duration ($MinTS):', challenge.challenge_duration),
+                    _textWidget('$PartTS:', challenge.challenge_question_part),
+                    _textWidget('$NumberQuestionsTS:',
+                        '${challenge.challenge_point_value} $questionTS'),
                   ],
                 ),
               );
@@ -440,7 +469,15 @@ class _ChallengeStartTimeState extends State<ChallengeStartTime>
                 context: context,
                 type: QuickAlertType.confirm,
                 width: MediaQuery.of(context).size.width > 600 ? 590 : 400,
-                title: 'Are you ready?',
+                title: '$AreYouReadyTS',
+                customAsset:'assets/images/learning/student.png',
+                confirmBtnText: '$startTS',
+                confirmBtnColor: Colors.blue,
+                confirmBtnTextStyle: const TextStyle(
+                  color: Colors.white,
+                  fontSize: 18,
+                  fontWeight: FontWeight.w600,
+                ),
                 onCancelBtnTap: () => Navigator.pop(context),
                 onConfirmBtnTap: () {
                   Navigator.push(
@@ -449,10 +486,10 @@ class _ChallengeStartTimeState extends State<ChallengeStartTime>
                       builder: (context) => ChallengePage(
                         employee: widget.employee,
                         Authorization: widget.Authorization,
-                        initialMinutes:
-                            double.tryParse(getChallenges[index].challenge_duration) ?? 0.0,
-                        challenge: getChallenges[index],
-                        timer_end: (String value) {},
+                        initialMinutes: double.tryParse(
+                                getChallenges[index].challenge_duration) ??
+                            0.0,
+                        getchallenge: getChallenges[index],
                       ),
                     ),
                   ).then((_) {
@@ -470,13 +507,15 @@ class _ChallengeStartTimeState extends State<ChallengeStartTime>
                 widget: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    _textWidget('Challenge:', challenge.challenge_name),
-                    _textWidget('Description:', challenge.challenge_description),
-                    _textWidget('Rule:', challenge.challenge_rule),
-                    _textWidget('Duration (Min):', challenge.challenge_duration),
-                    _textWidget('Part:', challenge.challenge_question_part),
-                    _textWidget('Number of questions:',
-                        '${challenge.challenge_point_value} questions'),
+                    _textWidget('$challengeTS:', challenge.challenge_name),
+                    _textWidget(
+                        '$DescriptionTS:', challenge.challenge_description),
+                    _textWidget('$RuleTS:', challenge.challenge_rule),
+                    _textWidget(
+                        '$DurationTS ($MinTS):', challenge.challenge_duration),
+                    _textWidget('$PartTS:', challenge.challenge_question_part),
+                    _textWidget('$NumberQuestionsTS:',
+                        '${challenge.challenge_point_value} $questionTS'),
                   ],
                 ),
               );
@@ -502,13 +541,12 @@ class _ChallengeStartTimeState extends State<ChallengeStartTime>
                     Expanded(
                       child: ClipRRect(
                         borderRadius: BorderRadius.circular(10),
-                        child: Image.network(
-                          challenge.challenge_logo,
-                          width: double.infinity, // ความกว้างเต็มจอ
-                          fit: BoxFit.contain,
-                          errorBuilder: (context, error, stackTrace) =>
-                              const Icon(Icons.error, size: 80),
-                        ),
+                        child: Image.network(challenge.challenge_logo,
+                            width: double.infinity, // ความกว้างเต็มจอ
+                            fit: BoxFit.contain,
+                            errorBuilder: (context, error, stackTrace) {
+                          return Icon(Icons.error, size: 80);
+                        }),
                       ),
                     ),
                     const SizedBox(width: 14),
@@ -529,7 +567,7 @@ class _ChallengeStartTimeState extends State<ChallengeStartTime>
                           ),
                           const SizedBox(height: 4),
                           Text(
-                            'Start: ${challenge.challenge_start}',
+                            '$startTS: ${challenge.challenge_start}',
                             style: const TextStyle(
                               fontFamily: 'Arial',
                               fontSize: 14,
@@ -540,7 +578,7 @@ class _ChallengeStartTimeState extends State<ChallengeStartTime>
                           ),
                           const SizedBox(height: 4),
                           Text(
-                            'End: ${challenge.challenge_end}',
+                            '$endTS: ${challenge.challenge_end}',
                             style: const TextStyle(
                               fontFamily: 'Arial',
                               color: Color(0xFF555555),
@@ -589,7 +627,8 @@ class _ChallengeStartTimeState extends State<ChallengeStartTime>
               padding:
                   const EdgeInsets.symmetric(horizontal: 8.0, vertical: 8.0),
               child: InkWell(
-                onTap: () => _showChallengeDialog(context, challenge,getChallenges[index]),
+                onTap: () => _showChallengeDialog(
+                    context, challenge, getChallenges[index]),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -633,7 +672,7 @@ class _ChallengeStartTimeState extends State<ChallengeStartTime>
                               ),
                               const SizedBox(height: 16),
                               Text(
-                                '$start : ${challenge.challenge_start}',
+                                '$startTS : ${challenge.challenge_start}',
                                 style: TextStyle(
                                   fontFamily: 'Arial',
                                   fontSize: 24,
@@ -660,23 +699,32 @@ class _ChallengeStartTimeState extends State<ChallengeStartTime>
     );
   }
 
-  void _showChallengeDialog(BuildContext context, GetChallenge challenge, GetChallenge challeng2) {
+  void _showChallengeDialog(
+      BuildContext context, GetChallenge challenge, GetChallenge challeng2) {
     QuickAlert.show(
       context: context,
       type: QuickAlertType.confirm,
       // customAsset: 'assets/images/learning/img.png',
       width: MediaQuery.of(context).size.width > 600 ? 590 : 400,
-      title: 'Are you ready?',
+      title: '$AreYouReadyTS',
+      confirmBtnText: '$startTS',
+      customAsset:'assets/images/learning/student.png',
+      confirmBtnColor: Colors.blue,
+      confirmBtnTextStyle: const TextStyle(
+        color: Colors.white,
+        fontSize: 18,
+        fontWeight: FontWeight.w600,
+      ),
       widget: Column(
         children: [
           const SizedBox(height: 8),
-          _textWidget('Challenge:', challenge.challenge_name),
-          _textWidget('Description:', challenge.challenge_description),
-          _textWidget('Rule:', challenge.challenge_rule),
-          _textWidget('Duration (Min):', challenge.challenge_duration),
-          _textWidget('Part:', challenge.challenge_question_part),
-          _textWidget('Number of questions:',
-              '${challenge.challenge_point_value} questions'),
+          _textWidget('$challengeTS:', challenge.challenge_name),
+          _textWidget('$DescriptionTS:', challenge.challenge_description),
+          _textWidget('$RuleTS:', challenge.challenge_rule),
+          _textWidget('$DurationTS ($MinTS):', challenge.challenge_duration),
+          _textWidget('$PartTS:', challenge.challenge_question_part),
+          _textWidget('$NumberQuestionsTS:',
+              '${challenge.challenge_point_value} $questionTS'),
         ],
       ),
       onCancelBtnTap: () => Navigator.pop(context),
@@ -688,8 +736,7 @@ class _ChallengeStartTimeState extends State<ChallengeStartTime>
               employee: widget.employee,
               Authorization: widget.Authorization,
               initialMinutes: double.parse(challeng2.challenge_duration),
-              challenge: challeng2,
-              timer_end: (String value) {},
+              getchallenge: challeng2,
             ),
           ),
         ).then((_) {
@@ -723,9 +770,8 @@ class _ChallengeStartTimeState extends State<ChallengeStartTime>
       // ตรวจสอบว่ามีคีย์ 'academy_data' และไม่เป็น null
       if (jsonResponse['code'] == 200) {
         final List<dynamic> challengeJson = jsonResponse['challenge_data'];
-        return getChallenges = challengeJson
-            .map((json) => GetChallenge.fromJson(json))
-            .toList();
+        return getChallenges =
+            challengeJson.map((json) => GetChallenge.fromJson(json)).toList();
       } else {
         // หากไม่มีข้อมูลใน 'academy_data' ให้คืนค่าเป็นลิสต์ว่าง
         print('No challenge data available.');

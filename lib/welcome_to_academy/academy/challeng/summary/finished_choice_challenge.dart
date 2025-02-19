@@ -11,12 +11,6 @@ class FinishedChoiceChallenge extends StatefulWidget {
     super.key,
     required this.employee,
     required this.Authorization,
-    required this.duration,
-    required this.total_point,
-    required this.time_used,
-    required this.topChallenge,
-    required this.challengeData,
-    required this.total_point_all,
     required this.challenge,
     required this.questionList,
     required this.isQuestion,
@@ -25,12 +19,6 @@ class FinishedChoiceChallenge extends StatefulWidget {
   });
   final Employee employee;
   final String Authorization;
-  final String duration;
-  final String total_point;
-  final String time_used;
-  final TopChallenge topChallenge;
-  final ChallengeData challengeData;
-  final String total_point_all;
   final GetChallenge challenge;
   final List<String> questionList;
   final List<CheckAllChallenge> isQuestion;
@@ -128,7 +116,7 @@ class _FinishedChoiceChallengeState extends State<FinishedChoiceChallenge> {
                       CircularProgressIndicator(color: Color(0xFFFF9900)),
                       SizedBox(width: 12),
                       Text(
-                        'Loading...',
+                        '$loadingTS...',
                         style: TextStyle(
                             fontFamily: 'Arial',
                             fontSize: 16,
@@ -289,7 +277,6 @@ class _FinishedChoiceChallengeState extends State<FinishedChoiceChallenge> {
       List<Choice> choiceList,
       List<CheckAllChallenge> isQuestion,
       List<ChoiceChoose> choice_choose) {
-
     return Card(
       elevation: 0,
       child: Column(
@@ -422,7 +409,7 @@ class _FinishedChoiceChallengeState extends State<FinishedChoiceChallenge> {
               // Optional: Provide feedback if limit reached
               ScaffoldMessenger.of(context).showSnackBar(
                 SnackBar(
-                    content: Text('You can select up to $choiceNo choices')),
+                    content: Text('You can select up to choice no choices')),
               );
             }
           }
@@ -461,7 +448,7 @@ class _FinishedChoiceChallengeState extends State<FinishedChoiceChallenge> {
                           mainAxisSize: MainAxisSize.min,
                           children: [
                             Text(
-                              "YOU ARE VIEWING CHALLENGE SECTION",
+                              "$challengeSectionTS",
                               style: TextStyle(
                                 fontFamily: 'Arial',
                                 fontSize: (isAndroid || isIPhone) ? 20 : 30,
@@ -472,7 +459,7 @@ class _FinishedChoiceChallengeState extends State<FinishedChoiceChallenge> {
                             ),
                             SizedBox(height: 16),
                             Text(
-                              "$question: ${isQuestion.length}",
+                              "$questionTS: ${isQuestion.length}",
                               style: TextStyle(
                                 fontFamily: 'Arial',
                                 fontSize: (isAndroid || isIPhone) ? 16 : 24,
@@ -549,7 +536,7 @@ class _FinishedChoiceChallengeState extends State<FinishedChoiceChallenge> {
                                       SizedBox(width: 8),
                                       Flexible(
                                         child: Text(
-                                          '$correct',
+                                          '$correctTS',
                                           style: TextStyle(
                                             fontFamily: 'Arial',
                                             fontSize: (isAndroid || isIPhone)
@@ -575,7 +562,7 @@ class _FinishedChoiceChallengeState extends State<FinishedChoiceChallenge> {
                                       SizedBox(width: 8),
                                       Flexible(
                                         child: Text(
-                                          '$incorrect',
+                                          '$incorrectTS',
                                           style: TextStyle(
                                             fontFamily: 'Arial',
                                             fontSize: (isAndroid || isIPhone)

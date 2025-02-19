@@ -27,12 +27,43 @@ class _AcademyHomePageState extends State<AcademyHomePage> {
   void initState() {
     super.initState();
     // Listener สำหรับการกรอง
+    allTranslate();
+    _loadSelectedRadio();
     _searchController.addListener(() {
       setState(() {
         search = _searchController.text;
       });
     });
   }
+
+  // โหลดค่าที่บันทึกไว้
+  _loadSelectedRadio() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    setState(() {
+      selectedRadio = prefs.getInt('selectedRadio') ?? 2;
+      allTranslate();
+    });
+  }
+
+  // บันทึกค่าเมื่อมีการเปลี่ยนแปลง
+  _handleRadioValueChange(int? value) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    setState(() {
+      selectedRadio = value!;
+      prefs.setInt('selectedRadio', selectedRadio);
+      allTranslate();
+      // Navigator.pushReplacement(
+      //   context,
+      //   MaterialPageRoute(
+      //     builder: (context) => LoginPage(
+      //       num: 0,
+      //       popPage: 0,
+      //     ),
+      //   ),
+      // );
+    });
+  }
+
 
   Future<void> _launchUrl(Uri url) async {
     if (!await launchUrl(url)) {
@@ -46,11 +77,9 @@ class _AcademyHomePageState extends State<AcademyHomePage> {
       body: SafeArea(
         child: Column(
           children: [
-            if (_showBanner)
-            _buildMobileAppBanner(),
             _buildNavigationBar(),
-            // _buildHeroImageSlider(),
-            _buildAdBanner(),
+            // _buildAdBanner(),
+            SizedBox(height: 8),
             (page == 'challenge')?Expanded(
               child: ChallengeStartTime(
                 employee: widget.employee,
@@ -87,7 +116,7 @@ class _AcademyHomePageState extends State<AcademyHomePage> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: const [
               Text("Origami Academy"),
-              Text("Open in the Origami Life Web",
+              Text("Open on the Origami Life website",
                   style: TextStyle(fontSize: 12)),
             ],
           ),
@@ -99,7 +128,7 @@ class _AcademyHomePageState extends State<AcademyHomePage> {
                 _launchUrl(_url);
               });
             },
-            child: const Text("Open"),
+            child: Text(openTS),
           ),
         ],
       ),
@@ -120,27 +149,27 @@ class _AcademyHomePageState extends State<AcademyHomePage> {
           //   },
           //   icon: const Icon(Icons.menu),
           // ),
-
+          // _handleRadioValueChange(1);
           // Language Dropdown
-          DropdownButton(
-            items: const [
-              DropdownMenuItem(value: 'en', child: Text('EN')),
-              DropdownMenuItem(value: 'th', child: Text('TH')),
-            ],
-            onChanged: (value) {},
-            hint: const Text('EN'), // Current language
-          ),
+          // DropdownButton(
+          //   items: const [
+          //     DropdownMenuItem(value: 'en', child: Text('EN')),
+          //     DropdownMenuItem(value: 'th', child: Text('TH')),
+          //   ],
+          //   onChanged: (value) {},
+          //   hint: const Text('EN'), // Current language
+          // ),
 
           // Logo
-          Image.network(
-            "https://p-a.popcdn.net/assets/blue-eventpop-logo-767017e3b2a12bf2e4887dfa4a723e2cc247925856d9abd29359ccbec71a6680.png",
-            height: 40,
-          ),
+          // Image.network(
+          //   "https://p-a.popcdn.net/assets/blue-eventpop-logo-767017e3b2a12bf2e4887dfa4a723e2cc247925856d9abd29359ccbec71a6680.png",
+          //   height: 40,
+          // ),
         ],
       ),
 
       actions: [
-        // Organizer Dropdown
+        SizedBox(width: 20),
         DropdownButton(
           items: const [
             DropdownMenuItem(value: 'course', child: Text('My Learning')),
@@ -171,17 +200,19 @@ class _AcademyHomePageState extends State<AcademyHomePage> {
           value: selectedValue,
           hint: const Text('My Learning'),
         ),
-
-        // Language Switcher (Desktop)
+        Spacer(),
         Row(
           children: [
-            TextButton(onPressed: () {}, child: const Text('TH')),
-            const Text('|'),
-            TextButton(onPressed: () {}, child: const Text('EN')),
+            TextButton(onPressed: () {_handleRadioValueChange(1);}, child: const Text('TH')),
+            const Text('|', style: TextStyle(
+              fontFamily: 'Arial',
+              fontSize: 16,
+              fontWeight: FontWeight.w700,
+              color: Color(0xFF555555),
+            ),),
+            TextButton(onPressed: () {_handleRadioValueChange(2);}, child: const Text('EN')),
           ],
         ),
-
-        // Login/Signup Button
         TextButton(
           onPressed: () {
             Navigator.pushAndRemoveUntil(
@@ -195,17 +226,15 @@ class _AcademyHomePageState extends State<AcademyHomePage> {
               (route) => false,
             );
           },
-          child: const Text('Log In / Sign Up'),
+          child: Text('$IntOutTS'),
         ),
+        SizedBox(width: 16),
       ],
     );
   }
 
   Widget _buildHeroImageSlider() {
-    final heroImages = [
-      // ... your hero image data
-    ]; // Replace with your actual data
-
+    final heroImages = [];
     return CarouselSlider(
       options: CarouselOptions(height: 400.0), // Adjust height as needed
       items: heroImages.map((image) {
@@ -236,13 +265,12 @@ class _AcademyHomePageState extends State<AcademyHomePage> {
       child: Column(
         children: [
           _buildSearchField(),
-          SizedBox(height: 16),
+          SizedBox(height: 8),
           Expanded(
             child: FutureBuilder<List<AcademyRespond>>(
               future: fetchAcademies(),
               builder: (context, snapshot) {
                 if (snapshot.connectionState == ConnectionState.waiting) {
-                  // แสดงตัวโหลดข้อมูล
                   return Center(
                       child: Row(
                     mainAxisAlignment: MainAxisAlignment.center,
@@ -254,7 +282,7 @@ class _AcademyHomePageState extends State<AcademyHomePage> {
                         width: 12,
                       ),
                       Text(
-                        '$loading...',
+                        '$loadingTS...',
                         style: TextStyle(
                           fontFamily: 'Arial',
                           fontSize: 16,
@@ -276,7 +304,7 @@ class _AcademyHomePageState extends State<AcademyHomePage> {
                 } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
                   return Center(
                       child: Text(
-                    NotFoundData,
+                    NotFoundDataTS,
                     style: TextStyle(
                       fontFamily: 'Arial',
                       fontSize: 16.0,
@@ -317,7 +345,7 @@ class _AcademyHomePageState extends State<AcademyHomePage> {
     return Container(
       alignment: Alignment.center,
       child: Text(
-        NotFoundData, // You can replace this with a constant if needed.
+        NotFoundDataTS, // You can replace this with a constant if needed.
         style: TextStyle(
           fontFamily: 'Arial',
           fontSize: 16.0,
@@ -333,50 +361,70 @@ class _AcademyHomePageState extends State<AcademyHomePage> {
   Widget _buildSearchField() {
     return Padding(
       padding: const EdgeInsets.only(left: 8, right: 8),
-      child: TextFormField(
-        controller: _searchController,
-        keyboardType: TextInputType.text,
-        style: TextStyle(
-          fontFamily: 'Arial',
-          color: Color(0xFF555555),
-          fontSize: 14,
+      child: Container(
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(100),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.2), // สีเงา
+              blurRadius: 8, // ความฟุ้งของเงา
+              offset: Offset(0, 4), // การเยื้องของเงา (แนวแกน X, Y)
+            ),
+          ],
         ),
-        decoration: InputDecoration(
-          isDense: true,
-          filled: true,
-          fillColor: Colors.white,
-          contentPadding:
-              const EdgeInsets.symmetric(horizontal: 24, vertical: 14),
-          hintText: '$Search...',
-          hintStyle: TextStyle(
-              fontFamily: 'Arial', fontSize: 14, color: Color(0xFF555555)),
-          border: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(10),
+        child: TextFormField(
+          controller: _searchController,
+          keyboardType: TextInputType.text,
+          style: TextStyle(
+            fontFamily: 'Arial',
+            color: Color(0xFF555555),
+            fontSize: 14,
           ),
-          suffixIcon: Padding(
-            padding: const EdgeInsets.only(right: 8.0),
-            child: Icon(
-              Icons.search,
-              // color: Colors.red, // สีไอคอน
-              size: 24, // ขนาดไอคอน
+          decoration: InputDecoration(
+            isDense: true,
+            filled: true,
+            fillColor: Colors.white,
+            contentPadding: EdgeInsets.symmetric(horizontal: 24, vertical: 14),
+            hintText: '$SearchTS...',
+            hintStyle: TextStyle(
+                fontFamily: 'Arial', fontSize: 14, color: Color(0xFF555555)),
+            border: InputBorder.none, // เอาขอบปกติออก
+            suffixIcon: Padding(
+              padding: EdgeInsets.only(right: 8.0),
+              child: Icon(
+                Icons.search,
+                size: 24,
+              ),
             ),
-          ),
-          enabledBorder: OutlineInputBorder(
-            borderSide: BorderSide(
-              color: Color(0xFF555555),
-              width: 1,
+            // border: OutlineInputBorder(
+            //   borderRadius: BorderRadius.circular(100),
+            // ),
+            // suffixIcon: Padding(
+            //   padding: const EdgeInsets.only(right: 8.0),
+            //   child: Icon(
+            //     Icons.search,
+            //     // color: Colors.red, // สีไอคอน
+            //     size: 24, // ขนาดไอคอน
+            //   ),
+            // ),
+            enabledBorder: OutlineInputBorder(
+              borderSide: BorderSide(
+                color: Colors.black38,
+                width: 1,
+              ),
+              borderRadius: BorderRadius.circular(50),
             ),
-            borderRadius: BorderRadius.circular(10),
-          ),
-          focusedBorder: OutlineInputBorder(
-            borderSide: BorderSide(
-              color: Color(0xFF555555),
-              width: 1,
+            focusedBorder: OutlineInputBorder(
+              borderSide: BorderSide(
+                color: Colors.black38,
+                width: 1,
+              ),
+              borderRadius: BorderRadius.circular(50),
             ),
-            borderRadius: BorderRadius.circular(10),
           ),
         ),
-      ),
+      )
     );
   }
 
@@ -438,12 +486,12 @@ class _AcademyHomePageState extends State<AcademyHomePage> {
                           child: Image.network(
                             academyItem.academy_image,
                             width: double.infinity, // ความกว้างเต็มจอ
-                            fit: BoxFit.fitWidth,
+                            fit: BoxFit.contain,
                             errorBuilder: (context, error, stackTrace) {
                               return Image.asset(
                                 'assets/images/default_image.png', // A default placeholder image in case of an error
                                 width: double.infinity, // ความกว้างเต็มจอ
-                                fit: BoxFit.fitWidth,
+                                fit: BoxFit.contain,
                               );
                             },
                           ),
@@ -479,7 +527,7 @@ class _AcademyHomePageState extends State<AcademyHomePage> {
                             Text(
                               academyItem.academy_date == "Time Out"
                                   ? academyItem.academy_date
-                                  : 'Start : ${academyItem.academy_date}',
+                                  : '$startTS : ${academyItem.academy_date}',
                               style: TextStyle(
                                 fontFamily: 'Arial',
                                 color: academyItem.academy_date == "Time Out"
@@ -557,7 +605,7 @@ class _AcademyHomePageState extends State<AcademyHomePage> {
                             'assets/images/default_image.png', // Default image in case of an error.
                             width: 200,
                             height: 200,
-                            fit: BoxFit.cover,
+                            fit: BoxFit.contain,
                           );
                         },
                       ),
@@ -581,7 +629,7 @@ class _AcademyHomePageState extends State<AcademyHomePage> {
                           Text(
                             academyItem.academy_date == "Time Out"
                                 ? academyItem.academy_date
-                                : 'Start : ${academyItem.academy_date}',
+                                : '$startTS : ${academyItem.academy_date}',
                             style: TextStyle(
                               fontFamily: 'Arial',
                               fontSize: 18,
@@ -609,7 +657,7 @@ class _AcademyHomePageState extends State<AcademyHomePage> {
                                           coachData.avatar ?? '',
                                           height: 50,
                                           width: 50,
-                                          fit: BoxFit.fitHeight,
+                                          fit: BoxFit.contain,
                                           errorBuilder:
                                               (context, error, stackTrace) {
                                             return Icon(Icons.error);

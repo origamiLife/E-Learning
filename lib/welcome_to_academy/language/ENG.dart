@@ -1,97 +1,96 @@
-
-
-
 import 'package:academy/welcome_to_academy/language/translate.dart';
 
-
-
-
-
-
-
-
-
-
-
-
-
 Future<void> ENG() async {
-  Search = 'Search';
-  NotFoundData = 'NOT FOUND DATA';
-  timeout = 'Time Out';
-  start = 'Start';
-  learning = 'Learning';
-  challenge = 'Challenge';
-  catalog = 'Catalog';
+  SearchTS = 'Search';
+  NotFoundDataTS = 'NOT FOUND DATA';
+  timeoutTS = 'Time Out';
+  startTS = 'Start';
+  learningTS = 'Learning';
+  challengeTS = 'Challenge';
+  catalogTS = 'Catalog';
   favoriteTS = 'Favorite';
-  coachCourse = 'Coach Course';
-  language = 'Language';
-  logout = 'Logout';
-  end = 'End';
-  time = 'Time';
-  skip = 'Skip';
-  next = 'Next';
-  challengeSection = 'YOU ARE VIEWING CHALLENGE SECTION';
-  question = 'QUESTION';
-  correct = 'Correct';
-  incorrect = 'Incorrect';
-  noResult = 'No Result';
-  summary = 'Summary';
-  myChallenge = 'My Challenge';
-  finishedChallenge = 'Finished Challenge';
-  Top_Challenge = 'Top Challenge';
-  examiner = 'Examiner';
-  correctAnswer = 'Correct answer';
-  timeUsed = 'Time used';
-  startChallenge = 'Start Challenge';
-  RequestCA = 'Request challenge again';
-  timeStatus = 'TIME STATUS';
-  examDuration = 'Exam Duration';
-  name = 'Name';
-  score = 'Score';
-  academy = 'Academy';
-  loading = 'Loading';
-  AOB = 'Allable On Boarding';
-  favorite = 'Favorite';
-  status = 'Status';
-  student = 'student';
-  video = 'Video';
-  EnrollForm = 'Enroll form';
-  HistoryRequest = 'History request';
-  Cancel = 'Cancel';
-  Enroll = 'Enroll';
-  ERROR = 'ERROR!';
-  Download = 'Download';
-  exitApp = 'Press back again to exit the origami application.';
-  WYL = "What you'll learn?";
-  courseIncludes = 'This course includes';
-  file = 'File';
-  link = 'Link';
-  event = 'Event';
-  certificate = 'Certificate of completion';
-  comments = 'Comments';
-  post = 'Post';
-  editDiscussion = 'Edit Discussion';
-  edit = 'Edit';
-  warning = 'Warning!';
-  areYouDelete = 'Are you sure you want to delete?';
-  delete = 'Delete';
-  students = 'Students';
-  courses = 'Courses';
-  currentPosition = 'Current Position';
-  youtubePlayer = 'Youtube Player';
-  exitApp2 = 'Press back again to exit';
-  elearning = 'E-Learning';
-  forgotPwd = 'Forgot Pwd?';
-  login = 'LOGIN';
-  messageforgotPwd = 'Forgot your password?';
-  messageRestPwd = 'Please enter your email address to request a password reset.';
-  send = 'SEND';
-  returnLogin = 'Return to login.';
-  checkPwd = 'Please enter both email and password.';
-  statusCodeError = 'Status Code Error!';
+  coachCourseTS = 'Coach Course';
+  languageTS = 'Language';
+  logoutTS = 'Logout';
+  endTS = 'End';
+  timeTS = 'Time';
+  skipTS = 'Skip';
+  nextTS = 'Next';
+  challengeSectionTS = 'YOU ARE VIEWING CHALLENGE SECTION';
+  questionTS = 'QUESTION';
+  correctTS = 'Correct';
+  incorrectTS = 'Incorrect';
+  noResultTS = 'No Result';
+  summaryTS = 'Summary';
+  myChallengeTS = 'My Challenge';
+  finishedChallengeTS = 'Finished Challenge';
+  Top_ChallengeTS = 'Top Challenge';
+  examinerTS = 'Examiner';
+  correctAnswerTS = 'Correct answer';
+  timeUsedTS = 'Time used';
+  startChallengeTS = 'Start Challenge';
+  RequestCATS = 'Request challenge again';
+  timeStatusTS = 'TIME STATUS';
+  examDurationTS = 'Exam Duration';
+  nameTS = 'Name';
+  scoreTS = 'Score';
+  academyTS = 'Academy';
+  loadingTS = 'Loading';
+  AOBTS = 'Allable On Boarding';
+  favoriteTS = 'Favorite';
+  statusTS = 'Status';
+  studentTS = 'student';
+  videoTS = 'Video';
+  EnrollFormTS = 'Enroll form';
+  HistoryRequestTS = 'History request';
+  CancelTS = 'Cancel';
+  EnrollTS = 'Enroll';
+  ERRORTS = 'ERROR!';
+  DownloadTS = 'Download';
+  exitAppTS = 'Press back again to exit the origami application.';
+  WYLTS = "What you'll learn?";
+  courseIncludesTS = 'This course includes';
+  fileTS = 'File';
+  linkTS = 'Link';
+  eventTS = 'Event';
+  certificateTS = 'Certificate of completion';
+  commentsTS = 'Comments';
+  postTS = 'Post';
+  editDiscussionTS = 'Edit Discussion';
+  editTS = 'Edit';
+  warningTS = 'Warning!';
+  areYouDeleteTS = 'Are you sure you want to delete?';
+  deleteTS = 'Delete';
+  studentsTS = 'Students';
+  coursesTS = 'Courses';
+  currentPositionTS = 'Current Position';
+  youtubePlayerTS = 'Youtube Player';
+  exitApp2TS = 'Press back again to exit';
+  elearningTS = 'E-Learning';
+  forgotPwdTS = 'Forgot Pwd?';
+  loginTS = 'LOGIN';
+  messageforgotPwdTS = 'Forgot your password?';
+  messageRestPwdTS = 'Please enter your email address to request a password reset.';
+  sendTS = 'SEND';
+  returnLoginTS = 'Return to login.';
+  checkPwdTS = 'Please enter both email and password.';
+  statusCodeErrorTS = 'Status Code Error!';
   DescriptionTS = 'Description';
   CurriculumTS = 'Curriculum';
   InstructorsTS = 'Instructors';
   CertificationTS = 'Certification';
+  IntOutTS = 'LogOut';
+  openTS = 'Open';
+  PartTS = 'Part';
+  MinTS = 'Min';
+  DurationTS = 'Duration';
+  RuleTS = 'Rule';
+  NumberQuestionsTS = 'Number of questions';
+  AreYouReadyTS = 'Are you ready?';
+  WarnTS = 'Warn';
+  timeoutMessageTH = 'The system will process all test-taking results of all test-takers into a database for display.';
+  SaveTS = 'Save';
+  failureMessageTS = 'There are questions that have not been answered. Press the Close button to return to the test and complete all questions, or press the Success button to submit your answers.';
+  FinishTS = 'Finish';
+
 }

@@ -29,116 +29,333 @@ class YouTubePlayerWidget extends StatefulWidget {
 }
 
 class _YouTubePlayerWidgetState extends State<YouTubePlayerWidget> {
-  late YoutubePlayerController _controller;
-  int? _lastStopTime;
-  final Duration _startTime = Duration(milliseconds: 5568); // เปลี่ยนเป็น 5568 มิลลิวินาที (5.5686 วินาที)
+  late YoutubePlayerController _youtubePlayerController;
+  Duration _startTime = const Duration(milliseconds: 5568);
   Duration _currentPosition = Duration.zero;
-  bool _isFetching = false; // ตัวแปรป้องกันการเรียก API ซ้ำ
+  bool _showControls = true;
+  Timer? _hideControlsTimer;
+  bool _isFullScreen = false;
+  bool iconStop = false;
+  double _playbackSpeed = 1.0;
+  int totalSeconds = 10;
 
   @override
   void initState() {
     super.initState();
-    _controller = YoutubePlayerController(
+    _begin(widget.topic.topicDuration);
+    SystemChrome.setPreferredOrientations(
+        [DeviceOrientation.portraitUp, DeviceOrientation.landscapeRight]);
+
+    _youtubePlayerController = YoutubePlayerController(
       initialVideoId: widget.videoId,
-      flags: YoutubePlayerFlags(autoPlay: true, mute: false),
+      flags: YoutubePlayerFlags(
+        autoPlay: false,
+        mute: false,
+        startAt: totalSeconds
+      ),
     );
 
-    // เพิ่ม listener เพื่อติดตามสถานะของวิดีโอ
-    _controller.addListener(() {
-      if (_controller.value.isPlaying && _controller.value.isReady) {
-        setState(() {
-          _currentPosition = _controller.value.position;
-        });
-      }
+    _youtubePlayerController.addListener(_videoListener);
+    _startHideControlsTimer();
+  }
 
-      if (!_controller.value.isPlaying &&
-          (_lastStopTime != _controller.value.position?.inSeconds)) {
-        _lastStopTime = _controller.value.position?.inSeconds ?? 0;
-        print('Video stopped at: $_lastStopTime');
+  void _videoListener() {
+    if (_youtubePlayerController.value.isPlaying) {
+      setState(() {
+        _currentPosition = _youtubePlayerController.value.position;
+        Timer(Duration(seconds: 5), () {
+          fetchStatus(_currentPosition.inMilliseconds);
+        });
+        print('start - stop : ${_currentPosition.inMilliseconds}');
+        iconStop = false;
+      });
+    } else {
+      iconStop = true;
+    }
+  }
+
+  void _toggleControls() {
+    setState(() => _showControls = !_showControls);
+    if (_showControls) {
+      _startHideControlsTimer();
+    } else {
+      _hideControlsTimer?.cancel();
+    }
+  }
+
+  void _startHideControlsTimer() {
+    _hideControlsTimer?.cancel();
+    _hideControlsTimer = Timer(const Duration(seconds: 3), () {
+      setState(() {
+        _showControls = false;
+      });
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullScreen = !_isFullScreen;
+      if (_isFullScreen) {
+        SystemChrome.setPreferredOrientations([
+          DeviceOrientation.landscapeLeft,
+          DeviceOrientation.landscapeRight,
+        ]);
+      } else {
+        SystemChrome.setPreferredOrientations([
+          DeviceOrientation.portraitUp,
+          DeviceOrientation.portraitDown,
+        ]);
       }
     });
   }
 
+  void _changeSpeed(double speed) {
+    setState(() {
+      _playbackSpeed = speed;
+      _youtubePlayerController.setPlaybackRate(speed);
+    });
+  }
+
+  String _formatDuration(Duration duration) {
+    String twoDigits(int n) => n.toString().padLeft(2, '0');
+    String minutes = twoDigits(duration.inMinutes.remainder(60));
+    String seconds = twoDigits(duration.inSeconds.remainder(60));
+    return "$minutes:$seconds";
+  }
+
+  void _begin(String topicDuration) {
+    String time = topicDuration;
+    final regex = RegExp(r'(\d+)h (\d+)m (\d+)s');
+    final match = regex.firstMatch(time);
+
+    if (match != null) {
+      int hours = int.parse(match.group(1)!);
+      int minutes = int.parse(match.group(2)!);
+      int seconds = int.parse(match.group(3)!);
+
+      totalSeconds = (hours * 3600) + (minutes * 60) + seconds;
+      _startTime = Duration(
+        hours: hours,
+        minutes: minutes,
+        seconds: seconds,
+      );
+      print(_startTime);
+    }
+  }
+
   @override
   void dispose() {
-    // แปลงตำแหน่งปัจจุบันเป็นมิลลิวินาที
-    final int videoViewedInMillisec = _currentPosition.inMilliseconds;
-
-    // เรียก API พร้อมข้อมูลเวลาที่ดูวิดีโอ
-    fetchStatus(videoViewedInMillisec);
-
-    _controller.dispose();
+    _youtubePlayerController.dispose();
+    _hideControlsTimer?.cancel();
+    SystemChrome.setPreferredOrientations([
+      DeviceOrientation.portraitUp,
+      DeviceOrientation.portraitDown,
+    ]);
+    _youtubePlayerController.removeListener(_videoListener);
+    fetchStatus(_currentPosition.inMilliseconds);
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
     return PopScope(
-      // canPop: true, // ป้องกันการออกจากหน้าก่อนเรียก fetchStatus()
-      onPopInvoked: (didPop) async {
-        if (!didPop) {
-          final int videoViewedInMillisec = _currentPosition.inMilliseconds;
-          fetchStatus(videoViewedInMillisec);
-        }
+      onPopInvoked: (didPop) {
+        if (!didPop) fetchStatus(_currentPosition.inMilliseconds);
       },
       child: Scaffold(
         backgroundColor: Colors.black,
-        appBar: AppBar(
-          foregroundColor: Colors.white,
-          backgroundColor: Color(0xFFFF9900),
-          title: Text(
-            'Youtube Player',
-            style: TextStyle(
-              fontFamily: 'Arial',
-              fontSize: 24,
-              color: Colors.white,
-              fontWeight: FontWeight.w700,
-            ),
-          ),
-        ),
-        body: YoutubePlayerBuilder(
-          player: YoutubePlayer(
-            controller: _controller,
-            showVideoProgressIndicator: true,
-            onReady: () {
-              print('Player is ready.');
-              if (_lastStopTime != null) {
-                _controller.seekTo(Duration(seconds: _lastStopTime!));
-              } else {
-                _controller.seekTo(_startTime); // เริ่มต้นที่ 5.5686 วินาที
-              }
-            },
-          ),
-          builder: (context, player) {
-            return Stack(
-              children: [
-                Center(child: player),
-                Positioned(
-                  bottom: 20,
-                  right: 20,
-                  child: Text(
-                    'Current Position: ${_currentPosition.inSeconds}s',
-                    style: const TextStyle(color: Colors.white),
+        body: SafeArea(
+          child: GestureDetector(
+            onTap: _toggleControls,
+            child: Center(
+              child: YoutubePlayerBuilder(
+                player: YoutubePlayer(
+                  controller: _youtubePlayerController,
+                  progressColors: ProgressBarColors(
+                    playedColor: Colors.transparent, // ซ่อนสี progress
+                    handleColor: Colors.transparent, // ซ่อนตัวเลื่อน
                   ),
                 ),
-              ],
-            );
-          },
+                builder: (context, player) {
+                  return Stack(
+                    alignment: Alignment.center,
+                    children: [
+                      // Use a fixed aspect ratio for the video (16:9)
+                      AspectRatio(
+                        aspectRatio: 16 / 9,
+                        child: player,
+                      ),
+                      Container(
+                          color: (_showControls || iconStop == true)
+                              ? Colors.black38
+                              : Colors.transparent),
+                      if (_showControls || iconStop == true)
+                        Center(
+                          child: InkWell(
+                            onTap: () {
+                              setState(() {
+                                _youtubePlayerController.value.isPlaying
+                                    ? _youtubePlayerController.pause()
+                                    : _youtubePlayerController.play();
+                              });
+                            },
+                            child: Container(
+                              decoration: BoxDecoration(
+                                color: Colors.black54,
+                                borderRadius: BorderRadius.circular(100),
+                              ),
+                              child: Icon(
+                                _youtubePlayerController.value.isPlaying
+                                    ? Icons.pause
+                                    : Icons.play_arrow,
+                                color: Colors.white,
+                                size: 54,
+                              ),
+                            ),
+                          ),
+                        ),
+                      if (_showControls || iconStop == true)
+                        Positioned(
+                          top: 10,
+                          left: 20,
+                          right: 20,
+                          child: Row(
+                            children: [
+                              InkWell(
+                                  onTap: () => Navigator.pop(context),
+                                  child: Icon(Icons.keyboard_arrow_down,
+                                      color: Colors.white, size: 28)),
+                              SizedBox(width: 4),
+                              Expanded(
+                                child: Text(
+                                  '${widget.topic.topicName}',
+                                  style: TextStyle(
+                                      color: Colors.white,
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.w700),
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      if (_showControls) _buildControls(),
+                    ],
+                  );
+                },
+              ),
+            ),
+          ),
         ),
       ),
     );
   }
 
-  Future<void> fetchStatus(int videoViewed) async {
+  Widget _buildControls() {
+    return Positioned(
+      bottom: 0,
+      left: 20,
+      right: 20,
+      child: Row(
+        children: [
+          Text(
+            '${_formatDuration(_youtubePlayerController.value.position)}  ',
+            style: TextStyle(color: Colors.white, fontSize: 12),
+          ),
+          Flexible(
+            child: Slider(
+              value:
+                  _youtubePlayerController.value.position.inSeconds.toDouble(),
+              min: 0,
+              max: _youtubePlayerController.metadata.duration.inSeconds
+                  .toDouble(),
+              onChanged: (double value) {
+                _youtubePlayerController
+                    .seekTo(Duration(seconds: value.toInt()));
+              },
+            ),
+          ),
+          Text(
+            ' - ${_formatDuration(_youtubePlayerController.metadata.duration)}',
+            style: TextStyle(color: Colors.white, fontSize: 12),
+          ),
+          PopupMenuButton<double>(
+            icon: Icon(Icons.speed, color: Colors.white, size: 18),
+            onSelected: _changeSpeed,
+            itemBuilder: (context) => [
+              PopupMenuItem(
+                  value: 0.25,
+                  child: Text(
+                    "0.25x",
+                    style: TextStyle(color: Colors.black, fontSize: 12),
+                  )),
+              PopupMenuItem(
+                  value: 0.5,
+                  child: Text(
+                    "0.5x",
+                    style: TextStyle(color: Colors.black, fontSize: 12),
+                  )),
+              PopupMenuItem(
+                  value: 0.75,
+                  child: Text(
+                    "0.75x",
+                    style: TextStyle(color: Colors.black, fontSize: 12),
+                  )),
+              PopupMenuItem(
+                  value: 1.0,
+                  child: Text(
+                    "Normal",
+                    style: TextStyle(color: Colors.black, fontSize: 12),
+                  )),
+              PopupMenuItem(
+                  value: 1.25,
+                  child: Text(
+                    "1.25x",
+                    style: TextStyle(color: Colors.black, fontSize: 12),
+                  )),
+              PopupMenuItem(
+                  value: 1.5,
+                  child: Text(
+                    "1.5x",
+                    style: TextStyle(color: Colors.black, fontSize: 12),
+                  )),
+              PopupMenuItem(
+                  value: 1.75,
+                  child: Text(
+                    "1.75x",
+                    style: TextStyle(color: Colors.black, fontSize: 12),
+                  )),
+              PopupMenuItem(
+                  value: 2.0,
+                  child: Text(
+                    "2.0x",
+                    style: TextStyle(color: Colors.black, fontSize: 12),
+                  )),
+            ],
+          ),
+          InkWell(
+            onTap: _toggleFullScreen,
+            child: Icon(
+              _isFullScreen ? Icons.fullscreen_exit : Icons.fullscreen,
+              color: Colors.white,
+              size: 18,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Future<void> fetchStatus(int videoViewedInMillisec) async {
+    final uri = Uri.parse("$host/api/origami/academy/save.php");
     try {
-      final uri = Uri.parse("$host/api/origami/academy/save.php");
       final response = await http.post(
         uri,
         headers: {'Authorization': 'Bearer ${widget.Authorization}'},
         body: {
           'comp_id': widget.employee.comp_id,
           'emp_id': widget.employee.emp_id,
-          'Authorization': widget.Authorization,
           'academy_id': widget.academy.academy_id,
           'academy_type': widget.academy.academy_type,
           'course_id': widget.courseId,
@@ -147,22 +364,19 @@ class _YouTubePlayerWidgetState extends State<YouTubePlayerWidget> {
           'topic_option': widget.topic.topicOption,
           'topic_item': widget.topic.topicItem,
           'learning_seq': widget.learning_seq,
-          'video_viewed': videoViewed.toString(), // ส่งเวลาในมิลลิวินาที
+          'video_viewed': '$videoViewedInMillisec',
           'video_duration': widget.topic.topicDuration,
         },
       );
 
       if (response.statusCode == 200) {
-        final Map<String, dynamic> jsonResponse = json.decode(response.body);
-        print('Status: $jsonResponse');
+        final jsonResponse = json.decode(response.body);
+        // Handle the response
       } else {
-        print('Failed to save status: ${response.statusCode}');
+        print('Error: ${response.statusCode}');
       }
     } catch (e) {
-      print('Error occurred while saving status: $e');
+      print('Network error: $e');
     }
   }
-
 }
-
-

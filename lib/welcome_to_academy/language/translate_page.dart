@@ -62,7 +62,7 @@ class _TranslatePageState extends State<TranslatePage> {
               ? Alignment.centerLeft
               : Alignment.center,
           child: Text(
-            language,
+            languageTS,
             style: TextStyle(
               fontFamily: 'Arial',
               color: Color(0xFFFF9900),

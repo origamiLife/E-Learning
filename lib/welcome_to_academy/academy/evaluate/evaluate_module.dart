@@ -120,13 +120,19 @@ class _EvaluateModuleState extends State<EvaluateModule>
         foregroundColor: Colors.white,
         backgroundColor: Color(0xFFFF9900),
         title: Text(
-          'Academy',
+          '$academyTS',
           style: TextStyle(
             fontFamily: 'Arial',
             fontSize: 24,
             color: Colors.white,
             fontWeight: FontWeight.w700,
           ),
+        ),
+        leading: IconButton(
+          icon: Icon(Icons.arrow_back_ios, color: Colors.white, size: 24),
+          onPressed: () {
+            Navigator.pop(context);
+          },
         ),
       ),
       body: FutureBuilder<Map<String, dynamic>>(
@@ -145,7 +151,7 @@ class _EvaluateModuleState extends State<EvaluateModule>
                   width: 12,
                 ),
                 Text(
-                  '$loading...',
+                  '$loadingTS...',
                   style: TextStyle(
                     fontFamily: 'Arial',
                     fontSize: 16,
@@ -167,7 +173,7 @@ class _EvaluateModuleState extends State<EvaluateModule>
           } else {
             return Center(
                 child: Text(
-              NotFoundData,
+              NotFoundDataTS,
               style: TextStyle(
                 fontFamily: 'Arial',
                 fontSize: 16.0,
@@ -196,59 +202,17 @@ class _EvaluateModuleState extends State<EvaluateModule>
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Padding(
-                padding: const EdgeInsets.only(left: 16,top: 8),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Flexible(
-                      child: SingleChildScrollView(
-                        scrollDirection: Axis.horizontal,
-                        child: Text(
-                          widget.academy.academy_subject,
-                          style: TextStyle(
-                            fontFamily: 'Arial',
-                            fontSize: 20,
-                            fontWeight: FontWeight.w700,
-                            color: Color(0xFF555555),
-                          ),
-                          overflow: TextOverflow.ellipsis,
-                          maxLines: 1,
-                        ),
-                      ),
-                    ),
-                    SizedBox(width: 8),
-                    InkWell(
-                      onTap: () {
-                        setState(() {
-                          widget.callback!();
-                          _isClick = !_isClick;
-                        });
-                      },
-                      child: Container(
-                        padding: const EdgeInsets.all(8),
-                        decoration: BoxDecoration(
-                          color: _isClick ? Colors.red.shade100 : Color(0xFFE5E5E5),
-                          borderRadius: BorderRadius.circular(10),
-                        ),
-                        child: Row(
-                          children: [
-                            Icon(
-                              Icons.favorite,
-                              color: _isClick ? Colors.red : Colors.grey,
-                            ),
-                            SizedBox(width: 4),
-                            Text(
-                              "Favorite",
-                              style: TextStyle(
-                                fontFamily: 'Arial',
-                                color: _isClick ? Colors.red : Colors.grey,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-                  ],
+                padding: const EdgeInsets.only(left: 16, top: 8),
+                child: Text(
+                  widget.academy.academy_subject,
+                  style: TextStyle(
+                    fontFamily: 'Arial',
+                    fontSize: 20,
+                    fontWeight: FontWeight.w700,
+                    color: Color(0xFF555555),
+                  ),
+                  // overflow: TextOverflow.ellipsis,
+                  // maxLines: 1,
                 ),
               ),
               SizedBox(height: 8),
@@ -274,7 +238,7 @@ class _EvaluateModuleState extends State<EvaluateModule>
                             fastView.fastview_cover ?? '',
                             width: 90,
                             height: 80,
-                            fit: BoxFit.cover,
+                            fit: BoxFit.contain,
                           ),
                         ),
                         SizedBox(width: 12),
@@ -297,7 +261,7 @@ class _EvaluateModuleState extends State<EvaluateModule>
                               Row(
                                 children: [
                                   Text(
-                                    "Start: ",
+                                    "$startTS: ",
                                     style: TextStyle(
                                       fontFamily: 'Arial',
                                       fontSize: 14,
@@ -321,7 +285,7 @@ class _EvaluateModuleState extends State<EvaluateModule>
                               Row(
                                 children: [
                                   Text(
-                                    "Status: ",
+                                    "$statusTS: ",
                                     style: TextStyle(
                                       fontFamily: 'Arial',
                                       fontSize: 14,
@@ -350,15 +314,68 @@ class _EvaluateModuleState extends State<EvaluateModule>
                   ),
                 ),
               ),
+              SizedBox(height: 8),
+              InkWell(
+                onTap: () {
+                  setState(() {
+                    widget.callback!();
+                    _isClick = !_isClick;
+                  });
+                },
+                child: Container(
+                  padding: const EdgeInsets.all(8),
+                  decoration: BoxDecoration(
+                    color: _isClick
+                        ? Colors.red.shade100
+                        : Color(0xFFE5E5E5),
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(
+                        Icons.favorite,
+                        color: _isClick ? Colors.red : Colors.grey,
+                      ),
+                      SizedBox(width: 4),
+                      Text(
+                        "$favoriteTS",
+                        style: TextStyle(
+                          fontFamily: 'Arial',
+                          color: _isClick ? Colors.red : Colors.grey,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
               SizedBox(height: 12),
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 8),
                 child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    _infoRow(Icons.people_alt_outlined, '${headerData.student_number} student'),
-                    _infoRow(Icons.access_time, '${headerData.video_number} Video : ${headerData.video_time}'),
-                    _infoRow(Icons.bookmark_border, headerData.category_name ?? ''),
+                    _infoRow(Icons.video_collection_outlined,
+                        '${headerData.video_number} Video'),
+                    Text(
+                      '|',
+                      style: TextStyle(
+                        fontFamily: 'Arial',
+                        fontSize: 16,
+                        color: Color(0xFF555555),
+                      ),
+                    ),
+                    _infoRow(
+                        Icons.access_time, '${headerData.video_time}'),
+                    Text(
+                      '|',
+                      style: TextStyle(
+                        fontFamily: 'Arial',
+                        fontSize: 16,
+                        color: Color(0xFF555555),
+                      ),
+                    ),
+                    _infoRow(Icons.bookmark_border,
+                        headerData.category_name ?? ''),
                   ],
                 ),
               ),
@@ -389,27 +406,25 @@ class _EvaluateModuleState extends State<EvaluateModule>
 
   Widget _infoRow(IconData icon, String text) {
     return Expanded(
-      child: SingleChildScrollView(
-        scrollDirection: Axis.horizontal,
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.start,
-          children: [
-            Icon(icon, color: Colors.amber),
-            SizedBox(width: 8),
-            Text(
-              text,
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Icon(icon, color: Colors.amber),
+          SizedBox(width: 8),
+          Flexible(
+            child: Text(
+              text == '' ? '-' : text,
               style: TextStyle(
                 fontFamily: 'Arial',
                 fontSize: 14,
                 color: Color(0xFF555555),
               ),
             ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }
-
 
   int _selectedIndex = 0;
 
@@ -417,9 +432,9 @@ class _EvaluateModuleState extends State<EvaluateModule>
     '$DescriptionTS',
     '$CurriculumTS',
     '$InstructorsTS',
-    // 'Discussion',
+    'Discussion',
     // 'Announcements',
-    // 'Attach File',
+    'Attach File',
     '$CertificationTS',
   ];
 
@@ -443,21 +458,21 @@ class _EvaluateModuleState extends State<EvaluateModule>
           academy: widget.academy,
           Authorization: widget.Authorization,
         );
-      // case 3:
-      //   return Discussion(
-      //     employee: widget.employee,
-      //     academy: widget.academy,
-      //     Authorization: widget.Authorization,
-      //   );
+      case 3:
+        return Discussion(
+          employee: widget.employee,
+          academy: widget.academy,
+          Authorization: widget.Authorization,
+        );
       // case 4:
       //   return Announcements();
-      //   case 3:
-      //     return AttachFile(
-      //       employee: widget.employee,
-      //       academy: widget.academy,
-      //       Authorization: widget.Authorization,
-      //     );
-      case 3:
+        case 4:
+          return AttachFile(
+            employee: widget.employee,
+            academy: widget.academy,
+            Authorization: widget.Authorization,
+          );
+      case 5:
         return Certification(
           employee: widget.employee,
           academy: widget.academy,
@@ -480,185 +495,6 @@ class _EvaluateModuleState extends State<EvaluateModule>
         );
     }
   }
-
-  void _showDialogA() {
-    showDialog(
-      context: context,
-      barrierDismissible: true,
-      builder: (BuildContext dialogContext) {
-        return AlertDialog(
-          elevation: 0,
-          backgroundColor: Colors.white,
-          title: Column(
-            children: [
-              Row(
-                children: [
-                  const Icon(Icons.file_copy_outlined),
-                  const SizedBox(
-                    width: 4,
-                  ),
-                  Text(
-                    'Enroll form',
-                    style: TextStyle(
-                      fontFamily: 'Arial',
-                      fontWeight: FontWeight.w700,
-                      color: const Color(0xFF555555),
-                    ),
-                  ),
-                ],
-              ),
-              const SizedBox(
-                height: 8,
-              ),
-              Container(
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(15),
-                  border: Border.all(
-                    color: const Color(0xFF555555),
-                    width: 1.0,
-                  ),
-                ),
-                child: TextFormField(
-                  minLines: 3,
-                  maxLines: null,
-                  keyboardType: TextInputType.text,
-                  controller: _commentControllerA,
-                  style: TextStyle(
-                      fontFamily: 'Arial',
-                      color: const Color(0xFF555555),
-                      fontSize: 14),
-                  decoration: InputDecoration(
-                    isDense: true,
-                    filled: true,
-                    fillColor: Colors.white,
-                    hintText: '',
-                    hintStyle: TextStyle(
-                        fontFamily: 'Arial',
-                        fontSize: 14,
-                        color: const Color(0xFF555555)),
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(15),
-                      borderSide: BorderSide.none,
-                    ),
-                    focusedBorder: UnderlineInputBorder(
-                      borderSide: BorderSide(color: Color(0xFF555555)),
-                    ),
-                  ),
-                  onChanged: (value) {},
-                ),
-              ),
-            ],
-          ),
-          content: InkWell(
-            onTap: (){},//_showDialogB,
-            child: Row(
-              // mainAxisAlignment: MainAxisAlignment.end,
-              children: [
-                Text(
-                  'History request',
-                  style: TextStyle(
-                    fontFamily: 'Arial',
-                    decoration: TextDecoration.underline,
-                    // fontWeight: FontWeight.w700,
-                    // color: Color(0xFF555555),
-                  ),
-                ),
-                const Icon(Icons.arrow_drop_down),
-              ],
-            ),
-          ),
-          actions: <Widget>[
-            TextButton(
-              child: Text(
-                'Cancel',
-                style: TextStyle(
-                  fontFamily: 'Arial',
-                  color: const Color(0xFF555555),
-                ),
-              ),
-              onPressed: () {
-                Navigator.pop(context);
-              },
-            ),
-            TextButton(
-              child: Text(
-                'Enroll',
-                style: TextStyle(
-                  fontFamily: 'Arial',
-                  fontWeight: FontWeight.w700,
-                  color: Colors.green,
-                ),
-              ),
-              onPressed: () {
-                setState(() {
-                  // fetchApprovelMassage(setApprovel?.mny_request_id,"N",_commentN);
-                });
-                Navigator.pop(context);
-              },
-            ),
-          ],
-        );
-      },
-    );
-  }
-
-  void _showDialogB() {
-    showDialog(
-      context: context,
-      barrierDismissible: true,
-      builder: (BuildContext dialogContext) {
-        return AlertDialog(
-          elevation: 0,
-          backgroundColor: Colors.white,
-          title: Column(
-            children: [
-              Row(
-                children: [
-                  const Icon(Icons.history),
-                  const SizedBox(
-                    width: 4,
-                  ),
-                  Text(
-                    'History request',
-                    style: TextStyle(
-                      fontFamily: 'Arial',
-                      fontWeight: FontWeight.w700,
-                      color: const Color(0xFF555555),
-                    ),
-                  ),
-                ],
-              ),
-              const SizedBox(
-                height: 16,
-              ),
-              Text(
-                'No data available in table',
-                style: TextStyle(
-                  fontFamily: 'Arial',
-                  color: Colors.grey,
-                  fontSize: 14,
-                ),
-              ),
-            ],
-          ),
-          actions: <Widget>[
-            TextButton(
-              child: Text(
-                'Cancel',
-                style: TextStyle(
-                  fontFamily: 'Arial',
-                  color: const Color(0xFF555555),
-                ),
-              ),
-              onPressed: () {
-                Navigator.pop(context);
-              },
-            ),
-          ],
-        );
-      },
-    );
-  }
 }
 
 class IDPlan {
@@ -677,54 +513,54 @@ class IDPlan {
 }
 
 class HeaderData {
-  final String? academy_name;
-  final String? academy_description;
-  final String? category_name;
-  final String? video_time;
-  final String? video_number;
-  final String? student_number;
-  final String? announce_number;
-  final int? favorite_status;
-  final String? academy_link;
+  final String academy_name;
+  final String academy_description;
+  final String category_name;
+  final String video_time;
+  final String video_number;
+  final String student_number;
+  final String announce_number;
+  final int favorite_status;
+  final String academy_link;
 
   HeaderData({
-    this.academy_name,
-    this.academy_description,
-    this.category_name,
-    this.video_time,
-    this.video_number,
-    this.student_number,
-    this.announce_number,
-    this.favorite_status,
-    this.academy_link,
+    required this.academy_name,
+    required this.academy_description,
+    required this.category_name,
+    required this.video_time,
+    required this.video_number,
+    required this.student_number,
+    required this.announce_number,
+    required this.favorite_status,
+    required this.academy_link,
   });
 
   // สร้างฟังก์ชันเพื่อแปลง JSON ไปเป็น Object ของ Academy
   factory HeaderData.fromJson(Map<String, dynamic> json) {
     return HeaderData(
-      academy_name: json['academy_name'],
-      academy_description: json['academy_description'],
-      category_name: json['category_name'],
-      video_time: json['video_time'],
-      video_number: json['video_number'],
-      student_number: json['student_number'],
-      announce_number: json['announce_number'],
-      favorite_status: json['favorite_status'],
-      academy_link: json['academy_link'],
+      academy_name: json['academy_name'] ?? '',
+      academy_description: json['academy_description'] ?? '',
+      category_name: json['category_name'] ?? '',
+      video_time: json['video_time'] ?? '',
+      video_number: json['video_number'] ?? '',
+      student_number: json['student_number'] ?? '',
+      announce_number: json['announce_number'] ?? '',
+      favorite_status: json['favorite_status'] ?? 0,
+      academy_link: json['academy_link'] ?? '',
     );
   }
 }
 
 class FastView {
-  final String? fastview_cover;
-  final String? course_id;
-  final String? course_option;
-  final String? item_id;
-  final String? topic_no;
-  final String? topic_id;
-  final String? fastview_button;
-  final String? fastview_exp;
-  final String? fastview_text;
+  final String fastview_cover;
+  final String course_id;
+  final String course_option;
+  final String item_id;
+  final String topic_no;
+  final String topic_id;
+  final String fastview_button;
+  final String fastview_exp;
+  final String fastview_text;
 
   FastView({
     required this.fastview_cover,
@@ -741,53 +577,53 @@ class FastView {
   // สร้างฟังก์ชันเพื่อแปลง JSON ไปเป็น Object ของ Academy
   factory FastView.fromJson(Map<String, dynamic> json) {
     return FastView(
-      fastview_cover: json['fastview_cover'],
-      course_id: json['course_id'],
-      course_option: json['course_option'],
-      item_id: json['item_id'],
-      topic_no: json['topic_no'],
-      topic_id: json['topic_id'],
-      fastview_button: json['fastview_button'],
-      fastview_exp: json['fastview_exp'],
-      fastview_text: json['fastview_text'],
+      fastview_cover: json['fastview_cover'] ?? '',
+      course_id: json['course_id'] ?? '',
+      course_option: json['course_option'] ?? '',
+      item_id: json['item_id'] ?? '',
+      topic_no: json['topic_no'] ?? '',
+      topic_id: json['topic_id'] ?? '',
+      fastview_button: json['fastview_button'] ?? '',
+      fastview_exp: json['fastview_exp'] ?? '',
+      fastview_text: json['fastview_text'] ?? '',
     );
   }
 }
 
 class CourseData {
-  final String? fastview_cover;
-  final String? count;
-  final String? course;
-  final String? fastview_exp;
-  final String? id;
-  final String? item;
-  final String? no;
-  final String? option;
-  final String? text;
+  final String fastview_cover;
+  final String count;
+  final String course;
+  final String fastview_exp;
+  final String id;
+  final String item;
+  final String no;
+  final String option;
+  final String text;
 
   CourseData({
-    this.fastview_cover,
-    this.count,
-    this.course,
-    this.fastview_exp,
-    this.id,
-    this.item,
-    this.no,
-    this.option,
-    this.text,
+    required this.fastview_cover,
+    required this.count,
+    required this.course,
+    required this.fastview_exp,
+    required this.id,
+    required this.item,
+    required this.no,
+    required this.option,
+    required this.text,
   });
 
   factory CourseData.fromJson(Map<String, dynamic> json) {
     return CourseData(
-      fastview_cover: json['fastview_cover'],
-      count: json['count'],
-      course: json['course'],
-      fastview_exp: json['fastview_exp'],
-      id: json['id'],
-      item: json['item'],
-      no: json['no'],
-      option: json['option'],
-      text: json['text'],
+      fastview_cover: json['fastview_cover'] ?? '',
+      count: json['count'] ?? '',
+      course: json['course'] ?? '',
+      fastview_exp: json['fastview_exp'] ?? '',
+      id: json['id'] ?? '',
+      item: json['item'] ?? '',
+      no: json['no'] ?? '',
+      option: json['option'] ?? '',
+      text: json['text'] ?? '',
     );
   }
 }

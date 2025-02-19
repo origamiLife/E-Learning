@@ -47,7 +47,7 @@ class _FinishedChallengeState extends State<FinishedChallenge> {
                     SizedBox(
                         height: 12),
                     Text(
-                      'Loading...',
+                      '$loadingTS...',
                       style: TextStyle(
                         fontFamily: 'Arial',
                         fontSize: 16,
@@ -123,12 +123,12 @@ class _FinishedChallengeState extends State<FinishedChallenge> {
                   headingRowHeight: 40,
                   dataRowHeight: 40,
                   columns: <DataColumn>[
-                    _buildDataColumn('Name'),
-                    _buildDataColumn('Correct answer'),
-                    _buildDataColumn('Score'),
-                    _buildDataColumn('Start'), // Capitalize for consistency
-                    _buildDataColumn('End'),
-                    _buildDataColumn('Time used'),
+                    _buildDataColumn('$nameTS'),
+                    _buildDataColumn('$correctAnswerTS'),
+                    _buildDataColumn('$scoreTS'),
+                    _buildDataColumn('$startTS'), // Capitalize for consistency
+                    _buildDataColumn('$endTS'),
+                    _buildDataColumn('$timeUsedTS'),
                   ],
                   rows: <DataRow>[
                     DataRow(

@@ -1,5 +1,6 @@
 import 'dart:ui';
 import 'package:academy/welcome_to_academy/export.dart';
+import 'package:academy/welcome_to_academy/home_page.dart';
 import 'package:http/http.dart' as http;
 import 'package:hive/hive.dart';
 import 'package:hive_flutter/hive_flutter.dart';
@@ -285,7 +286,7 @@ class _LoginPageState extends State<LoginPage> {
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
                 content: Text(
-                  'Press back again to exit',
+                  '$exitApp2TS',
                   style: TextStyle(fontFamily: 'Arial', color: Colors.white),
                 ),
                 duration: maxDuration,
@@ -377,13 +378,13 @@ class _LoginPageState extends State<LoginPage> {
                     alignment: Alignment.centerRight,
                     child: TextButton(
                       onPressed: _onForgotPasswordPressed,
-                      child: const Row(
+                      child: Row(
                         mainAxisSize: MainAxisSize.min,
                         children: [
                           Icon(Icons.lock_open, color: Colors.white, size: 20),
                           SizedBox(width: 8),
                           Text(
-                            'Forgot Pwd?',
+                            '$forgotPwdTS',
                             style: TextStyle(
                               fontFamily: 'Arial',
                               color: Colors.white,
@@ -595,7 +596,7 @@ class _LoginPageState extends State<LoginPage> {
         ),
         onPressed: _login,
         child: Text(
-          'LOGIN',
+          '$loginTS',
           style: TextStyle(
             fontFamily: 'Arial',
             color: Colors.white,
@@ -616,7 +617,7 @@ class _LoginPageState extends State<LoginPage> {
     if (username.isEmpty && password.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text('Please enter both email and password.',
+          content: Text('$checkPwdTS',
               style: TextStyle(
                 fontFamily: 'Arial',
                 color: Colors.white,
@@ -659,7 +660,7 @@ class _LoginPageState extends State<LoginPage> {
         Navigator.pushReplacement(
           context,
           MaterialPageRoute(
-            builder: (context) => AcademyPage(
+            builder: (context) => AcademyHomePage(
               employee: employee1,
               Authorization: Authorization,
             ),
@@ -682,7 +683,7 @@ class _LoginPageState extends State<LoginPage> {
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text('Status Code Error!',
+          content: Text('$statusCodeErrorTS',
               style: TextStyle(
                 fontFamily: 'Arial',
                 color: Colors.white,

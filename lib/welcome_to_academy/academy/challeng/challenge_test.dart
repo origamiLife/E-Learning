@@ -14,14 +14,12 @@ class ChallengePage extends StatefulWidget {
     required this.employee,
     required this.Authorization,
     required this.initialMinutes,
-    required this.challenge,
-    required this.timer_end,
+    required this.getchallenge,
   });
   final Employee employee;
   final String Authorization;
   final double initialMinutes;
-  final GetChallenge challenge;
-  final Function(String) timer_end;
+  final GetChallenge getchallenge;
   @override
   _ChallengePageState createState() => _ChallengePageState();
 }
@@ -43,12 +41,17 @@ class _ChallengePageState extends State<ChallengePage> {
   @override
   void initState() {
     super.initState();
-    fetchNextChallenge();
-    if ((widget.challenge.challenge_status != 'doing' ||
-        widget.challenge.challenge_status != 'not_start')) {
+    oneShot = true;
+    fetchStartChallenge();
+    print("object:1");
+    if ((widget.getchallenge.challenge_status != 'doing' ||
+        widget.getchallenge.challenge_status != 'not_start')) {
       _progress = 0;
+    } else {
+      fetchStartChallenge();
+      print("object:2");
     }
-    fetchResult();
+    // fetchResult();
   }
 
   // นับเวลาถอยหลัง
@@ -56,40 +59,29 @@ class _ChallengePageState extends State<ChallengePage> {
     timer = Timer.periodic(Duration(seconds: 1), (timer) {
       setState(() {
         if (_progress > 0 &&
-            (widget.challenge.challenge_status == 'doing' ||
-                widget.challenge.challenge_status == 'not_start')) {
+            (widget.getchallenge.challenge_status == 'doing' ||
+                widget.getchallenge.challenge_status == 'not_start')) {
           _progress--;
           print("เวลาคงเหลือ: $_progress วินาที");
         } else {
           print("หมดเวลา");
           _progress = 0;
           timer.cancel();
-          if ((widget.challenge.challenge_status == 'doing' ||
-              widget.challenge.challenge_status == 'not_start')) {
-            timeOutNextPage();
-          }else{
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) => SummaryScores(
-                  employee: widget.employee,
-                  Authorization: widget.Authorization,
-                  initialMinutes: widget.initialMinutes,
-                  total_point: total_point,
-                  time_used: time_used,
-                  topChallenge: topChallenge!,
-                  challengeData: challengeData!,
-                  total_point_all: total_point_all.toString(),
-                  challenge: widget.challenge,
-                  questionList: questionList,
-                  isQuestion: checkAllChallenge,
-                ),
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => SummaryScores(
+                employee: widget.employee,
+                Authorization: widget.Authorization,
+                initialMinutes: widget.initialMinutes,
+                challenge: widget.getchallenge,
+                questionList: questionList,
+                isQuestion: checkAllChallenge,
               ),
-            ).then((_) {
-              Navigator.pop(context);
-              // Navigator.pop(context);
-            });
-          }
+            ),
+          ).then((_) {
+            Navigator.pop(context);
+          });
         }
       });
       // print("เวลาคงเหลือ: $_progress วินาที");
@@ -108,9 +100,8 @@ class _ChallengePageState extends State<ChallengePage> {
         child: Image.network(
             'https://images.ctfassets.net/unrdeg6se4ke/42cuIBOAntDgaG1GinrKHs/e424890c6ae3ed84021e247011ca949c/summary-1366x446-1.jpg'),
       ),
-      title: 'หมดเวลา!',
-      text:
-          'ระบบจะประมวลผลการทำข้อสอบของผู้เข้าสอบทั้งหมดเข้าสู่ฐานข้อมูลเพื่อการแสดงผล',
+      title: '$timeoutTS!',
+      text: '$timeoutMessageTH',
       // autoCloseDuration: const Duration(seconds: 2),
       showConfirmBtn: true,
       barrierDismissible: false, // ปิดการแตะออกนอกกรอบ
@@ -126,12 +117,12 @@ class _ChallengePageState extends State<ChallengePage> {
               employee: widget.employee,
               Authorization: widget.Authorization,
               initialMinutes: widget.initialMinutes,
-              total_point: total_point,
-              time_used: time_used,
-              topChallenge: topChallenge!,
-              challengeData: challengeData!,
-              total_point_all: total_point_all.toString(),
-              challenge: widget.challenge,
+              // total_point: total_point,
+              // time_used: time_used,
+              // topChallenge: topChallenge!,
+              // challengeData: challengeData!,
+              // total_point_all: total_point_all.toString(),
+              challenge: widget.getchallenge,
               questionList: questionList,
               isQuestion: checkAllChallenge,
             ),
@@ -163,8 +154,8 @@ class _ChallengePageState extends State<ChallengePage> {
             'https://images.ctfassets.net/unrdeg6se4ke/42cuIBOAntDgaG1GinrKHs/e424890c6ae3ed84021e247011ca949c/summary-1366x446-1.jpg',
           ),
         ),
-        title: 'แจ้งเตือน!',
-        text: successMessage,
+        title: '$WarnTS!',
+        text: failureMessage,
         confirmBtnText: 'Success',
         cancelBtnText: 'Close',
         showConfirmBtn: true,
@@ -182,12 +173,12 @@ class _ChallengePageState extends State<ChallengePage> {
                 employee: widget.employee,
                 Authorization: widget.Authorization,
                 initialMinutes: widget.initialMinutes,
-                total_point: total_point,
-                time_used: time_used,
-                topChallenge: topChallenge!,
-                challengeData: challengeData!,
-                total_point_all: total_point_all.toString(),
-                challenge: widget.challenge,
+                // total_point: total_point,
+                // time_used: time_used,
+                // topChallenge: topChallenge!,
+                // challengeData: challengeData!,
+                // total_point_all: total_point_all.toString(),
+                challenge: widget.getchallenge,
                 questionList: questionList,
                 isQuestion: checkAllChallenge,
               ),
@@ -272,7 +263,7 @@ class _ChallengePageState extends State<ChallengePage> {
     return PopScope(
       canPop: true, // ป้องกันการออกจากหน้าก่อนเรียก fetchStatus()
       onPopInvoked: (didPop) async {
-        fetchFinishChallenge();
+        // fetchFinishChallenge();
       },
       child: Scaffold(
         backgroundColor: Colors.white,
@@ -282,7 +273,7 @@ class _ChallengePageState extends State<ChallengePage> {
           backgroundColor: Color(0xFFFF9900),
           title: RichText(
             text: TextSpan(
-              text: 'Time: ', // ข้อความที่ต้องการให้เป็นสีส้ม
+              text: '$timeTS: ', // ข้อความที่ต้องการให้เป็นสีส้ม
               style: TextStyle(
                 fontFamily: 'Arial',
                 fontSize: (isIPad || isTablet) ? 38 : 28,
@@ -291,7 +282,8 @@ class _ChallengePageState extends State<ChallengePage> {
               ),
               children: [
                 TextSpan(
-                  text: '${formatTime(_progress.toInt())}', // ส่วนข้อความที่เหลือ
+                  text:
+                      '${formatTime(_progress.toInt())}', // ส่วนข้อความที่เหลือ
                   style: TextStyle(
                     fontFamily: 'Arial',
                     fontSize: (isIPad || isTablet) ? 38 : 28,
@@ -319,7 +311,6 @@ class _ChallengePageState extends State<ChallengePage> {
               borderRadius: BorderRadius.circular(10),
               child: Stack(
                 children: [
-                  // Background LinearProgressIndicator (สีเทา)
                   LinearProgressIndicator(
                     value: widget.initialMinutes * 60,
                     backgroundColor: Colors.grey.shade300,
@@ -327,13 +318,12 @@ class _ChallengePageState extends State<ChallengePage> {
                         AlwaysStoppedAnimation<Color>(Colors.grey.shade300),
                     minHeight: 10,
                   ),
-                  // Foreground LinearProgressIndicator with ShaderMask
                   ShaderMask(
                     shaderCallback: (bounds) => LinearGradient(
                       colors: [
-                        Colors.lightBlueAccent,
-                        Colors.lightBlue,
-                        Colors.blueAccent
+                        Colors.orange.shade100,
+                        Colors.orange.shade300,
+                        Colors.orange.shade500
                       ],
                       begin: Alignment.centerLeft,
                       end: Alignment.centerRight,
@@ -374,7 +364,7 @@ class _ChallengePageState extends State<ChallengePage> {
           CircularProgressIndicator(color: Color(0xFFFF9900)),
           SizedBox(width: 12),
           Text(
-            'Loading...',
+            '$loadingTS...',
             style: TextStyle(
                 fontFamily: 'Arial',
                 fontSize: 16,
@@ -409,6 +399,27 @@ class _ChallengePageState extends State<ChallengePage> {
                           _choice(questionData.question.choice, isQuestion,
                               questionData.question.choice_choose),
                           SizedBox(height: 8),
+                          Padding(
+                            padding: const EdgeInsets.all(8.0),
+                            child: Align(
+                              alignment: Alignment.centerRight,
+                              child: Container(
+                                padding: EdgeInsets.all(5),
+                                decoration: BoxDecoration(
+                                  color: Colors.orange.shade200,
+                                  borderRadius: BorderRadius.circular(10),
+                                ),
+                                child: Text(
+                                  'ความคืบหน้า : 50%',
+                                  style: TextStyle(
+                                      fontFamily: 'Arial',
+                                      fontSize: 14,
+                                      fontWeight: FontWeight.w600,
+                                      color: Colors.white),
+                                ),
+                              ),
+                            ),
+                          ),
                         ],
                       ),
                     ),
@@ -513,58 +524,73 @@ class _ChallengePageState extends State<ChallengePage> {
   Widget _actionButtons(
       QuestionData questionData, List<CheckAllChallenge> isQuestion) {
     return Container(
-      child: Column(
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        crossAxisAlignment: CrossAxisAlignment.end,
         children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            crossAxisAlignment: CrossAxisAlignment.end,
-            children: [
-              _actionButton("${skip}", () {
-                if (questionData.question.question_seq !=
-                    questionList.length.toString()) {
-                  int index = int.parse(questionData.question.question_seq);
-                  question_first = questionList[index];
-                  fetchNextChallenge();
-                }
-              }),
-              IconButton(
-                  onPressed: () {
-                    _showDialog(isQuestion);
-                  },
-                  icon: Icon(Icons.window_sharp)),
-              (isYChoice == false)
-                  ? _actionButton("${next}", () {
-                      if (_oneChoice != '') {
-                        if (questionData.question.question_seq ==
-                            questionList.length.toString()) {
-                          int index =
-                              int.parse(questionData.question.question_seq) - 1;
-                          question_first = questionList[index];
-                          fetchSend(_oneChoice);
-                          finishNextpage(isQuestion);
-                        } else {
-                          int index =
-                              int.parse(questionData.question.question_seq);
-                          question_first = questionList[index];
-                          fetchSend(_oneChoice);
-                          showIconDialog(context, choice_correct);
-                        }
-                      }
-                    })
-                  : _actionButton((questionData.question.question_seq ==
-                  questionList.length.toString())?"finish":"", () {
+          _actionButton("${skipTS}", () {
+            if (questionData.question.question_seq !=
+                questionList.length.toString()) {
+              int index = int.parse(questionData.question.question_seq);
+              question_first = questionList[index];
+              // fetchStartChallenge();
+            }
+          }),
+          IconButton(
+              onPressed: () {
+                _showDialog(isQuestion);
+              },
+              icon: Container(
+                  padding: EdgeInsets.all(4),
+                  decoration: BoxDecoration(
+                    color: Colors.blue,
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  child: Icon(
+                    Icons.window_sharp,
+                    color: Colors.white,
+                  ))),
+          // (isYChoice == false)
+          //     ?
+          _actionButton(
+              (questionData.question.question_seq ==
+                      questionList.length.toString())
+                  ? "${FinishTS}"
+                  : "${nextTS}", () {
+            if (questionData.question.choice_choose == []) {
+            } else {
+              if (_oneChoice != '') {
                 if (questionData.question.question_seq ==
                     questionList.length.toString()) {
-                  int index =
-                      int.parse(questionData.question.question_seq) - 1;
+                  int index = int.parse(questionData.question.question_seq) - 1;
                   question_first = questionList[index];
-                  fetchSend(_oneChoice);
+                  fetchSend(_oneChoice, questionList[index]);
                   finishNextpage(isQuestion);
-                }
+                } else {
+                  int index = int.parse(questionData.question.question_seq) - 1;
+                  int index2 = int.parse(questionData.question.question_seq);
+                  question_first = questionList[index2];
 
-                    }),
-            ],
-          ),
+                  fetchSend(_oneChoice, questionList[index]);
+                  showIconDialog(context, choice_correct);
+                }
+              }
+            }
+          })
+          // : _actionButton(
+          //     (questionData.question.question_seq ==
+          //             questionList.length.toString())
+          //         ? "finish"
+          //         : "", () {
+          //     if (questionData.question.question_seq ==
+          //         questionList.length.toString()) {
+          //       int index =
+          //           int.parse(questionData.question.question_seq) - 1;
+          //       question_first = questionList[index];
+          //       fetchSend(_oneChoice);
+          //       finishNextpage(isQuestion);
+          //     }
+          //   }),
         ],
       ),
     );
@@ -573,13 +599,20 @@ class _ChallengePageState extends State<ChallengePage> {
   Widget _actionButton(String label, VoidCallback onPressed) {
     return TextButton(
       onPressed: onPressed,
-      child: Text(
-        label,
-        style: TextStyle(
-            fontFamily: 'Arial',
-            fontSize: (isIPad || isTablet) ? 24 : 16,
-            color: Color(0xFF555555),
-            fontWeight: FontWeight.w700),
+      child: Container(
+        padding: EdgeInsets.only(right: 8, left: 8, top: 4, bottom: 4),
+        decoration: BoxDecoration(
+          color: Colors.orange.shade300,
+          borderRadius: BorderRadius.circular(10),
+        ),
+        child: Text(
+          label,
+          style: TextStyle(
+              fontFamily: 'Arial',
+              fontSize: (isIPad || isTablet) ? 24 : 16,
+              color: Colors.white,
+              fontWeight: FontWeight.w500),
+        ),
       ),
     );
   }
@@ -597,10 +630,13 @@ class _ChallengePageState extends State<ChallengePage> {
           return Row(
             children: [
               Expanded(
-                child: (choice_choose.isEmpty ||
-                        choice_choose.first.choice_no.isEmpty)
-                    ? nChoice(choice, isSelected, isQuestion)
-                    : yChoice(choice, isSelected, isQuestion, choice_choose),
+                child:
+                    // nChoice(choice, isSelected, isQuestion)
+                    (choice_choose.isEmpty ||
+                            choice_choose.first.choice_no.isEmpty)
+                        ? nChoice(choice, isSelected, isQuestion)
+                        : yChoice(
+                            choice, isSelected, isQuestion, choice_choose),
               ),
             ],
           );
@@ -609,8 +645,10 @@ class _ChallengePageState extends State<ChallengePage> {
     );
   }
 
-  int choiceNo = 1;
   bool isYChoice = false;
+  int choiceNo = 1;
+
+// ปรับปรุงฟังก์ชัน yChoice
   Widget yChoice(Choice choice, bool isSelected,
       List<CheckAllChallenge> isQuestion, List<ChoiceChoose> choice_choose) {
     isYChoice = true;
@@ -660,6 +698,57 @@ class _ChallengePageState extends State<ChallengePage> {
       ),
     );
   }
+
+  // bool isYChoice = false;
+  // Widget yChoice(Choice choice, bool isSelected,
+  //     List<CheckAllChallenge> isQuestion, List<ChoiceChoose> choice_choose) {
+  //   isYChoice = true;
+  //   Color borderColor = Colors.white;
+  //   if (choice.choice_no == choice_choose.first.choice_no) {
+  //     if (choice_choose.first.choice_correct == "0") {
+  //       borderColor = const Color(0xFFEE546C); // สีแดง
+  //     } else {
+  //       borderColor = const Color(0xFF00C789); // สีเขียว
+  //     }
+  //   }
+  //   return Container(
+  //     decoration: BoxDecoration(
+  //       color: Color(0xFFF1F7F0),
+  //       borderRadius: BorderRadius.circular(4),
+  //       border: Border.all(
+  //           color: borderColor, width: 2), // ใช้ borderColor ตามเงื่อนไข
+  //     ),
+  //     child: ListTile(
+  //       contentPadding: EdgeInsets.symmetric(vertical: 0, horizontal: 16),
+  //       title: Row(
+  //         children: [
+  //           Expanded(
+  //             child: Text(
+  //               choice.choice_text,
+  //               style: TextStyle(
+  //                 fontFamily: 'Arial',
+  //                 fontSize: (isIPad || isTablet) ? 24 : 16,
+  //                 color: Color(0xFF555555),
+  //                 fontWeight: FontWeight.w500,
+  //               ),
+  //             ),
+  //           ),
+  //           if (choice.choice_correct == "1")
+  //             Icon(Icons.check_circle, color: Colors.green)
+  //         ],
+  //       ),
+  //       leading: (choiceNo > 1)
+  //           ? manyChoice(choice, isSelected, isQuestion)
+  //           : Radio<String>(
+  //               value: choice.choice_no,
+  //               groupValue: choice_choose.first.choice_no,
+  //               hoverColor: Color(0xFF555555),
+  //               activeColor: Color(0xFF555555),
+  //               onChanged: (String? value) {},
+  //             ),
+  //     ),
+  //   );
+  // }
 
   // ยังไม่ทำ
   Widget nChoice(
@@ -713,7 +802,7 @@ class _ChallengePageState extends State<ChallengePage> {
   // มากกว่า 1 ข้อ
   Widget manyChoice(
       Choice choice, bool isSelected, List<CheckAllChallenge> isQuestion) {
-    isYChoice = false;
+    // isYChoice = false;
     return GestureDetector(
       onTap: () {
         setState(() {
@@ -728,7 +817,7 @@ class _ChallengePageState extends State<ChallengePage> {
               // Optional: Provide feedback if limit reached
               ScaffoldMessenger.of(context).showSnackBar(
                 SnackBar(
-                    content: Text('You can select up to $choiceNo choices')),
+                    content: Text('You can select up to choice no choices')),
               );
             }
           }
@@ -767,7 +856,7 @@ class _ChallengePageState extends State<ChallengePage> {
                           mainAxisSize: MainAxisSize.min,
                           children: [
                             Text(
-                              "YOU ARE VIEWING CHALLENGE SECTION",
+                              "$challengeSectionTS",
                               style: TextStyle(
                                 fontFamily: 'Arial',
                                 fontSize: (isAndroid || isIPhone) ? 20 : 30,
@@ -778,7 +867,7 @@ class _ChallengePageState extends State<ChallengePage> {
                             ),
                             SizedBox(height: 16),
                             Text(
-                              "$question: ${isQuestion.length}",
+                              "$questionTS: ${isQuestion.length}",
                               style: TextStyle(
                                 fontFamily: 'Arial',
                                 fontSize: (isAndroid || isIPhone) ? 16 : 24,
@@ -808,9 +897,12 @@ class _ChallengePageState extends State<ChallengePage> {
                                     }
                                     return InkWell(
                                       onTap: () {
-                                        question_first = questionList[index];
-                                        fetchNextChallenge();
-                                        Navigator.pop(dialogContext);
+                                        if ((dataQ.question_status != 'Y') ||
+                                            (dataQ.question_status != 'N')) {
+                                          question_first = questionList[index];
+                                          // fetchStartChallenge();
+                                          Navigator.pop(dialogContext);
+                                        }
                                       },
                                       child: Container(
                                         height:
@@ -855,7 +947,7 @@ class _ChallengePageState extends State<ChallengePage> {
                                       SizedBox(width: 8),
                                       Flexible(
                                         child: Text(
-                                          '$correct',
+                                          '$correctTS',
                                           style: TextStyle(
                                             fontFamily: 'Arial',
                                             fontSize: (isAndroid || isIPhone)
@@ -881,7 +973,7 @@ class _ChallengePageState extends State<ChallengePage> {
                                       SizedBox(width: 8),
                                       Flexible(
                                         child: Text(
-                                          '$incorrect',
+                                          '$incorrectTS',
                                           style: TextStyle(
                                             fontFamily: 'Arial',
                                             fontSize: (isAndroid || isIPhone)
@@ -907,7 +999,7 @@ class _ChallengePageState extends State<ChallengePage> {
                                       SizedBox(width: 8),
                                       Flexible(
                                         child: Text(
-                                          'No Result',
+                                          '$noResultTS',
                                           style: TextStyle(
                                             fontFamily: 'Arial',
                                             fontSize: (isAndroid || isIPhone)
@@ -995,8 +1087,9 @@ class _ChallengePageState extends State<ChallengePage> {
   int total_point_all = 0;
   String question_first = '';
 
-  Future<void> fetchNextChallenge() async {
+  Future<void> fetchStartChallenge() async {
     final uri = Uri.parse("$host/api/origami/challenge/start-challenge.php");
+
     try {
       final response = await http.post(
         uri,
@@ -1004,111 +1097,170 @@ class _ChallengePageState extends State<ChallengePage> {
         body: {
           'comp_id': widget.employee.comp_id,
           'emp_id': widget.employee.emp_id,
-          'challenge_id': widget.challenge.challenge_id,
-          'request_id': widget.challenge.request_id,
+          'challenge_id': widget.getchallenge.challenge_id,
+          'request_id': widget.getchallenge.request_id,
         },
       );
 
-      if (response.statusCode == 200) {
-        final jsonResponse = json.decode(response.body);
+      if (response.statusCode != 200) {
+        throw Exception(
+            'Failed to load challenge data. Status code: ${response.statusCode}');
+      }
+
+      final jsonResponse = json.decode(response.body);
+      String timerStart = jsonResponse['timer_start']?.toString() ?? '';
+      String questionFirst = jsonResponse['question_first']?.toString() ?? '';
+
+      if (questionFirst == '') {
+        print('questionFirst1 : $questionFirst');
+        print("Retrying fetchNextChallenge, timer_start is empty.$timerStart");
+        await Future.delayed(
+            Duration(seconds: 2)); // ป้องกันการเรียกซ้ำเร็วเกินไป
+        return fetchStartChallenge();
+      } else {
+        print('questionFirst2 : $questionFirst');
+        // ตรวจสอบและแปลง `question_list` เป็น List<String>
+        List<String> tempQuestionList = [];
+        if (jsonResponse['question_list'] is List) {
+          tempQuestionList = List<String>.from(jsonResponse['question_list']);
+        } else {
+          print("Warning: question_list is not a valid list.");
+        }
 
         setState(() {
-          final String timerStart = jsonResponse['timer_start']?.toString() ?? '';
-          final String questionFirst = jsonResponse['question_first']?.toString() ?? '';
-
-          print("timer_start: $timerStart");
-          print("question_first: $questionFirst");
-
-          // ตรวจสอบว่า question_list เป็น List จริง
-          if (jsonResponse['question_list'] is List) {
-            questionList = List<String>.from(jsonResponse['question_list']);
-          } else {
-            questionList = [];
-            print("Warning: question_list is not a valid list.");
-          }
-
+          questionList = tempQuestionList;
           total_point_all = questionList.length;
-          print('questionList: $questionList');
-          print('fetchNextChallenge: ${widget.challenge.challenge_status}');
+          print('Updated questionList: $questionList');
 
-          if (oneShot && questionList.isNotEmpty) {
-            // กำหนดค่า question_first โดยใช้ค่า API หรือ fallback ไปที่ค่าแรกของ questionList
-            question_first = questionFirst.isNotEmpty ? questionFirst : questionList.first;
-            print("Final question_first: $question_first");
-
-            if (timerStart.isNotEmpty) {
-              _mainDateTime(widget.challenge, timerStart);
-            }
+          if (oneShot == true) {
+            question_first = questionFirst;
+            _mainDateTime(widget.getchallenge, timerStart);
             oneShot = false;
+            print("Final question_first: $question_first");
           }
         });
-      } else {
-        throw Exception('Failed to load challenge data. Status code: ${response.statusCode}');
       }
     } catch (e) {
       print('Error fetching challenge data: $e');
-    } finally {
-      setState(() {}); // อัปเดต UI หลังจากโหลดเสร็จ
     }
   }
 
+  // Future<void> fetchStartChallenge() async {
+  //   final uri = Uri.parse("$host/api/origami/challenge/start-challenge.php");
+  //   try {
+  //     final response = await http.post(
+  //       uri,
+  //       headers: {'Authorization': 'Bearer ${widget.Authorization}'},
+  //       body: {
+  //         'comp_id': widget.employee.comp_id,
+  //         'emp_id': widget.employee.emp_id,
+  //         'challenge_id': widget.getchallenge.challenge_id,
+  //         'request_id': widget.getchallenge.request_id,
+  //       },
+  //     );
+  //
+  //     if (response.statusCode == 200) {
+  //       final jsonResponse = json.decode(response.body);
+  //
+  //       // setState(() {
+  //       final String timerStart = jsonResponse['timer_start']?.toString() ?? '';
+  //       final String questionFirst =
+  //           jsonResponse['question_first']?.toString() ?? '';
+  //       // });
+  //       if (timerStart == '') {
+  //         fetchStartChallenge();
+  //         print("timer_start: $timerStart");
+  //         print("question_first: $questionFirst");
+  //       } else {
+  //         // ตรวจสอบว่า question_list เป็น List จริง
+  //         if (jsonResponse['question_list'] is List) {
+  //           questionList = List<String>.from(jsonResponse['question_list']);
+  //         } else {
+  //           questionList = [];
+  //           print("Warning: question_list is not a valid list.");
+  //         }
+  //
+  //         total_point_all = questionList.length;
+  //         print('questionList: $questionList');
+  //         if (oneShot && questionList.isNotEmpty) {
+  //           // กำหนดค่า question_first โดยใช้ค่า API หรือ fallback ไปที่ค่าแรกของ questionList
+  //           question_first =
+  //               questionFirst.isNotEmpty ? questionFirst : questionList.first;
+  //           print("Final question_first: $question_first");
+  //
+  //           if (timerStart.isNotEmpty) {
+  //             _mainDateTime(widget.getchallenge, timerStart);
+  //           }
+  //           oneShot = false;
+  //         }
+  //       }
+  //     } else {
+  //       throw Exception(
+  //           'Failed to load challenge data. Status code: ${response.statusCode}');
+  //     }
+  //   } catch (e) {
+  //     print('Error fetching challenge data: $e');
+  //   } finally {
+  //     setState(() {}); // อัปเดต UI หลังจากโหลดเสร็จ
+  //   }
+  // }
 
   //-------------- 2.2 result-challenge---------------------------------------------------------------
 
-  TopChallenge? topChallenge;
-  ChallengeData? challengeData;
-  String total_point = '';
-  String time_used = '';
-  Future<void> fetchResult() async {
-    final uri = Uri.parse("$host/api/origami/challenge/result-challenge.php");
-    try {
-      final response = await http.post(
-        uri,
-        headers: {'Authorization': 'Bearer ${widget.Authorization}'},
-        body: {
-          'comp_id': widget.employee.comp_id,
-          'emp_id': widget.employee.emp_id,
-          'challenge_id': widget.challenge.challenge_id,
-          'request_id': widget.challenge.request_id,
-        },
-      );
-
-      if (response.statusCode == 200) {
-        final Map<String, dynamic> jsonResponse = json.decode(response.body);
-        if (jsonResponse['code'] == 200) {
-          setState(() {
-            String total_point0 = jsonResponse['total_point']?.toString() ?? '';
-            String time_used0 = jsonResponse['time_used']?.toString() ?? '';
-            total_point = total_point0;
-            time_used = time_used0;
-            challengeData = jsonResponse['challenge_data'] != null
-                ? ChallengeData.fromJson(jsonResponse['challenge_data'])
-                : null;
-
-            if (jsonResponse['top_challenge'] != null &&
-                jsonResponse['top_challenge']['top_challenge'] != null) {
-              topChallenge =
-                  TopChallenge.fromJson(jsonResponse['top_challenge']);
-              print('Result : ${topChallenge}');
-            } else {
-              topChallenge = null;
-              print('Result Null : ${topChallenge}');
-            }
-
-            print('fetchResult : ${widget.challenge.challenge_status}');
-          });
-        } else {
-          throw Exception('Empty response data');
-        }
-      } else {
-        throw Exception(
-            'Failed to load challenge data, status code: ${response.statusCode}');
-      }
-    } catch (e) {
-      // จับข้อผิดพลาดต่างๆ เช่น การเชื่อมต่อ API หรือการแปลง JSON
-      throw Exception('Error fetching challenge data: $e');
-    }
-  }
+  // TopChallenge? topChallenge;
+  // ChallengeData? challengeData;
+  // String total_point = '';
+  // String time_used = '';
+  // Future<void> fetchResult() async {
+  //   final uri = Uri.parse("$host/api/origami/challenge/result-challenge.php");
+  //   try {
+  //     final response = await http.post(
+  //       uri,
+  //       headers: {'Authorization': 'Bearer ${widget.Authorization}'},
+  //       body: {
+  //         'comp_id': widget.employee.comp_id,
+  //         'emp_id': widget.employee.emp_id,
+  //         'challenge_id': widget.getchallenge.challenge_id,
+  //         'request_id': widget.getchallenge.request_id,
+  //       },
+  //     );
+  //
+  //     if (response.statusCode == 200) {
+  //       final Map<String, dynamic> jsonResponse = json.decode(response.body);
+  //       if (jsonResponse['code'] == 200) {
+  //         setState(() {
+  //           String total_point0 = jsonResponse['total_point']?.toString() ?? '';
+  //           String time_used0 = jsonResponse['time_used']?.toString() ?? '';
+  //           total_point = total_point0;
+  //           time_used = time_used0;
+  //           challengeData = jsonResponse['challenge_data'] != null
+  //               ? ChallengeData.fromJson(jsonResponse['challenge_data'])
+  //               : null;
+  //
+  //           if (jsonResponse['top_challenge'] != null &&
+  //               jsonResponse['top_challenge']['top_challenge'] != null) {
+  //             topChallenge =
+  //                 TopChallenge.fromJson(jsonResponse['top_challenge']);
+  //             print('Result : ${topChallenge}');
+  //           } else {
+  //             topChallenge = null;
+  //             print('Result Null : ${topChallenge}');
+  //           }
+  //
+  //           print('fetchResult : ${widget.challenge.challenge_status}');
+  //         });
+  //       } else {
+  //         throw Exception('Empty response data');
+  //       }
+  //     } else {
+  //       throw Exception(
+  //           'Failed to load challenge data, status code: ${response.statusCode}');
+  //     }
+  //   } catch (e) {
+  //     // จับข้อผิดพลาดต่างๆ เช่น การเชื่อมต่อ API หรือการแปลง JSON
+  //     throw Exception('Error fetching challenge data: $e');
+  //   }
+  // }
 
   //-----------------2.3 get-question-no------------------------------------------------------------
 
@@ -1122,8 +1274,8 @@ class _ChallengePageState extends State<ChallengePage> {
         body: {
           'comp_id': widget.employee.comp_id,
           'emp_id': widget.employee.emp_id,
-          'challenge_id': widget.challenge.challenge_id,
-          'request_id': widget.challenge.request_id,
+          'challenge_id': widget.getchallenge.challenge_id,
+          'request_id': widget.getchallenge.request_id,
           'question_no': question_first,
         },
       );
@@ -1131,7 +1283,6 @@ class _ChallengePageState extends State<ChallengePage> {
         final Map<String, dynamic> jsonResponse = json.decode(response.body);
         // เข้าถึงข้อมูลในคีย์ 'instructors'
         final List<dynamic> challengeJson = jsonResponse['challenge_data'];
-        print('CheckAllChallenge : ${widget.challenge.challenge_status}');
         // แปลงข้อมูลจาก JSON เป็น List<Instructor>
         return challengeJson
             .map((json) => CheckAllChallenge.fromJson(json))
@@ -1149,8 +1300,13 @@ class _ChallengePageState extends State<ChallengePage> {
   //------------------3.1 get-question-----------------------------------------------------------
 
   Future<QuestionData?> fetchQuestionData() async {
-    final uri = Uri.parse("$host/api/origami/challenge/get-question.php");
+    if (question_first.isEmpty) {
+      await fetchStartChallenge(); // ดึง Challenge ก่อน
+      if (question_first.isEmpty)
+        return null; // ถ้ายังไม่มี question_first ก็จบเลย
+    }
 
+    final uri = Uri.parse("$host/api/origami/challenge/get-question.php");
     try {
       final response = await http.post(
         uri,
@@ -1158,39 +1314,35 @@ class _ChallengePageState extends State<ChallengePage> {
         body: {
           'comp_id': widget.employee.comp_id,
           'emp_id': widget.employee.emp_id,
-          'challenge_id': widget.challenge.challenge_id,
-          'request_id': widget.challenge.request_id,
+          'challenge_id': widget.getchallenge.challenge_id,
+          'request_id': widget.getchallenge.request_id,
           'question_no': question_first,
         },
       );
 
       if (response.statusCode == 200) {
         final jsonResponse = jsonDecode(response.body);
-        // Debug: ตรวจสอบ response
-        print("Response: ${response.body}");
-
         if (jsonResponse.containsKey('question_data') &&
             jsonResponse['question_data'] != null) {
-          print('QuestionData: ${widget.challenge.challenge_status}');
-          print('คำถาม: ${jsonResponse['question_data']}');
           return QuestionData.fromJson(jsonResponse['question_data']);
         } else {
           print('No question data found in response.');
-          return null; // คืนค่า `null` แทนที่จะ throw error
+          return null;
         }
       } else {
-        throw Exception('Failed to load question data, status code: ${response.statusCode}');
+        throw Exception(
+            'Failed to load question data, status code: ${response.statusCode}');
       }
     } catch (e) {
       print('Error fetching question data: $e');
-      return null; // คืนค่า `null` เพื่อป้องกันแอป crash
+      return null;
     }
   }
 
   //------------------ 3.2 send-answer-----------------------------------------------------------
 
   String next_question = '';
-  Future<void> fetchSend(String choices) async {
+  Future<void> fetchSend(String choices, String question_no) async {
     final uri = Uri.parse("$host/api/origami/challenge/send-answer.php");
     try {
       final response = await http.post(
@@ -1199,18 +1351,16 @@ class _ChallengePageState extends State<ChallengePage> {
         body: {
           'comp_id': widget.employee.comp_id,
           'emp_id': widget.employee.emp_id,
-          'challenge_id': widget.challenge.challenge_id,
-          'request_id': widget.challenge.request_id,
-          'question_no': question_first,
-          'choices': choices,
+          'challenge_id': widget.getchallenge.challenge_id,
+          'request_id': widget.getchallenge.request_id,
+          'question_no': question_no,
+          'choices[0]': choices,
         },
       );
 
       if (response.statusCode == 200) {
         final Map<String, dynamic> jsonResponse = json.decode(response.body);
         if (jsonResponse.isNotEmpty) {
-          fetchNextChallenge();
-          print('fetchSend : ${widget.challenge.challenge_status}');
         } else {
           throw Exception('Empty response data');
         }
@@ -1235,8 +1385,8 @@ class _ChallengePageState extends State<ChallengePage> {
         body: {
           'comp_id': widget.employee.comp_id,
           'emp_id': widget.employee.emp_id,
-          'challenge_id': widget.challenge.challenge_id,
-          'request_id': widget.challenge.request_id,
+          'challenge_id': widget.getchallenge.challenge_id,
+          'request_id': widget.getchallenge.request_id,
         },
       );
 

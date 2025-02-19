@@ -4,7 +4,12 @@ import 'package:intl/intl.dart';
 import 'package:http/http.dart' as http;
 
 class Instructors extends StatefulWidget {
-  Instructors({super.key, required this.employee, required this.academy, required this.Authorization, });
+  Instructors({
+    super.key,
+    required this.employee,
+    required this.academy,
+    required this.Authorization,
+  });
   final Employee employee;
   final AcademyRespond academy;
   final String Authorization;
@@ -13,11 +18,11 @@ class Instructors extends StatefulWidget {
 }
 
 class _InstructorsState extends State<Instructors> {
-
   Future<List<Instructor>> fetchInstructors() async {
     final uri = Uri.parse("$host/api/origami/academy/instructors.php");
     final response = await http.post(
-      uri, headers: {'Authorization': 'Bearer ${widget.Authorization}'},
+      uri,
+      headers: {'Authorization': 'Bearer ${widget.Authorization}'},
       body: {
         'comp_id': widget.employee.comp_id,
         'emp_id': widget.employee.emp_id,
@@ -32,14 +37,11 @@ class _InstructorsState extends State<Instructors> {
       // เข้าถึงข้อมูลในคีย์ 'instructors'
       final List<dynamic> instructorsJson = jsonResponse['instructors'];
       // แปลงข้อมูลจาก JSON เป็น List<Instructor>
-      return instructorsJson
-          .map((json) => Instructor.fromJson(json))
-          .toList();
+      return instructorsJson.map((json) => Instructor.fromJson(json)).toList();
     } else {
       throw Exception('Failed to load instructors');
     }
   }
-  
 
   @override
   void initState() {
@@ -49,10 +51,6 @@ class _InstructorsState extends State<Instructors> {
 
   @override
   Widget build(BuildContext context) {
-    return loading();
-  }
-
-  Widget loading() {
     return FutureBuilder<List<Instructor>>(
       future: fetchInstructors(),
       builder: (context, snapshot) {
@@ -61,15 +59,16 @@ class _InstructorsState extends State<Instructors> {
         } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
           return Center(
               child: Text(
-                NotFoundData,
-                style: TextStyle(fontFamily: 'Arial',
-                  fontSize: 16.0,
-                  color: const Color(0xFF555555),
-                  fontWeight: FontWeight.w700,
-                ),
-                overflow: TextOverflow.ellipsis,
-                maxLines: 1,
-              ));
+            NotFoundDataTS,
+            style: TextStyle(
+              fontFamily: 'Arial',
+              fontSize: 16.0,
+              color: const Color(0xFF555555),
+              fontWeight: FontWeight.w700,
+            ),
+            overflow: TextOverflow.ellipsis,
+            maxLines: 1,
+          ));
         } else {
           return _getContentWidget(snapshot.data!);
         }
@@ -77,7 +76,7 @@ class _InstructorsState extends State<Instructors> {
     );
   }
 
-  Widget _getContentWidget(List<Instructor> instructor){
+  Widget _getContentWidget(List<Instructor> instructor) {
     return SafeArea(
       child: Container(
         color: Colors.grey.shade50,
@@ -99,7 +98,8 @@ class _InstructorsState extends State<Instructors> {
                           Expanded(
                             child: Text(
                               instructor[index].courseSubject,
-                              style: TextStyle(fontFamily: 'Arial',
+                              style: TextStyle(
+                                fontFamily: 'Arial',
                                 fontSize: 18.0,
                                 color: Color(0xFF555555),
                                 fontWeight: FontWeight.w700,
@@ -111,7 +111,8 @@ class _InstructorsState extends State<Instructors> {
                     ),
                     SizedBox(height: 8),
                     Column(
-                      children: List.generate(instructor[index].coachData.length, (indexI) {
+                      children: List.generate(
+                          instructor[index].coachData.length, (indexI) {
                         final coachData = instructor[index].coachData[indexI];
                         return Card(
                           color: Color(0xFFF5F5F5),
@@ -139,26 +140,31 @@ class _InstructorsState extends State<Instructors> {
                                     //   fit: BoxFit.cover,
                                     // ),
                                     Expanded(
-                                      flex:2,
+                                      flex: 1,
                                       child: Image.network(
                                         coachData.coach_image,
                                         width: double.infinity,
-                                        fit: BoxFit.fitWidth,
+                                        fit: BoxFit.contain,
+                                        errorBuilder: (context, error, stackTrace) {
+                                          return Icon(Icons.info, size: 40);
+                                        },
                                       ),
                                     ),
                                     SizedBox(
                                       width: 8,
                                     ),
                                     Expanded(
-                                      flex:3,
+                                      flex: 2,
                                       child: Column(
-                                        mainAxisAlignment: MainAxisAlignment.start,
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.start,
                                         crossAxisAlignment:
-                                        CrossAxisAlignment.start,
+                                            CrossAxisAlignment.start,
                                         children: [
                                           Text(
                                             coachData.coach_name,
-                                            style: TextStyle(fontFamily: 'Arial',
+                                            style: TextStyle(
+                                              fontFamily: 'Arial',
                                               fontSize: 16.0,
                                               color: Color(0xFF555555),
                                               fontWeight: FontWeight.w700,
@@ -179,7 +185,8 @@ class _InstructorsState extends State<Instructors> {
                                               Flexible(
                                                 child: Text(
                                                   coachData.coach_department,
-                                                  style: TextStyle(fontFamily: 'Arial',
+                                                  style: TextStyle(
+                                                    fontFamily: 'Arial',
                                                     fontSize: 14.0,
                                                     color: Color(0xFF555555),
                                                     fontWeight: FontWeight.w500,
@@ -203,7 +210,8 @@ class _InstructorsState extends State<Instructors> {
                                               Flexible(
                                                 child: Text(
                                                   coachData.coach_comapny,
-                                                  style: TextStyle(fontFamily: 'Arial',
+                                                  style: TextStyle(
+                                                    fontFamily: 'Arial',
                                                     color: Color(0xFF555555),
                                                   ),
                                                   maxLines: 2,
@@ -216,11 +224,13 @@ class _InstructorsState extends State<Instructors> {
                                             children: [
                                               Expanded(
                                                 child: SingleChildScrollView(
-                                                  scrollDirection: Axis.horizontal,
+                                                  scrollDirection:
+                                                      Axis.horizontal,
                                                   child: Row(
                                                     children: [
                                                       Icon(
-                                                        Icons.people_alt_outlined,
+                                                        Icons
+                                                            .people_alt_outlined,
                                                         color: Colors.amber,
                                                       ),
                                                       SizedBox(
@@ -228,8 +238,10 @@ class _InstructorsState extends State<Instructors> {
                                                       ),
                                                       Text(
                                                         '${coachData.count_trainee} Students',
-                                                        style: TextStyle(fontFamily: 'Arial',
-                                                          color: Color(0xFF555555),
+                                                        style: TextStyle(
+                                                          fontFamily: 'Arial',
+                                                          color:
+                                                              Color(0xFF555555),
                                                         ),
                                                       )
                                                     ],
@@ -238,7 +250,8 @@ class _InstructorsState extends State<Instructors> {
                                               ),
                                               Expanded(
                                                 child: SingleChildScrollView(
-                                                  scrollDirection: Axis.horizontal,
+                                                  scrollDirection:
+                                                      Axis.horizontal,
                                                   child: Row(
                                                     children: [
                                                       Icon(
@@ -250,8 +263,10 @@ class _InstructorsState extends State<Instructors> {
                                                       ),
                                                       Text(
                                                         '${coachData.coach_course} Courses',
-                                                        style: TextStyle(fontFamily: 'Arial',
-                                                          color: Color(0xFF555555),
+                                                        style: TextStyle(
+                                                          fontFamily: 'Arial',
+                                                          color:
+                                                              Color(0xFF555555),
                                                         ),
                                                       )
                                                     ],
@@ -324,14 +339,12 @@ class InstructorsData {
 
   factory InstructorsData.fromJson(Map<String, dynamic> json) {
     return InstructorsData(
-      count_trainee: json['count_trainee']??'',
-      coach_course: json['coach_course']??'',
-      coach_comapny: json['coach_comapny']??'',
-      coach_name: json['coach_name']??'',
-      coach_image: json['coach_image']??'',
-      coach_department: json['coach_department']??'',
+      count_trainee: json['count_trainee'] ?? '',
+      coach_course: json['coach_course'] ?? '',
+      coach_comapny: json['coach_comapny'] ?? '',
+      coach_name: json['coach_name'] ?? '',
+      coach_image: json['coach_image'] ?? '',
+      coach_department: json['coach_department'] ?? '',
     );
   }
 }
-
-

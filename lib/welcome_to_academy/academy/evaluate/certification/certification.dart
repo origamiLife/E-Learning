@@ -55,7 +55,7 @@ class _CertificationState extends State<Certification> {
         } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
           return Center(
               child: Text(
-            NotFoundData,
+            NotFoundDataTS,
             style: TextStyle(
               fontFamily: 'Arial',
               fontSize: 16.0,
@@ -242,7 +242,9 @@ class _CertificationState extends State<Certification> {
               width: double.infinity,
               fit: BoxFit.fill,
               errorBuilder: (context, error, stackTrace) {
-                return Icon(Icons.error,);
+                return Icon(
+                  Icons.error,
+                );
               },
             ),
             Center(
@@ -274,14 +276,9 @@ class _CertificationState extends State<Certification> {
           ),
         ),
         SizedBox(height: 4),
-        SingleChildScrollView(
-          scrollDirection: Axis.horizontal,
-          child: Text(
-            certificate.certificationDescription,
-            style: _getTextStyle(14.0, FontWeight.w600, Color(0xFF555555)),
-            // overflow: TextOverflow.ellipsis,
-            maxLines: 2,
-          ),
+        Text(
+          certificate.certificationDescription,
+          style: _getTextStyle(14.0, FontWeight.w600, Color(0xFF555555)),
         ),
         SizedBox(height: 8),
         _buildCertificationConditions(certificate),
@@ -296,7 +293,9 @@ class _CertificationState extends State<Certification> {
           padding: const EdgeInsets.only(bottom: 8),
           child: Row(
             children: [
-              SizedBox(width: 8),
+              // SizedBox(width: 8),
+              Icon(Icons.lens_sharp, color: Colors.green, size: 8),
+              SizedBox(width: 4),
               Flexible(
                 child: SingleChildScrollView(
                   scrollDirection: Axis.horizontal,
@@ -338,7 +337,7 @@ class _CertificationState extends State<Certification> {
             Icon(Icons.cloud_download, color: Colors.white),
             SizedBox(width: 4),
             Text(
-              'Download',
+              '$DownloadTS',
               style: _getTextStyle(14.0, FontWeight.w600, Color(0xFF555555)),
             ),
           ],
@@ -404,6 +403,7 @@ class _CertificationState extends State<Certification> {
       if (response.statusCode == 200) {
         final jsonResponse = jsonDecode(response.body);
         if (jsonResponse['status'] == true) {
+          print("$jsonResponse");
           certification_file = jsonResponse['certification_file'];
           print("message: $certification_file");
           final Uri _url = Uri.parse(certification_file);
