@@ -1,7 +1,7 @@
 import 'package:academy/welcome_to_academy/export.dart';
 import 'package:http/http.dart' as http;
 
-import '../challenge_start.dart';
+import '../challenge_menu.dart';
 
 class FinishedChallenge extends StatefulWidget {
   FinishedChallenge({

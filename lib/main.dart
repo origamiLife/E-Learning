@@ -25,11 +25,7 @@ void main() async {
   await Hive.initFlutter(appDocumentDirectory.path);
   await Hive.openBox('userBox');
 
-  // บังคับให้แอปทำงานในแนวตั้งก่อนเรียก runApp()
-  SystemChrome.setPreferredOrientations([
-    DeviceOrientation.portraitUp,
-    DeviceOrientation.portraitDown,
-  ]).then((_) => runApp(const MyApp()));
+  runApp(const MyApp());
 }
 
 // Future<void> secureScreen() async {
@@ -662,7 +658,7 @@ class _LoginPageState extends State<LoginPage> {
           MaterialPageRoute(
             builder: (context) => AcademyHomePage(
               employee: employee1,
-              Authorization: Authorization,
+              Authorization: Authorization, page: 'course',
             ),
           ),
         );

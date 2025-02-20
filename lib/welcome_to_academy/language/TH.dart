@@ -79,7 +79,7 @@ Future<void> TH() async {
   CurriculumTS = 'หลักสูตร';
   InstructorsTS = 'ผู้สอน';
   CertificationTS = 'ใบประกาศ';
-  IntOutTS = 'ออกจากระบบ';
+  IntOutTS = 'LOGOUT'; //'ออกจากระบบ';
   openTS = 'เปิด';
   PartTS = 'พาร์ท';
   MinTS = 'นาที';
@@ -92,5 +92,18 @@ Future<void> TH() async {
   SaveTS = 'บันทึก';
   failureMessageTS = 'มีข้อที่ยังไม่ได้ตอบ กดปุ่ม Close เพื่อกลับไปทำข้อสอบให้ครบทุกข้อ หรือกดปุ่ม Success เพื่อส่งคำตอบ';
   FinishTS = 'เสร็จสิ้น';
-
+  DiscussionTS = 'การสนธนา';
+  AttachFileTS = 'แนบไฟล์เอกสาร';
+  MyLearningTS = 'การเรียนรู้';
+  MyChallengeTS = 'แบบทดสอบ';
+  CatalogTS = 'แคตตาล็อก';
+  FavoriteTS = 'รายการโปรด';
+  ExplainTS = 'อธิบาย';
+  ReplyThreadTS = 'ตอบกระทู้';
+  SorryChallengeTS = "ขออภัยทำชาเลนจ์ไม่ได้";
+  AfterTS = "หลังวันที่";
+  BeforeTS = "ก่อนวันที่";
+  doingTS = "เริ่มแล้ว";
+  notStartTS = "ยังไม่เริ่ม";
+  successTS = "สำเร็จ";
 }

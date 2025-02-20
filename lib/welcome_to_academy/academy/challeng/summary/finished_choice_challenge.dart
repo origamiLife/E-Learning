@@ -4,7 +4,7 @@ import 'package:carousel_slider/carousel_slider.dart';
 import 'package:academy/welcome_to_academy/export.dart';
 import 'package:academy/main.dart';
 import 'package:http/http.dart' as http;
-import '../challenge_start.dart';
+import '../challenge_menu.dart';
 
 class FinishedChoiceChallenge extends StatefulWidget {
   FinishedChoiceChallenge({

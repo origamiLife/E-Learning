@@ -2,7 +2,8 @@ import 'package:academy/welcome_to_academy/academy/challeng/summary/finished_cha
 import 'package:academy/welcome_to_academy/academy/challeng/summary/my_challenge.dart';
 import 'package:academy/welcome_to_academy/export.dart';
 
-import 'challenge_start.dart';
+import '../../home_page.dart';
+import 'challenge_menu.dart';
 import 'challenge_test.dart';
 
 class SummaryScores extends StatefulWidget {
@@ -72,6 +73,20 @@ class _SummaryScoresState extends State<SummaryScores> {
             color: Colors.white,
             fontWeight: FontWeight.w700,
           ),
+        ),
+        leading: IconButton(
+          icon: Icon(Icons.arrow_back_ios, color: Colors.white, size: 24),
+          onPressed: () {
+            Navigator.pushReplacement(
+              context,
+              MaterialPageRoute(
+                builder: (context) => AcademyHomePage(
+                  employee: widget.employee,
+                  Authorization: widget.Authorization, page: 'challenge',
+                ),
+              ),
+            );
+          },
         ),
       ),
       body: Column(

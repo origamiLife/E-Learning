@@ -1,5 +1,5 @@
 import 'package:academy/welcome_to_academy/export.dart';
-import '../challenge_start.dart';
+import '../challenge_menu.dart';
 import '../challenge_test.dart';
 import 'finished_challenge.dart';
 import 'package:http/http.dart' as http;

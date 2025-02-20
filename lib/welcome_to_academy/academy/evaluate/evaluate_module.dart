@@ -432,9 +432,9 @@ class _EvaluateModuleState extends State<EvaluateModule>
     '$DescriptionTS',
     '$CurriculumTS',
     '$InstructorsTS',
-    'Discussion',
+    '$DiscussionTS',
     // 'Announcements',
-    'Attach File',
+    '$AttachFileTS',
     '$CertificationTS',
   ];
 

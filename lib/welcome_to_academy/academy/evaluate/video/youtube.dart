@@ -180,7 +180,6 @@ class _YouTubePlayerWidgetState extends State<YouTubePlayerWidget> {
                   return Stack(
                     alignment: Alignment.center,
                     children: [
-                      // Use a fixed aspect ratio for the video (16:9)
                       AspectRatio(
                         aspectRatio: 16 / 9,
                         child: player,

@@ -1,4 +1,4 @@
-import 'package:academy/welcome_to_academy/academy/challeng/challenge_start.dart';
+import 'package:academy/welcome_to_academy/academy/challeng/challenge_menu.dart';
 import 'package:academy/welcome_to_academy/academy/challeng/summary_scores.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:academy/welcome_to_academy/export.dart';
@@ -6,6 +6,7 @@ import 'package:academy/main.dart';
 import 'package:intl/intl.dart';
 import 'package:http/http.dart' as http;
 
+import '../../home_page.dart';
 import '../evaluate/curriculum/curriculum.dart';
 
 class ChallengePage extends StatefulWidget {
@@ -67,6 +68,7 @@ class _ChallengePageState extends State<ChallengePage> {
           print("หมดเวลา");
           _progress = 0;
           timer.cancel();
+          fetchFinishChallenge();
           Navigator.push(
             context,
             MaterialPageRoute(
@@ -79,9 +81,10 @@ class _ChallengePageState extends State<ChallengePage> {
                 isQuestion: checkAllChallenge,
               ),
             ),
-          ).then((_) {
-            Navigator.pop(context);
-          });
+          );
+          //     .then((_) {
+          //   Navigator.pop(context);
+          // });
         }
       });
       // print("เวลาคงเหลือ: $_progress วินาที");
@@ -117,30 +120,22 @@ class _ChallengePageState extends State<ChallengePage> {
               employee: widget.employee,
               Authorization: widget.Authorization,
               initialMinutes: widget.initialMinutes,
-              // total_point: total_point,
-              // time_used: time_used,
-              // topChallenge: topChallenge!,
-              // challengeData: challengeData!,
-              // total_point_all: total_point_all.toString(),
               challenge: widget.getchallenge,
               questionList: questionList,
               isQuestion: checkAllChallenge,
             ),
           ),
-        ).then((_) {
-          Navigator.pop(context);
-          Navigator.pop(context);
-        });
+        );
       },
     );
   }
 
   // สิ้นสุดการทดสอบ
   void finishNextpage(List<CheckAllChallenge> isQuestion) {
-    final String successMessage =
-        'คุณได้ทำข้อสอบให้ครบทุกข้อแล้วกดปุ่ม Success เพื่อส่งคำตอบ หรือกดปุ่ม Close เพื่อกลับไปทบทวน';
-    final String failureMessage =
-        'มีข้อที่ยังไม่ได้ตอบ กดปุ่ม Close เพื่อกลับไปทำข้อสอบให้ครบทุกข้อ หรือกดปุ่ม Success เพื่อส่งคำตอบ';
+    // final String successMessage =
+    //     'คุณได้ทำข้อสอบให้ครบทุกข้อแล้วกดปุ่ม Success เพื่อส่งคำตอบ หรือกดปุ่ม Close เพื่อกลับไปทบทวน';
+    // final String failureMessage =
+    //     'มีข้อที่ยังไม่ได้ตอบ กดปุ่ม Close เพื่อกลับไปทำข้อสอบให้ครบทุกข้อ หรือกดปุ่ม Success เพื่อส่งคำตอบ';
 
     if (_oneChoice.isNotEmpty || _manyChoiceSet.isNotEmpty) {
       QuickAlert.show(
@@ -155,7 +150,7 @@ class _ChallengePageState extends State<ChallengePage> {
           ),
         ),
         title: '$WarnTS!',
-        text: failureMessage,
+        text: '$failureMessageTS',
         confirmBtnText: 'Success',
         cancelBtnText: 'Close',
         showConfirmBtn: true,
@@ -165,7 +160,7 @@ class _ChallengePageState extends State<ChallengePage> {
           _showDialog(isQuestion);
         },
         onConfirmBtnTap: () {
-          // fetchFinishChallenge();
+          fetchFinishChallenge();
           Navigator.push(
             context,
             MaterialPageRoute(
@@ -173,20 +168,12 @@ class _ChallengePageState extends State<ChallengePage> {
                 employee: widget.employee,
                 Authorization: widget.Authorization,
                 initialMinutes: widget.initialMinutes,
-                // total_point: total_point,
-                // time_used: time_used,
-                // topChallenge: topChallenge!,
-                // challengeData: challengeData!,
-                // total_point_all: total_point_all.toString(),
                 challenge: widget.getchallenge,
                 questionList: questionList,
                 isQuestion: checkAllChallenge,
               ),
             ),
-          ).then((_) {
-            Navigator.pop(context);
-            Navigator.pop(context);
-          });
+          );
         },
       );
     }
@@ -294,6 +281,20 @@ class _ChallengePageState extends State<ChallengePage> {
               ],
             ),
           ),
+          leading: IconButton(
+            icon: Icon(Icons.arrow_back_ios, color: Colors.white, size: 24),
+            onPressed: () {
+              Navigator.pushReplacement(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => AcademyHomePage(
+                    employee: widget.employee,
+                    Authorization: widget.Authorization, page: 'challenge',
+                  ),
+                ),
+              );
+            },
+          ),
           // leading: Icon(null),
         ),
         body: _getContentWidget(),
@@ -399,27 +400,27 @@ class _ChallengePageState extends State<ChallengePage> {
                           _choice(questionData.question.choice, isQuestion,
                               questionData.question.choice_choose),
                           SizedBox(height: 8),
-                          Padding(
-                            padding: const EdgeInsets.all(8.0),
-                            child: Align(
-                              alignment: Alignment.centerRight,
-                              child: Container(
-                                padding: EdgeInsets.all(5),
-                                decoration: BoxDecoration(
-                                  color: Colors.orange.shade200,
-                                  borderRadius: BorderRadius.circular(10),
-                                ),
-                                child: Text(
-                                  'ความคืบหน้า : 50%',
-                                  style: TextStyle(
-                                      fontFamily: 'Arial',
-                                      fontSize: 14,
-                                      fontWeight: FontWeight.w600,
-                                      color: Colors.white),
-                                ),
-                              ),
-                            ),
-                          ),
+                          // Padding(
+                          //   padding: const EdgeInsets.all(8.0),
+                          //   child: Align(
+                          //     alignment: Alignment.centerRight,
+                          //     child: Container(
+                          //       padding: EdgeInsets.all(5),
+                          //       decoration: BoxDecoration(
+                          //         color: Colors.orange.shade200,
+                          //         borderRadius: BorderRadius.circular(10),
+                          //       ),
+                          //       child: Text(
+                          //         'ความคืบหน้า : 50%',
+                          //         style: TextStyle(
+                          //             fontFamily: 'Arial',
+                          //             fontSize: 14,
+                          //             fontWeight: FontWeight.w600,
+                          //             color: Colors.white),
+                          //       ),
+                          //     ),
+                          //   ),
+                          // ),
                         ],
                       ),
                     ),

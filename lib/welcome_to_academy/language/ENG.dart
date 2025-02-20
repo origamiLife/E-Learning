@@ -37,7 +37,6 @@ Future<void> ENG() async {
   academyTS = 'Academy';
   loadingTS = 'Loading';
   AOBTS = 'Allable On Boarding';
-  favoriteTS = 'Favorite';
   statusTS = 'Status';
   studentTS = 'student';
   videoTS = 'Video';
@@ -79,7 +78,7 @@ Future<void> ENG() async {
   CurriculumTS = 'Curriculum';
   InstructorsTS = 'Instructors';
   CertificationTS = 'Certification';
-  IntOutTS = 'LogOut';
+  IntOutTS = 'LOGOUT';
   openTS = 'Open';
   PartTS = 'Part';
   MinTS = 'Min';
@@ -92,5 +91,18 @@ Future<void> ENG() async {
   SaveTS = 'Save';
   failureMessageTS = 'There are questions that have not been answered. Press the Close button to return to the test and complete all questions, or press the Success button to submit your answers.';
   FinishTS = 'Finish';
-
+  DiscussionTS = 'Discussion';
+  AttachFileTS = 'AttachFile';
+  MyLearningTS = 'My Learning';
+  MyChallengeTS = 'My Challenge';
+  CatalogTS = 'Catalog';
+  FavoriteTS = 'Favorite';
+  ExplainTS = 'Explain';
+  ReplyThreadTS = 'Reply to the thread';
+  SorryChallengeTS = "Sorry can't do the challenge";
+  AfterTS = "After";
+  BeforeTS = "Before";
+  doingTS = "Doing";
+  notStartTS = "Before";
+  successTS = "Success";
 }

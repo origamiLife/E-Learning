@@ -351,7 +351,7 @@ class _NetworkVideoPlayerState extends State<NetworkVideoPlayer> {
 
       if (response.statusCode == 200) {
         final jsonResponse = json.decode(response.body);
-        // print('Status Response: $jsonResponse');
+        print('Status Response: $jsonResponse');
       } else {
         print('Error: ${response.statusCode}');
       }

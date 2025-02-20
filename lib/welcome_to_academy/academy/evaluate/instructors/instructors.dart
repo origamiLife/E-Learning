@@ -87,29 +87,29 @@ class _InstructorsState extends State<Instructors> {
               children: List.generate(instructor.length, (index) {
                 return Column(
                   children: [
-                    Container(
-                      // color: Colors.transparent,
-                      decoration: BoxDecoration(
-                        color: Colors.transparent,
-                        borderRadius: BorderRadius.circular(20),
-                      ),
-                      child: Row(
-                        children: [
-                          Expanded(
-                            child: Text(
-                              instructor[index].courseSubject,
-                              style: TextStyle(
-                                fontFamily: 'Arial',
-                                fontSize: 18.0,
-                                color: Color(0xFF555555),
-                                fontWeight: FontWeight.w700,
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                    SizedBox(height: 8),
+                    // Container(
+                    //   // color: Colors.transparent,
+                    //   decoration: BoxDecoration(
+                    //     color: Colors.transparent,
+                    //     borderRadius: BorderRadius.circular(20),
+                    //   ),
+                    //   child: Row(
+                    //     children: [
+                    //       Expanded(
+                    //         child: Text(
+                    //           '$InstructorsTS : ${instructor[index].courseSubject}',
+                    //           style: TextStyle(
+                    //             fontFamily: 'Arial',
+                    //             fontSize: 18.0,
+                    //             color: Color(0xFF555555),
+                    //             fontWeight: FontWeight.w700,
+                    //           ),
+                    //         ),
+                    //       ),
+                    //     ],
+                    //   ),
+                    // ),
+                    // SizedBox(height: 8),
                     Column(
                       children: List.generate(
                           instructor[index].coachData.length, (indexI) {

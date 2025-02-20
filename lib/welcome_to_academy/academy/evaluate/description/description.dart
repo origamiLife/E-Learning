@@ -300,7 +300,7 @@ class _DescriptionState extends State<Description> {
                                                                     width: 8,
                                                                   ),
                                                                   Text(
-                                                                    "${description[index].video_count} Video",
+                                                                    "${description[index].video_count} $videoTS",
                                                                     style:
                                                                         TextStyle(
                                                                       fontFamily:
@@ -309,7 +309,7 @@ class _DescriptionState extends State<Description> {
                                                                           .grey,
                                                                       fontWeight:
                                                                           FontWeight
-                                                                              .w700,
+                                                                              .w500,
                                                                     ),
                                                                   ),
                                                                 ],

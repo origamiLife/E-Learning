@@ -66,7 +66,20 @@ class _CertificationState extends State<Certification> {
             maxLines: 1,
           ));
         } else {
-          return _getContentWidget(snapshot.data!);
+          return (snapshot.data!.first.certificationList.isEmpty)
+              ? Center(
+                  child: Text(
+                  NotFoundDataTS,
+                  style: TextStyle(
+                    fontFamily: 'Arial',
+                    fontSize: 16.0,
+                    color: const Color(0xFF555555),
+                    fontWeight: FontWeight.w700,
+                  ),
+                  overflow: TextOverflow.ellipsis,
+                  maxLines: 1,
+                ))
+              : _getContentWidget(snapshot.data!);
         }
       },
     );

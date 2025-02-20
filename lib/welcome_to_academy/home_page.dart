@@ -1,16 +1,20 @@
 import 'package:http/http.dart' as http;
 import 'package:html/parser.dart' show parse;
 import 'package:carousel_slider/carousel_slider.dart';
-import 'academy/challeng/challenge_start.dart';
+import 'academy/challeng/challenge_menu.dart';
 import 'academy/evaluate/evaluate_module.dart';
 import 'export.dart';
 
 class AcademyHomePage extends StatefulWidget {
   const AcademyHomePage(
-      {Key? key, required this.employee, required this.Authorization})
+      {Key? key,
+      required this.employee,
+      required this.Authorization,
+      required this.page})
       : super(key: key);
   final Employee employee;
   final String Authorization;
+  final String page;
   @override
   State<AcademyHomePage> createState() => _AcademyHomePageState();
 }
@@ -26,6 +30,7 @@ class _AcademyHomePageState extends State<AcademyHomePage> {
   @override
   void initState() {
     super.initState();
+    page = widget.page;
     // Listener สำหรับการกรอง
     allTranslate();
     _loadSelectedRadio();
@@ -34,6 +39,12 @@ class _AcademyHomePageState extends State<AcademyHomePage> {
         search = _searchController.text;
       });
     });
+  }
+
+  @override
+  void dispose() {
+    _searchController.dispose();
+    super.dispose();
   }
 
   // โหลดค่าที่บันทึกไว้
@@ -64,7 +75,6 @@ class _AcademyHomePageState extends State<AcademyHomePage> {
     });
   }
 
-
   Future<void> _launchUrl(Uri url) async {
     if (!await launchUrl(url)) {
       throw Exception('Could not launch ${url}');
@@ -74,20 +84,24 @@ class _AcademyHomePageState extends State<AcademyHomePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.white,
       body: SafeArea(
-        child: Column(
-          children: [
-            _buildNavigationBar(),
-            // _buildAdBanner(),
-            SizedBox(height: 8),
-            (page == 'challenge')?Expanded(
-              child: ChallengeStartTime(
-                employee: widget.employee,
-                Authorization: widget.Authorization,
-              ),
-            ):
-            Expanded(child: _buildPopularEvents()),
-          ],
+        child: Container(
+          child: Column(
+            children: [
+              _buildNavigationBar(),
+              // _buildAdBanner(),
+              SizedBox(height: 8),
+              (page == 'challenge')
+                  ? Expanded(
+                      child: ChallengeStartTime(
+                        employee: widget.employee,
+                        Authorization: widget.Authorization,
+                      ),
+                    )
+                  : Expanded(child: _buildPopularEvents()),
+            ],
+          ),
         ),
       ),
     );
@@ -138,97 +152,119 @@ class _AcademyHomePageState extends State<AcademyHomePage> {
   String? selectedValue;
   Widget _buildNavigationBar() {
     return AppBar(
-      backgroundColor: const Color(0xFFF9F9F9), // Example background color
+      backgroundColor: Colors.white, // Example background color
       automaticallyImplyLeading: false, // Remove default back button
-      title: Row(
-        children: [
-          // Hamburger Menu
-          // IconButton(
-          //   onPressed: () {
-          //     // Handle hamburger menu
-          //   },
-          //   icon: const Icon(Icons.menu),
-          // ),
-          // _handleRadioValueChange(1);
-          // Language Dropdown
-          // DropdownButton(
-          //   items: const [
-          //     DropdownMenuItem(value: 'en', child: Text('EN')),
-          //     DropdownMenuItem(value: 'th', child: Text('TH')),
-          //   ],
-          //   onChanged: (value) {},
-          //   hint: const Text('EN'), // Current language
-          // ),
-
-          // Logo
-          // Image.network(
-          //   "https://p-a.popcdn.net/assets/blue-eventpop-logo-767017e3b2a12bf2e4887dfa4a723e2cc247925856d9abd29359ccbec71a6680.png",
-          //   height: 40,
-          // ),
-        ],
-      ),
-
       actions: [
         SizedBox(width: 20),
-        DropdownButton(
-          items: const [
-            DropdownMenuItem(value: 'course', child: Text('My Learning')),
-            DropdownMenuItem(value: 'challenge', child: Text('My Challenge')),
-            DropdownMenuItem(value: 'catalog', child: Text('Catalog')),
-            DropdownMenuItem(value: 'favorite', child: Text('Favorite')),
-            // Add other menu items
-          ],
-          onChanged: (value) {
-            setState(() {
-              selectedValue = value;
-              page = value!;
-              // if (value == language) {
-              //   Navigator.push(
-              //     context,
-              //     MaterialPageRoute(
-              //       builder: (context) => TranslatePage(
-              //         employee: widget.employee,
-              //         Authorization: widget.Authorization,
-              //       ),
-              //     ),
-              //   );
-              // } else {
-              //   _showLogoutDialog();
-              // }
-            });
-          },
-          value: selectedValue,
-          hint: const Text('My Learning'),
+        Expanded(
+          flex: 2,
+          child: DropdownButton(
+            items: [
+              DropdownMenuItem(
+                  value: 'course',
+                  child: Text(
+                    '$MyLearningTS',
+                    overflow: TextOverflow.ellipsis,
+                    maxLines: 1,
+                  )),
+              DropdownMenuItem(
+                  value: 'challenge',
+                  child: Text(
+                    '$MyChallengeTS',
+                    overflow: TextOverflow.ellipsis,
+                    maxLines: 1,
+                  )),
+              DropdownMenuItem(
+                  value: 'catalog',
+                  child: Text(
+                    '$CatalogTS',
+                    overflow: TextOverflow.ellipsis,
+                    maxLines: 1,
+                  )),
+              DropdownMenuItem(
+                  value: 'favorite',
+                  child: Text(
+                    '$FavoriteTS',
+                    overflow: TextOverflow.ellipsis,
+                    maxLines: 1,
+                  )),
+              // Add other menu items
+            ],
+            onChanged: (value) {
+              setState(() {
+                selectedValue = value;
+                page = value!;
+              });
+            },
+            value: selectedValue,
+            hint: Text(
+              page == 'challenge' ? '$MyChallengeTS' : '$MyLearningTS',
+              style: TextStyle(
+                fontFamily: 'Arial',
+                fontSize: 16,
+                color: Colors.orange,
+                fontWeight: FontWeight.w500,
+              ),
+              overflow: TextOverflow.ellipsis,
+              maxLines: 1,
+            ),
+              style:TextStyle(
+                fontFamily: 'Arial',
+                fontSize: 16,
+                color: Colors.orange,
+                fontWeight: FontWeight.w500,
+              ),
+          ),
         ),
-        Spacer(),
-        Row(
-          children: [
-            TextButton(onPressed: () {_handleRadioValueChange(1);}, child: const Text('TH')),
-            const Text('|', style: TextStyle(
-              fontFamily: 'Arial',
-              fontSize: 16,
-              fontWeight: FontWeight.w700,
-              color: Color(0xFF555555),
-            ),),
-            TextButton(onPressed: () {_handleRadioValueChange(2);}, child: const Text('EN')),
-          ],
-        ),
-        TextButton(
-          onPressed: () {
-            Navigator.pushAndRemoveUntil(
-              context,
-              MaterialPageRoute(
-                builder: (context) => LoginPage(
-                  num: 1,
-                  popPage: 0,
+        Expanded(
+          flex: 1,
+          child: Row(
+            children: [
+              Expanded(
+                child: TextButton(
+                    onPressed: () {
+                      _handleRadioValueChange(1);
+                    },
+                    child: Text('TH')),
+              ),
+              Text(
+                '|',
+                style: TextStyle(
+                  fontFamily: 'Arial',
+                  fontSize: 16,
+                  fontWeight: FontWeight.w700,
+                  color: Color(0xFF555555),
                 ),
               ),
-              (route) => false,
-            );
-          },
-          child: Text('$IntOutTS'),
+              Expanded(
+                child: TextButton(
+                    onPressed: () {
+                      _handleRadioValueChange(2);
+                    },
+                    child: Text('EN')),
+              ),
+            ],
+          ),
         ),
-        SizedBox(width: 16),
+        Expanded(
+          flex: 1,
+          child: TextButton(
+            onPressed: () {
+              Navigator.pushAndRemoveUntil(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => LoginPage(
+                    num: 1,
+                    popPage: 0,
+                  ),
+                ),
+                (route) => false,
+              );
+            },
+            child: Text('$IntOutTS'),
+          ),
+        ),
+        // SizedBox(width: 16),
       ],
     );
   }
@@ -260,19 +296,18 @@ class _AcademyHomePageState extends State<AcademyHomePage> {
   }
 
   Widget _buildPopularEvents() {
-    return Container(
-      padding: const EdgeInsets.all(8),
-      child: Column(
-        children: [
-          _buildSearchField(),
-          SizedBox(height: 8),
-          Expanded(
+    return Column(
+      children: [
+        _buildSearchField(),
+        // SizedBox(height: 8),
+        Expanded(
+          child: Padding(
+            padding: const EdgeInsets.only(left: 8, right: 8),
             child: FutureBuilder<List<AcademyRespond>>(
               future: fetchAcademies(),
               builder: (context, snapshot) {
                 if (snapshot.connectionState == ConnectionState.waiting) {
-                  return Center(
-                      child: Row(
+                  return Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       CircularProgressIndicator(
@@ -291,7 +326,7 @@ class _AcademyHomePageState extends State<AcademyHomePage> {
                         ),
                       ),
                     ],
-                  ));
+                  );
                 } else if (snapshot.hasError) {
                   return Center(
                       child: Text(
@@ -320,16 +355,16 @@ class _AcademyHomePageState extends State<AcademyHomePage> {
               },
             ),
           ),
-        ],
-      ),
+        ),
+      ],
     );
   }
 
   Widget _Learning(List<AcademyRespond> filteredAcademy) {
     return filteredAcademy.isNotEmpty
         ? SingleChildScrollView(
-          child: _buildAcademyListView(filteredAcademy),
-        )
+            child: _buildAcademyListView(filteredAcademy),
+          )
         : _buildNotFoundText();
   }
 
@@ -360,83 +395,85 @@ class _AcademyHomePageState extends State<AcademyHomePage> {
 
   Widget _buildSearchField() {
     return Padding(
-      padding: const EdgeInsets.only(left: 8, right: 8),
-      child: Container(
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(100),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withOpacity(0.2), // สีเงา
-              blurRadius: 8, // ความฟุ้งของเงา
-              offset: Offset(0, 4), // การเยื้องของเงา (แนวแกน X, Y)
-            ),
-          ],
-        ),
-        child: TextFormField(
-          controller: _searchController,
-          keyboardType: TextInputType.text,
-          style: TextStyle(
-            fontFamily: 'Arial',
-            color: Color(0xFF555555),
-            fontSize: 14,
+        padding: const EdgeInsets.only(left: 8, right: 8),
+        child: Container(
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(100),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withOpacity(0.2), // สีเงา
+                blurRadius: 8, // ความฟุ้งของเงา
+                offset: Offset(0, 4), // การเยื้องของเงา (แนวแกน X, Y)
+              ),
+            ],
           ),
-          decoration: InputDecoration(
-            isDense: true,
-            filled: true,
-            fillColor: Colors.white,
-            contentPadding: EdgeInsets.symmetric(horizontal: 24, vertical: 14),
-            hintText: '$SearchTS...',
-            hintStyle: TextStyle(
-                fontFamily: 'Arial', fontSize: 14, color: Color(0xFF555555)),
-            border: InputBorder.none, // เอาขอบปกติออก
-            suffixIcon: Padding(
-              padding: EdgeInsets.only(right: 8.0),
-              child: Icon(
-                Icons.search,
-                size: 24,
-              ),
+          child: TextFormField(
+            controller: _searchController,
+            keyboardType: TextInputType.text,
+            style: TextStyle(
+              fontFamily: 'Arial',
+              color: Color(0xFF555555),
+              fontSize: 14,
             ),
-            // border: OutlineInputBorder(
-            //   borderRadius: BorderRadius.circular(100),
-            // ),
-            // suffixIcon: Padding(
-            //   padding: const EdgeInsets.only(right: 8.0),
-            //   child: Icon(
-            //     Icons.search,
-            //     // color: Colors.red, // สีไอคอน
-            //     size: 24, // ขนาดไอคอน
-            //   ),
-            // ),
-            enabledBorder: OutlineInputBorder(
-              borderSide: BorderSide(
-                color: Colors.black38,
-                width: 1,
+            decoration: InputDecoration(
+              isDense: true,
+              filled: true,
+              fillColor: Colors.white,
+              contentPadding:
+                  EdgeInsets.symmetric(horizontal: 24, vertical: 14),
+              hintText: '$SearchTS...',
+              hintStyle: TextStyle(
+                  fontFamily: 'Arial', fontSize: 14, color: Color(0xFF555555)),
+              border: InputBorder.none, // เอาขอบปกติออก
+              suffixIcon: Padding(
+                padding: EdgeInsets.only(right: 8.0),
+                child: Icon(
+                  Icons.search,
+                  size: 24,
+                ),
               ),
-              borderRadius: BorderRadius.circular(50),
-            ),
-            focusedBorder: OutlineInputBorder(
-              borderSide: BorderSide(
-                color: Colors.black38,
-                width: 1,
+              // border: OutlineInputBorder(
+              //   borderRadius: BorderRadius.circular(100),
+              // ),
+              // suffixIcon: Padding(
+              //   padding: const EdgeInsets.only(right: 8.0),
+              //   child: Icon(
+              //     Icons.search,
+              //     // color: Colors.red, // สีไอคอน
+              //     size: 24, // ขนาดไอคอน
+              //   ),
+              // ),
+              enabledBorder: OutlineInputBorder(
+                borderSide: BorderSide(
+                  color: Colors.black38,
+                  width: 1,
+                ),
+                borderRadius: BorderRadius.circular(50),
               ),
-              borderRadius: BorderRadius.circular(50),
+              focusedBorder: OutlineInputBorder(
+                borderSide: BorderSide(
+                  color: Colors.black38,
+                  width: 1,
+                ),
+                borderRadius: BorderRadius.circular(50),
+              ),
             ),
           ),
-        ),
-      )
-    );
+        ));
   }
 
   //android,iphone
   Widget _buildAcademyList(List<AcademyRespond> filteredAcademy) {
-    return Column(
-      children: List.generate(filteredAcademy.length, (indexI) {
-        final academyItem = filteredAcademy[
-            indexI]; // Store the academy item in a variable to avoid repetitive code.
-        return Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 8.0),
-          child: Card(
+    return ListView.separated(
+        padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 8),
+        shrinkWrap: true,
+        physics: const NeverScrollableScrollPhysics(),
+        itemCount: filteredAcademy.length,
+        separatorBuilder: (_, __) => const Divider(),
+        itemBuilder: (context, index) {
+          final academyItem = filteredAcademy[index];
+          return Card(
             color: Color(0xFFF5F5F5),
             child: InkWell(
               onTap: () {
@@ -474,7 +511,7 @@ class _AcademyHomePageState extends State<AcademyHomePage> {
                 child: Padding(
                   padding: const EdgeInsets.all(8.0),
                   child: Row(
-                    crossAxisAlignment: CrossAxisAlignment.start,
+                    crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
                       const SizedBox(width: 8),
                       Expanded(
@@ -517,16 +554,17 @@ class _AcademyHomePageState extends State<AcademyHomePage> {
                             Column(
                               children: academyItem.academy_coach_data.isEmpty
                                   ? [Text("")]
-                                  : List.generate(academyItem.academy_coach_data.length,
+                                  : List.generate(
+                                      academyItem.academy_coach_data.length,
                                       (index) {
-                                    return _buildCoachList(
-                                        academyItem.academy_coach_data[index]);
-                                  }),
+                                      return _buildCoachList(academyItem
+                                          .academy_coach_data[index]);
+                                    }),
                             ),
                             SizedBox(height: 8),
                             Text(
                               academyItem.academy_date == "Time Out"
-                                  ? academyItem.academy_date
+                                  ? '$timeoutTS'
                                   : '$startTS : ${academyItem.academy_date}',
                               style: TextStyle(
                                 fontFamily: 'Arial',
@@ -546,10 +584,8 @@ class _AcademyHomePageState extends State<AcademyHomePage> {
                 ),
               ),
             ),
-          ),
-        );
-      }),
-    );
+          );
+        });
   }
 
   //tablet, ipad
@@ -628,7 +664,7 @@ class _AcademyHomePageState extends State<AcademyHomePage> {
                           ),
                           Text(
                             academyItem.academy_date == "Time Out"
-                                ? academyItem.academy_date
+                                ? '$timeoutTS'
                                 : '$startTS : ${academyItem.academy_date}',
                             style: TextStyle(
                               fontFamily: 'Arial',

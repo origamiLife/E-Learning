@@ -18,8 +18,8 @@ class Discussion extends StatefulWidget {
 }
 
 class _DiscussionState extends State<Discussion> {
-  TextEditingController _commentControllerA = TextEditingController();
-  TextEditingController _commentControllerB = TextEditingController();
+  final TextEditingController _commentControllerA = TextEditingController();
+  final TextEditingController _commentControllerB = TextEditingController();
 
   Future<List<DiscussionData>> fetchDiscussion() async {
     final uri = Uri.parse("$host/api/origami/academy/discussion.php");
@@ -95,6 +95,7 @@ class _DiscussionState extends State<Discussion> {
   @override
   void dispose() {
     _commentControllerA.dispose();
+    _commentControllerB.dispose();
     super.dispose();
   }
 
@@ -148,8 +149,8 @@ class _DiscussionState extends State<Discussion> {
                           backgroundColor: Colors.transparent,
                           context: context,
                           isScrollControlled: true,
-                          isDismissible: false,
-                          enableDrag: true,
+                          // isDismissible: false,
+                          // enableDrag: true,
                           builder: (BuildContext context) {
                             return _Reply(disc);
                           },
@@ -297,180 +298,144 @@ class _DiscussionState extends State<Discussion> {
       color: Colors.white,
       child: FractionallySizedBox(
         heightFactor: 0.8,
-        child: MaterialApp(
-          debugShowCheckedModeBanner: false,
-          home: Scaffold(
-            backgroundColor: Colors.grey.shade50,
-            appBar: AppBar(
-              backgroundColor: Colors.white,
-              title: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text(
-                    '$commentsTS',
-                    style: TextStyle(
+        child: Scaffold(
+          backgroundColor: Colors.grey.shade50,
+          body: SingleChildScrollView(
+            child: Column(
+              children: [
+                const SizedBox(height: 16),
+                Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Text(
+                    '$ReplyThreadTS',
+                    style: const TextStyle(
                       fontFamily: 'Arial',
+                      fontSize: 24,
+                      fontWeight: FontWeight.w700,
                       color: Color(0xFF555555),
                     ),
                   ),
-                  Spacer(),
-                  InkWell(
-                    onTap: () => Navigator.pop(context),
-                    child: Icon(Icons.close),
-                  ),
-                ],
-              ),
-            ),
-            body: SingleChildScrollView(
-              child: Column(
-                children: [
-                  Padding(
-                    padding: const EdgeInsets.all(16),
-                    child: Stack(
-                      children: [
-                        Container(
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(15),
-                            border: Border.all(
-                              color: Colors.grey,
-                              width: 2.0,
-                            ),
-                          ),
-                          child: TextFormField(
-                            minLines: 5,
-                            maxLines: null,
-                            keyboardType: TextInputType.text,
-                            controller: _commentControllerA,
-                            style: TextStyle(
-                                fontFamily: 'Arial',
-                                color: const Color(0xFF555555),
-                                fontSize: 14),
-                            decoration: InputDecoration(
-                              isDense: true,
-                              filled: true,
-                              fillColor: Colors.white,
-                              hintText: '',
-                              hintStyle: TextStyle(
-                                  fontFamily: 'Arial',
-                                  fontSize: 14,
-                                  color: const Color(0xFF555555)),
-                              border: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(15),
-                                borderSide: BorderSide.none,
-                              ),
-                              focusedBorder: UnderlineInputBorder(
-                                borderSide:
-                                    BorderSide(color: Color(0xFF555555)),
-                              ),
-                            ),
-                            onChanged: (value) {},
-                          ),
-                        ),
-                        Positioned(
-                          bottom: 6,
-                          right: 6,
-                          child: Container(
-                            decoration: BoxDecoration(
-                              color: Colors.amber,
-                              borderRadius: BorderRadius.circular(10),
-                            ),
-                            child: InkWell(
-                              onTap: () {
-                                setState(() {
-                                  if (_commentA != "") {
-                                    DiscussionSave(
-                                      discussionId,
-                                      "$SaveTS",
-                                      "",
-                                      _commentA,
-                                    );
-                                  }
-                                  _commentControllerA.clear();
-                                });
-                              },
-                              child: Padding(
-                                padding: const EdgeInsets.only(
-                                    left: 8, right: 8, top: 2, bottom: 2),
-                                child: Center(
-                                  child: Text(
-                                    "$postTS",
-                                    style: TextStyle(
-                                      fontFamily: 'Arial',
-                                      fontSize: 18.0,
-                                      color: Colors.white,
-                                      fontWeight: FontWeight.w500,
-                                    ),
-                                  ),
-                                ),
-                              ),
-                            ),
-                          ),
-                        ),
-                      ],
+                ),
+                // Padding(
+                //   padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                //   child: Row(
+                //     children: [
+                //       const SizedBox(width: 8),
+                //       Text(
+                //         '$commentsTS',
+                //         style: const TextStyle(
+                //           fontFamily: 'Arial',
+                //           fontSize: 24,
+                //           color: Color(0xFF555555),
+                //         ),
+                //       ),
+                //       const Spacer(),
+                //       GestureDetector(
+                //         onTap: () => Navigator.pop(context),
+                //         child: const Icon(
+                //           Icons.close,
+                //           color: Colors.black,
+                //           size: 24,
+                //         ),
+                //       ),
+                //       const SizedBox(width: 16),
+                //     ],
+                //   ),
+                // ),
+                Padding(
+                  padding: const EdgeInsets.all(16),
+                  child: Column(
+                    children: [
+                      _buildTextField(_commentControllerA, '$ExplainTS...', (value) {
+                        setState(() {
+                          _commentA = value;
+                        });
+                      }),
+                      SizedBox(height: 8),
+                  Container(
+                    width: double.infinity,
+                    decoration: BoxDecoration(
+                      color: Colors.orange.shade300,
+                      borderRadius: BorderRadius.circular(10),
                     ),
-                  ),
-                  SizedBox(height: 8),
-                  Padding(
-                    padding: const EdgeInsets.only(left: 8.0),
-                    child: Container(
-                      alignment: Alignment.centerLeft,
+                    child: TextButton(
+                      onPressed: () {
+                        if (_commentA.isNotEmpty) {
+                          DiscussionSave(
+                            discussionId,
+                            "save",
+                            "",
+                            _commentA,
+                          );
+                          _commentControllerA.clear();
+                          setState(() {
+                            _commentA = "";
+                          });
+                        }
+                      },
+                      style: TextButton.styleFrom(
+                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                      ),
                       child: Text(
-                        "$commentsTS: ${disc.dissussion_reply_count}",
-                        style: TextStyle(
+                        "$postTS",
+                        style: const TextStyle(
                           fontFamily: 'Arial',
-                          fontSize: 18.0,
-                          color: Color(0xFF555555),
+                          fontSize: 20,
+                          color: Colors.white,
+                          fontWeight: FontWeight.w700,
                         ),
                       ),
-                    ),
+                    )),
+                    ],
                   ),
-                  FutureBuilder<List<ReplyData>>(
-                    future: fetchReply(),
-                    builder: (context, snapshot) {
-                      if (snapshot.connectionState == ConnectionState.waiting) {
-                        return Center(
-                            child: Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            CircularProgressIndicator(
-                              color: Color(0xFFFF9900),
-                            ),
-                            SizedBox(
-                              width: 12,
-                            ),
-                            Text(
-                              '$loadingTS...',
-                              style: TextStyle(
-                                fontFamily: 'Arial',
-                                fontSize: 16,
-                                fontWeight: FontWeight.w700,
-                                color: Color(0xFF555555),
+                ),
+                const SizedBox(height: 8),
+                FutureBuilder<List<ReplyData>>(
+                  future: fetchReply(),
+                  builder: (context, snapshot) {
+                    if (snapshot.connectionState == ConnectionState.waiting) {
+                      return Center(
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              CircularProgressIndicator(
+                                color: Color(0xFFFF9900),
                               ),
+                              SizedBox(
+                                width: 12,
+                              ),
+                              Text(
+                                '$loadingTS...',
+                                style: TextStyle(
+                                  fontFamily: 'Arial',
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.w700,
+                                  color: Color(0xFF555555),
+                                ),
+                              ),
+                            ],
+                          ));
+                    } else if (snapshot.hasError) {
+                      return Center(child: Text('Error: ${snapshot.error}'));
+                    } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+                      return Center(
+                          child: Text(
+                            NotFoundDataTS,
+                            style: TextStyle(
+                              fontFamily: 'Arial',
+                              fontSize: 16.0,
+                              color: const Color(0xFF555555),
+                              fontWeight: FontWeight.w700,
                             ),
-                          ],
-                        ));
-                      } else if (snapshot.hasError) {
-                        return Center(child: Text('Error: ${snapshot.error}'));
-                      } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
-                        return Center(
-                            child: Text(
-                          NotFoundDataTS,
-                          style: TextStyle(
-                            fontFamily: 'Arial',
-                            fontSize: 16.0,
-                            color: const Color(0xFF555555),
-                            fontWeight: FontWeight.w700,
-                          ),
-                          overflow: TextOverflow.ellipsis,
-                          maxLines: 1,
-                        ));
-                      } else {
-                        return _bodyReply(snapshot.data!);
-                      }
-                    },
-                  ),
-                ],
-              ),
+                            overflow: TextOverflow.ellipsis,
+                            maxLines: 1,
+                          ));
+                    } else {
+                      return _bodyReply(snapshot.data!);
+                    }
+                  },
+                ),
+              ],
             ),
           ),
         ),
@@ -478,130 +443,187 @@ class _DiscussionState extends State<Discussion> {
     );
   }
 
+  BoxDecoration _inputDecoration() {
+    return BoxDecoration(
+      borderRadius: BorderRadius.circular(15.0),
+      border: Border.all(color: const Color(0xFFFF9900), width: 1.0),
+    );
+  }
+
+  Widget _buildTextField(TextEditingController controller, String hintText,
+      Function(String) onChanged) {
+    return Container(
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(15),
+        border: Border.all(
+          color: Color(0xFF555555),
+          width: 1.0,
+        ),
+      ),
+      child: TextFormField(
+        minLines: 6,
+        maxLines: null,
+        controller: controller,
+        keyboardType: TextInputType.text,
+        style: GoogleFonts.openSans(fontSize: 14, color: const Color(0xFF555555)),
+        decoration: InputDecoration(
+          isDense: true,
+          filled: true,
+          fillColor: Colors.white,
+          hintText: hintText,
+          hintStyle: GoogleFonts.openSans(fontSize: 14, color: Colors.black38),
+          border: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(15),
+            borderSide: BorderSide.none,
+          ),
+        ),
+        onChanged: onChanged,
+      ),
+    );
+  }
+
   Widget _bodyReply(List<ReplyData> replyData) {
-    return Padding(
-      padding: const EdgeInsets.all(8.0),
-      child: Column(
-        children: List.generate(replyData.length, (indexI) {
-          final reply = replyData[indexI];
-          return Card(
-            color: Colors.white,
-            child: Container(
-              padding: EdgeInsets.all(20),
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(20),
+    return Column(
+      children: [
+        Padding(
+          padding: const EdgeInsets.only(left: 8.0),
+          child: Align(
+            alignment: Alignment.centerLeft,
+            child: Text(
+              "$commentsTS: ${replyData.length}",
+              style: const TextStyle(
+                fontFamily: 'Arial',
+                fontSize: 18.0,
+                color: Color(0xFF555555),
               ),
-              child: Row(
-                children: [
-                  Image.network(
-                    reply.reply_emp_image,
-                    height: 100,
-                    fit: BoxFit.fill,
+            ),
+          ),
+        ),
+        Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: Column(
+            children: List.generate(replyData.length, (indexI) {
+              final reply = replyData[indexI];
+              return Card(
+                color: Colors.white,
+                child: Container(
+                  padding: EdgeInsets.all(20),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(20),
                   ),
-                  SizedBox(
-                    width: 8,
-                  ),
-                  Expanded(
-                    flex: 2,
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          reply.reply_emp_name,
-                          style: TextStyle(
-                            fontFamily: 'Arial',
-                            fontSize: 18.0,
-                            color: Color(0xFF555555),
-                            fontWeight: FontWeight.w700,
-                          ),
-                          overflow: TextOverflow.ellipsis,
-                          maxLines: 1,
-                        ),
-                        SizedBox(height: 8),
-                        Row(
+                  child: Row(
+                    children: [
+                      Image.network(
+                        reply.reply_emp_image,
+                        height: 100,
+                        fit: BoxFit.fill,
+                      ),
+                      SizedBox(
+                        width: 8,
+                      ),
+                      Expanded(
+                        flex: 2,
+                        child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Icon(
-                              Icons.calendar_month,
-                              color: Colors.amber,
-                              size: 22,
-                            ),
-                            SizedBox(
-                              width: 8,
-                            ),
-                            Expanded(
-                              child: Text(
-                                reply.reply_date,
-                                style: TextStyle(
-                                  fontFamily: 'Arial',
-                                  color: Color(0xFF555555),
-                                ),
-                                overflow: TextOverflow.ellipsis,
-                                maxLines: 2,
+                            Text(
+                              reply.reply_emp_name,
+                              style: TextStyle(
+                                fontFamily: 'Arial',
+                                fontSize: 18.0,
+                                color: Color(0xFF555555),
+                                fontWeight: FontWeight.w700,
                               ),
+                              overflow: TextOverflow.ellipsis,
+                              maxLines: 1,
+                            ),
+                            SizedBox(height: 8),
+                            Row(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Icon(
+                                  Icons.calendar_month,
+                                  color: Colors.amber,
+                                  size: 22,
+                                ),
+                                SizedBox(
+                                  width: 8,
+                                ),
+                                Expanded(
+                                  child: Text(
+                                    reply.reply_date,
+                                    style: TextStyle(
+                                      fontFamily: 'Arial',
+                                      color: Color(0xFF555555),
+                                    ),
+                                    overflow: TextOverflow.ellipsis,
+                                    maxLines: 2,
+                                  ),
+                                ),
+                              ],
+                            ),
+                            SizedBox(height: 4),
+                            Text(
+                              reply.reply_desc,
+                              style: TextStyle(
+                                fontFamily: 'Arial',
+                                fontSize: 16,
+                                color: Color(0xFF555555),
+                              ),
+                              overflow: TextOverflow.ellipsis,
+                              maxLines: 1,
                             ),
                           ],
                         ),
-                        SizedBox(height: 4),
-                        Text(
-                          reply.reply_desc,
-                          style: TextStyle(
-                            fontFamily: 'Arial',
-                            fontSize: 16,
-                            color: Color(0xFF555555),
-                          ),
-                          overflow: TextOverflow.ellipsis,
-                          maxLines: 1,
-                        ),
-                      ],
-                    ),
+                      ),
+                      // SingleChildScrollView(
+                      //   scrollDirection: Axis.horizontal,
+                      //   child: Row(
+                      //     children: [
+                      //       IconButton(
+                      //         onPressed: () {
+                      //           if(reply.can_edit == "N") {
+                      //             return ;
+                      //           }else{
+                      //             setState(() {
+                      //               _showDialogB(reply);
+                      //             });
+                      //           }
+                      //         },
+                      //         icon: Icon(
+                      //           (reply.can_edit == "N")?null:Icons.edit_note_outlined,
+                      //           color: Colors.amber,
+                      //           size: 32,
+                      //         ),
+                      //         tooltip: '',
+                      //       ),
+                      //       IconButton(
+                      //         onPressed: () {
+                      //           if(reply.can_delete == "N") {
+                      //             return ;
+                      //           }else{
+                      //             setState(() {
+                      //               _showDialogC(reply);
+                      //             });
+                      //           }
+                      //         },
+                      //         icon: FaIcon(FontAwesomeIcons.trashAlt,
+                      //           color: (reply.can_delete == "N")?Colors.transparent:Colors.redAccent,
+                      //         ),
+                      //         tooltip: '',
+                      //       ),
+                      //     ],
+                      //   ),
+                      // ),
+                    ],
                   ),
-                  // SingleChildScrollView(
-                  //   scrollDirection: Axisx.horizontal,
-                  //   child: Row(
-                  //     children: [
-                  //       IconButton(
-                  //         onPressed: () {
-                  //           if(reply.can_edit == "N") {
-                  //             return ;
-                  //           }else{
-                  //             setState(() {
-                  //               _showDialogB(reply);
-                  //             });
-                  //           }
-                  //         },
-                  //         icon: Icon(
-                  //           (reply.can_edit == "N")?null:Icons.edit_note_outlined,
-                  //           color: Colors.amber,
-                  //           size: 32,
-                  //         ),
-                  //         tooltip: '',
-                  //       ),
-                  //       IconButton(
-                  //         onPressed: () {
-                  //           if(reply.can_delete == "N") {
-                  //             return ;
-                  //           }else{
-                  //             setState(() {
-                  //               _showDialogC(reply);
-                  //             });
-                  //           }
-                  //         },
-                  //         icon: FaIcon(FontAwesomeIcons.trashAlt,
-                  //           color: (reply.can_delete == "N")?Colors.transparent:Colors.redAccent,
-                  //         ),
-                  //         tooltip: '',
-                  //       ),
-                  //     ],
-                  //   ),
-                  // ),
-                ],
-              ),
-            ),
-          );
-        }),
-      ),
+                ),
+              );
+            }),
+          ),
+        ),
+      ],
     );
   }
 
@@ -805,6 +827,15 @@ class _DiscussionState extends State<Discussion> {
       if (response.statusCode == 200) {
         final jsonResponse = jsonDecode(response.body);
         if (jsonResponse['status'] == true) {
+          if(method == 'save'){
+            _commentControllerA.clear();
+            setState(() {
+              _commentA = "";
+            });
+          }else if(method == 'edit'){
+
+          }
+
           print("message: true");
         } else {
           throw Exception(

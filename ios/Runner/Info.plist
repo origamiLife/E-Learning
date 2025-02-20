@@ -51,7 +51,7 @@
     <string>Origami ขอสิทธิ์การเข้าถึงกล้องเพื่อสแกนเอกสารโครงการและถ่ายภาพสำหรับรายงาน</string>
 
     <key>NSPhotoLibraryUsageDescription</key>
-    <string>Origami ขอสิทธิ์เข้าถึงคลังภาพของคุณเพื่อให้คุณอัปโหลดรูปภาพและเอกสารที่เกี่ยวข้องกับโครงการได้</string>
+    <string>Origami ขอสิทธิ์เข้าถึงคลังภาพเพื่อให้อัปโหลดรูปภาพและเอกสารที่เกี่ยวข้องกับโครงการได้</string>
 
     <key>NSMicrophoneUsageDescription</key>
     <string>Origami ขอสิทธิ์เข้าถึงไมโครโฟนเพื่อเปิดใช้งานการบันทึกเสียงสำหรับการอัปเดตโครงการและการสื่อสารในทีม</string>
@@ -61,6 +61,12 @@
 
     <key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
     <string>Origami ขอสิทธิ์เข้าถึงตำแหน่งของคุณเพื่อใช้ในการระบุตำแหน่งโครงการและการติดตามข้อมูลที่เกี่ยวข้อง</string>
+
+    <key>NSLocationAlwaysUsageDescription</key>
+    <string>แอปนี้ต้องการติดตามตำแหน่งของคุณตลอดเวลา</string>
+
+    <key>NSMotionUsageDescription</key>
+    <string>แอปนี้ต้องการเข้าถึงข้อมูลการเคลื่อนไหวของคุณ</string>
 
 	<key>NSAppTransportSecurity</key>
     <dict>
