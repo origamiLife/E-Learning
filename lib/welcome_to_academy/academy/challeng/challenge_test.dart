@@ -38,20 +38,16 @@ class _ChallengePageState extends State<ChallengePage> {
   Timer? timer;
   double _progress = 0.0; // เริ่มต้นที่ 100%
   double _progressValue = 0.8; // ค่าความคืบหน้า
+  String getStatus = '';
 
   @override
   void initState() {
     super.initState();
     oneShot = true;
     fetchStartChallenge();
-    print("object:1");
-    if ((widget.getchallenge.challenge_status != 'doing' ||
-        widget.getchallenge.challenge_status != 'not_start')) {
-      _progress = 0;
-    } else {
-      fetchStartChallenge();
-      print("object:2");
-    }
+    fetchCheckAllChallenge();
+    getStatus = widget.getchallenge.challenge_status;
+
     // fetchResult();
   }
 
@@ -60,16 +56,17 @@ class _ChallengePageState extends State<ChallengePage> {
     timer = Timer.periodic(Duration(seconds: 1), (timer) {
       setState(() {
         if (_progress > 0 &&
-            (widget.getchallenge.challenge_status == 'doing' ||
-                widget.getchallenge.challenge_status == 'not_start')) {
+            (getStatus == 'doing' || getStatus == 'not_start')) {
           _progress--;
           print("เวลาคงเหลือ: $_progress วินาที");
         } else {
           print("หมดเวลา");
           _progress = 0;
           timer.cancel();
+
+          fetchCheckAllChallenge();
           fetchFinishChallenge();
-          Navigator.push(
+          Navigator.pushReplacement(
             context,
             MaterialPageRoute(
               builder: (context) => SummaryScores(
@@ -82,9 +79,6 @@ class _ChallengePageState extends State<ChallengePage> {
               ),
             ),
           );
-          //     .then((_) {
-          //   Navigator.pop(context);
-          // });
         }
       });
       // print("เวลาคงเหลือ: $_progress วินาที");
@@ -92,51 +86,145 @@ class _ChallengePageState extends State<ChallengePage> {
   }
 
   // หมดเวลา
-  void timeOutNextPage() {
-    QuickAlert.show(
+  // void _timeOutNextPage() {
+  //   QuickAlert.show(
+  //     context: context,
+  //     type: QuickAlertType.info,
+  //     width: MediaQuery.of(context).size.width > 600 ? 590 : 400,
+  //     customAsset: 'assets/images/busienss1.jpg',
+  //     widget: SizedBox(
+  //       height: 100, // กำหนดความสูงของรูป
+  //       child: Image.network(
+  //           'https://images.ctfassets.net/unrdeg6se4ke/42cuIBOAntDgaG1GinrKHs/e424890c6ae3ed84021e247011ca949c/summary-1366x446-1.jpg'),
+  //     ),
+  //     title: '$timeoutTS!',
+  //     text: '$timeoutMessageTH',
+  //     // autoCloseDuration: const Duration(seconds: 2),
+  //     showConfirmBtn: true,
+  //     barrierDismissible: false, // ปิดการแตะออกนอกกรอบ
+  //     onCancelBtnTap: () {
+  //       Navigator.pop(context);
+  //     },
+  //     onConfirmBtnTap: () {
+  //       fetchFinishChallenge();
+  //       Navigator.push(
+  //         context,
+  //         MaterialPageRoute(
+  //           builder: (context) => SummaryScores(
+  //             employee: widget.employee,
+  //             Authorization: widget.Authorization,
+  //             initialMinutes: widget.initialMinutes,
+  //             challenge: widget.getchallenge,
+  //             questionList: questionList,
+  //             isQuestion: checkAllChallenge,
+  //           ),
+  //         ),
+  //       );
+  //     },
+  //   );
+  // }
+
+  // สิ้นสุดการทดสอบ
+
+  void showCustomDialog(
+      BuildContext context, List<CheckAllChallenge> isQuestion) {
+    showDialog(
       context: context,
-      type: QuickAlertType.info,
-      width: MediaQuery.of(context).size.width > 600 ? 590 : 400,
-      customAsset: 'assets/images/busienss1.jpg',
-      widget: SizedBox(
-        height: 100, // กำหนดความสูงของรูป
-        child: Image.network(
-            'https://images.ctfassets.net/unrdeg6se4ke/42cuIBOAntDgaG1GinrKHs/e424890c6ae3ed84021e247011ca949c/summary-1366x446-1.jpg'),
-      ),
-      title: '$timeoutTS!',
-      text: '$timeoutMessageTH',
-      // autoCloseDuration: const Duration(seconds: 2),
-      showConfirmBtn: true,
-      barrierDismissible: false, // ปิดการแตะออกนอกกรอบ
-      onCancelBtnTap: () {
-        Navigator.pop(context);
-      },
-      onConfirmBtnTap: () {
-        fetchFinishChallenge();
-        Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (context) => SummaryScores(
-              employee: widget.employee,
-              Authorization: widget.Authorization,
-              initialMinutes: widget.initialMinutes,
-              challenge: widget.getchallenge,
-              questionList: questionList,
-              isQuestion: checkAllChallenge,
-            ),
+      barrierDismissible: false, // Prevent dismissing by tapping outside
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Column(
+            children: [
+              Text(
+                '$WarnTS!', // Title of the dialog
+                style: TextStyle(
+                    fontFamily: 'Arial',
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold),
+              ),
+              // SizedBox(height: ),
+              Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: SizedBox(
+                  width: MediaQuery.of(context).size.width > 600 ? 590 : 400,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      // Image (similar to customAsset)
+                      Image.asset(
+                        'https://images.ctfassets.net/unrdeg6se4ke/42cuIBOAntDgaG1GinrKHs/e424890c6ae3ed84021e247011ca949c/summary-1366x446-1.jpg',
+                        height: 150,
+                        width: double.infinity,
+                        fit: BoxFit.cover,
+                      ),
+                      SizedBox(height: 16),
+                      Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: Text(
+                          '$failureMessageTS',
+                          style: TextStyle(
+                            fontFamily: 'Arial',
+                            fontSize: 14,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ],
           ),
+          actions: [
+            // Cancel Button
+            TextButton(
+              onPressed: () {
+                Navigator.pop(context); // Close the dialog
+                _showDialog(isQuestion);
+              },
+              child: Text(
+                'Cancel',
+                style: TextStyle(
+                  fontSize: 14,
+                  color: Colors.grey,
+                  fontWeight: FontWeight.w700,
+                ),
+              ),
+            ),
+            // Confirm Button
+            TextButton(
+              onPressed: () {
+                fetchFinishChallenge();
+                fetchCheckAllChallenge();
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => SummaryScores(
+                      employee: widget.employee,
+                      Authorization: widget.Authorization,
+                      initialMinutes: widget.initialMinutes,
+                      challenge: widget.getchallenge,
+                      questionList: questionList,
+                      isQuestion: checkAllChallenge,
+                    ),
+                  ),
+                );
+              },
+              child: Text(
+                'Success',
+                style: TextStyle(
+                  fontSize: 16,
+                  color: Colors.orange,
+                  // fontWeight: FontWeight.w700,
+                ),
+              ),
+            ),
+          ],
         );
       },
     );
   }
 
-  // สิ้นสุดการทดสอบ
   void finishNextpage(List<CheckAllChallenge> isQuestion) {
-    // final String successMessage =
-    //     'คุณได้ทำข้อสอบให้ครบทุกข้อแล้วกดปุ่ม Success เพื่อส่งคำตอบ หรือกดปุ่ม Close เพื่อกลับไปทบทวน';
-    // final String failureMessage =
-    //     'มีข้อที่ยังไม่ได้ตอบ กดปุ่ม Close เพื่อกลับไปทำข้อสอบให้ครบทุกข้อ หรือกดปุ่ม Success เพื่อส่งคำตอบ';
-
     if (_oneChoice.isNotEmpty || _manyChoiceSet.isNotEmpty) {
       QuickAlert.show(
         context: context,
@@ -161,7 +249,8 @@ class _ChallengePageState extends State<ChallengePage> {
         },
         onConfirmBtnTap: () {
           fetchFinishChallenge();
-          Navigator.push(
+          fetchCheckAllChallenge();
+          Navigator.pushReplacement(
             context,
             MaterialPageRoute(
               builder: (context) => SummaryScores(
@@ -252,53 +341,57 @@ class _ChallengePageState extends State<ChallengePage> {
       onPopInvoked: (didPop) async {
         // fetchFinishChallenge();
       },
-      child: Scaffold(
-        backgroundColor: Colors.white,
-        appBar: AppBar(
-          // elevation: 1,
-          foregroundColor: Colors.white,
-          backgroundColor: Color(0xFFFF9900),
-          title: RichText(
-            text: TextSpan(
-              text: '$timeTS: ', // ข้อความที่ต้องการให้เป็นสีส้ม
-              style: TextStyle(
-                fontFamily: 'Arial',
-                fontSize: (isIPad || isTablet) ? 38 : 28,
-                color: Colors.white, // สีส้มสำหรับ 'Time:'
-                fontWeight: FontWeight.w500,
+      child: (getStatus == 'doing' || getStatus == 'not_start')
+          ? Scaffold(
+              backgroundColor: Colors.white,
+              appBar: AppBar(
+                // elevation: 1,
+                foregroundColor: Colors.white,
+                backgroundColor: Color(0xFFFF9900),
+                title: RichText(
+                  text: TextSpan(
+                    text: '$timeTS: ',
+                    style: TextStyle(
+                      fontFamily: 'Arial',
+                      fontSize: (isIPad || isTablet) ? 38 : 28,
+                      color: Colors.white, // สีส้มสำหรับ 'Time:'
+                      fontWeight: FontWeight.w500,
+                    ),
+                    children: [
+                      TextSpan(
+                        text:
+                            '${formatTime(_progress.toInt())}', // ส่วนข้อความที่เหลือ
+                        style: TextStyle(
+                          fontFamily: 'Arial',
+                          fontSize: (isIPad || isTablet) ? 38 : 28,
+                          color: Colors.white, // สีแดงสำหรับเวลา
+                          fontWeight: FontWeight.w700,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                leading: IconButton(
+                  icon:
+                      Icon(Icons.arrow_back_ios, color: Colors.white, size: 24),
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => AcademyHomePage(
+                          employee: widget.employee,
+                          Authorization: widget.Authorization,
+                          page: 'challenge',
+                        ),
+                      ),
+                    );
+                  },
+                ),
+                // leading: Icon(null),
               ),
-              children: [
-                TextSpan(
-                  text:
-                      '${formatTime(_progress.toInt())}', // ส่วนข้อความที่เหลือ
-                  style: TextStyle(
-                    fontFamily: 'Arial',
-                    fontSize: (isIPad || isTablet) ? 38 : 28,
-                    color: Colors.white, // สีแดงสำหรับเวลา
-                    fontWeight: FontWeight.w700,
-                  ),
-                ),
-              ],
-            ),
-          ),
-          leading: IconButton(
-            icon: Icon(Icons.arrow_back_ios, color: Colors.white, size: 24),
-            onPressed: () {
-              Navigator.pushReplacement(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => AcademyHomePage(
-                    employee: widget.employee,
-                    Authorization: widget.Authorization, page: 'challenge',
-                  ),
-                ),
-              );
-            },
-          ),
-          // leading: Icon(null),
-        ),
-        body: _getContentWidget(),
-      ),
+              body: _getContentWidget(),
+            )
+          : Scaffold(backgroundColor: Colors.white, body: _loadingWidget()),
     );
   }
 
@@ -1090,7 +1183,6 @@ class _ChallengePageState extends State<ChallengePage> {
 
   Future<void> fetchStartChallenge() async {
     final uri = Uri.parse("$host/api/origami/challenge/start-challenge.php");
-
     try {
       final response = await http.post(
         uri,
@@ -1146,125 +1238,6 @@ class _ChallengePageState extends State<ChallengePage> {
     }
   }
 
-  // Future<void> fetchStartChallenge() async {
-  //   final uri = Uri.parse("$host/api/origami/challenge/start-challenge.php");
-  //   try {
-  //     final response = await http.post(
-  //       uri,
-  //       headers: {'Authorization': 'Bearer ${widget.Authorization}'},
-  //       body: {
-  //         'comp_id': widget.employee.comp_id,
-  //         'emp_id': widget.employee.emp_id,
-  //         'challenge_id': widget.getchallenge.challenge_id,
-  //         'request_id': widget.getchallenge.request_id,
-  //       },
-  //     );
-  //
-  //     if (response.statusCode == 200) {
-  //       final jsonResponse = json.decode(response.body);
-  //
-  //       // setState(() {
-  //       final String timerStart = jsonResponse['timer_start']?.toString() ?? '';
-  //       final String questionFirst =
-  //           jsonResponse['question_first']?.toString() ?? '';
-  //       // });
-  //       if (timerStart == '') {
-  //         fetchStartChallenge();
-  //         print("timer_start: $timerStart");
-  //         print("question_first: $questionFirst");
-  //       } else {
-  //         // ตรวจสอบว่า question_list เป็น List จริง
-  //         if (jsonResponse['question_list'] is List) {
-  //           questionList = List<String>.from(jsonResponse['question_list']);
-  //         } else {
-  //           questionList = [];
-  //           print("Warning: question_list is not a valid list.");
-  //         }
-  //
-  //         total_point_all = questionList.length;
-  //         print('questionList: $questionList');
-  //         if (oneShot && questionList.isNotEmpty) {
-  //           // กำหนดค่า question_first โดยใช้ค่า API หรือ fallback ไปที่ค่าแรกของ questionList
-  //           question_first =
-  //               questionFirst.isNotEmpty ? questionFirst : questionList.first;
-  //           print("Final question_first: $question_first");
-  //
-  //           if (timerStart.isNotEmpty) {
-  //             _mainDateTime(widget.getchallenge, timerStart);
-  //           }
-  //           oneShot = false;
-  //         }
-  //       }
-  //     } else {
-  //       throw Exception(
-  //           'Failed to load challenge data. Status code: ${response.statusCode}');
-  //     }
-  //   } catch (e) {
-  //     print('Error fetching challenge data: $e');
-  //   } finally {
-  //     setState(() {}); // อัปเดต UI หลังจากโหลดเสร็จ
-  //   }
-  // }
-
-  //-------------- 2.2 result-challenge---------------------------------------------------------------
-
-  // TopChallenge? topChallenge;
-  // ChallengeData? challengeData;
-  // String total_point = '';
-  // String time_used = '';
-  // Future<void> fetchResult() async {
-  //   final uri = Uri.parse("$host/api/origami/challenge/result-challenge.php");
-  //   try {
-  //     final response = await http.post(
-  //       uri,
-  //       headers: {'Authorization': 'Bearer ${widget.Authorization}'},
-  //       body: {
-  //         'comp_id': widget.employee.comp_id,
-  //         'emp_id': widget.employee.emp_id,
-  //         'challenge_id': widget.getchallenge.challenge_id,
-  //         'request_id': widget.getchallenge.request_id,
-  //       },
-  //     );
-  //
-  //     if (response.statusCode == 200) {
-  //       final Map<String, dynamic> jsonResponse = json.decode(response.body);
-  //       if (jsonResponse['code'] == 200) {
-  //         setState(() {
-  //           String total_point0 = jsonResponse['total_point']?.toString() ?? '';
-  //           String time_used0 = jsonResponse['time_used']?.toString() ?? '';
-  //           total_point = total_point0;
-  //           time_used = time_used0;
-  //           challengeData = jsonResponse['challenge_data'] != null
-  //               ? ChallengeData.fromJson(jsonResponse['challenge_data'])
-  //               : null;
-  //
-  //           if (jsonResponse['top_challenge'] != null &&
-  //               jsonResponse['top_challenge']['top_challenge'] != null) {
-  //             topChallenge =
-  //                 TopChallenge.fromJson(jsonResponse['top_challenge']);
-  //             print('Result : ${topChallenge}');
-  //           } else {
-  //             topChallenge = null;
-  //             print('Result Null : ${topChallenge}');
-  //           }
-  //
-  //           print('fetchResult : ${widget.challenge.challenge_status}');
-  //         });
-  //       } else {
-  //         throw Exception('Empty response data');
-  //       }
-  //     } else {
-  //       throw Exception(
-  //           'Failed to load challenge data, status code: ${response.statusCode}');
-  //     }
-  //   } catch (e) {
-  //     // จับข้อผิดพลาดต่างๆ เช่น การเชื่อมต่อ API หรือการแปลง JSON
-  //     throw Exception('Error fetching challenge data: $e');
-  //   }
-  // }
-
-  //-----------------2.3 get-question-no------------------------------------------------------------
-
   List<CheckAllChallenge> checkAllChallenge = [];
   Future<List<CheckAllChallenge>> fetchCheckAllChallenge() async {
     final uri = Uri.parse("$host/api/origami/challenge/get-question-no.php");
@@ -1285,6 +1258,10 @@ class _ChallengePageState extends State<ChallengePage> {
         // เข้าถึงข้อมูลในคีย์ 'instructors'
         final List<dynamic> challengeJson = jsonResponse['challenge_data'];
         // แปลงข้อมูลจาก JSON เป็น List<Instructor>
+        checkAllChallenge = challengeJson
+            .map((json) => CheckAllChallenge.fromJson(json))
+            .toList();
+        print(checkAllChallenge);
         return challengeJson
             .map((json) => CheckAllChallenge.fromJson(json))
             .toList();
@@ -1549,146 +1526,6 @@ class TopUser {
       point: json['point'] ?? '',
       time_used: json['time_used'] ?? '',
       emp_id: json['emp_id'] ?? '',
-    );
-  }
-}
-
-class ChallengeData {
-  final String challenge_id;
-  final String challenge_name;
-  final String specific_question;
-  final String question_type;
-  final String challenge_duration;
-  final String duration_point;
-  final String challenge_random_question;
-  final String used_point;
-  final String cheat_answer;
-  final String challenge_start;
-  final String challenge_end;
-  final String timer_start;
-  final String challenge_last_question;
-  final String timer_finish;
-  final String check_request_status;
-  final String challenge_question_part;
-  final bool finish;
-  final String start_question;
-  final List<QuestionAnswer> question_answer;
-  final String question_total;
-
-  ChallengeData({
-    required this.challenge_id,
-    required this.challenge_name,
-    required this.specific_question,
-    required this.question_type,
-    required this.challenge_duration,
-    required this.duration_point,
-    required this.challenge_random_question,
-    required this.used_point,
-    required this.cheat_answer,
-    required this.challenge_start,
-    required this.challenge_end,
-    required this.timer_start,
-    required this.challenge_last_question,
-    required this.timer_finish,
-    required this.check_request_status,
-    required this.challenge_question_part,
-    required this.finish,
-    required this.start_question,
-    required this.question_answer,
-    required this.question_total,
-  });
-
-  factory ChallengeData.fromJson(Map<String, dynamic> json) {
-    return ChallengeData(
-      challenge_id: json['challenge_id'] ?? '',
-      challenge_name: json['challenge_name'] ?? '',
-      specific_question: json['specific_question'] ?? '',
-      question_type: json['question_type'] ?? '',
-      challenge_duration: json['challenge_duration'] ?? '',
-      duration_point: json['duration_point'] ?? '',
-      challenge_random_question: json['challenge_random_question'] ?? '',
-      used_point: json['used_point'] ?? '',
-      cheat_answer: json['cheat_answer'] ?? '',
-      challenge_start: json['challenge_start'] ?? '',
-      challenge_end: json['challenge_end'] ?? '',
-      timer_start: json['timer_start'] ?? '',
-      challenge_last_question: json['challenge_last_question'] ?? '',
-      timer_finish: json['timer_finish'] ?? '',
-      check_request_status: json['check_request_status'] ?? '',
-      challenge_question_part: json['challenge_question_part'] ?? '',
-      finish: json['finish'],
-      start_question: json['start_question'] ?? '',
-      question_answer: (json['question_answer'] as List?)
-              ?.map((e) => QuestionAnswer.fromJson(e))
-              .toList() ??
-          [],
-      question_total: json['question_total'] ?? '',
-    );
-  }
-}
-
-class QuestionAnswer {
-  final String question_index;
-  final String question_no;
-  final String question_answer;
-  final String correct_value;
-  final String correct_pt;
-  final CorrectAns? correct_ans;
-
-  QuestionAnswer({
-    required this.question_index,
-    required this.question_no,
-    required this.question_answer,
-    required this.correct_value,
-    required this.correct_pt,
-    this.correct_ans,
-  });
-
-  factory QuestionAnswer.fromJson(Map<String, dynamic> json) {
-    return QuestionAnswer(
-      question_index: json['question_index'] ?? '',
-      question_no: json['question_no'] ?? '',
-      question_answer: json['question_answer'] ?? '',
-      correct_value: json['correct_value'] ?? '',
-      correct_pt: json['correct_pt'] ?? '',
-      correct_ans: json['correct_ans'] is Map<String, dynamic>
-          ? CorrectAns.fromJson(json['correct_ans'])
-          : null, // ถ้าเป็น "" ให้กำหนดเป็น null
-    );
-  }
-}
-
-class CorrectAns {
-  final String challenge_id;
-  final String question_no;
-  final String correct_value;
-  final String answer_correct;
-  final String correct_point;
-  final String used_time;
-  final String found_answer;
-  final String status;
-
-  CorrectAns({
-    required this.challenge_id,
-    required this.question_no,
-    required this.correct_value,
-    required this.answer_correct,
-    required this.correct_point,
-    required this.used_time,
-    required this.found_answer,
-    required this.status,
-  });
-
-  factory CorrectAns.fromJson(Map<String, dynamic> json) {
-    return CorrectAns(
-      challenge_id: json['challenge_id'] ?? '',
-      question_no: json['question_no'] ?? '',
-      correct_value: json['correct_value'] ?? '',
-      answer_correct: json['answer_correct'] ?? '',
-      correct_point: json['correct_point'] ?? '',
-      used_time: json['used_time'] ?? '',
-      found_answer: json['found_answer'] ?? '',
-      status: json['status'] ?? '',
     );
   }
 }

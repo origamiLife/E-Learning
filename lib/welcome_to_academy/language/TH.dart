@@ -68,7 +68,7 @@ Future<void> TH() async {
   exitApp2TS = 'กดกลับอีกครั้งเพื่อออก';
   elearningTS = 'E-Learning';
   forgotPwdTS = 'ลืมรหัสผ่าน';
-  loginTS = 'เช้าสู่ระบบ';
+  loginTS = 'เข้าสู่ระบบ';
   messageforgotPwdTS = 'ลืมรหัสผ่านใช่ไหม?';
   messageRestPwdTS = 'กรุณากรอกที่อยู่อีเมลของคุณเพื่อขอรีเซ็ตรหัสผ่าน';
   sendTS = 'ส่ง';
@@ -106,4 +106,5 @@ Future<void> TH() async {
   doingTS = "เริ่มแล้ว";
   notStartTS = "ยังไม่เริ่ม";
   successTS = "สำเร็จ";
+  AnswersExamTS = "เฉลย";
 }

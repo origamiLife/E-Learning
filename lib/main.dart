@@ -1,6 +1,7 @@
 import 'dart:ui';
 import 'package:academy/welcome_to_academy/export.dart';
 import 'package:academy/welcome_to_academy/home_page.dart';
+import 'package:academy/welcome_to_academy/quickalert/quickalert.widget.dart';
 import 'package:http/http.dart' as http;
 import 'package:hive/hive.dart';
 import 'package:hive_flutter/hive_flutter.dart';
@@ -25,7 +26,10 @@ void main() async {
   await Hive.initFlutter(appDocumentDirectory.path);
   await Hive.openBox('userBox');
 
-  runApp(const MyApp());
+  runApp(MaterialApp(
+    debugShowCheckedModeBanner: false,
+    home: MyApp(),
+  ));
 }
 
 // Future<void> secureScreen() async {
@@ -173,8 +177,8 @@ class _LoginPageState extends State<LoginPage> {
     String? password = box.get('password') ?? '';
 
     setState(() {
-      _usernameController.text = username??'';
-      _passwordController.text = password??'';
+      _usernameController.text = username ?? '';
+      _passwordController.text = password ?? '';
     });
 
     if (username!.isNotEmpty && password!.isNotEmpty && widget.num == 0) {
@@ -199,16 +203,17 @@ class _LoginPageState extends State<LoginPage> {
 
         final shortestSide = context != null
             ? MediaQuery.of(context).size.shortestSide
-            : WidgetsBinding.instance.platformDispatcher.views.first.physicalSize.shortestSide /
-            WidgetsBinding.instance.platformDispatcher.views.first.devicePixelRatio;
+            : WidgetsBinding.instance.platformDispatcher.views.first
+                    .physicalSize.shortestSide /
+                WidgetsBinding
+                    .instance.platformDispatcher.views.first.devicePixelRatio;
 
         isTablet = shortestSide >= 600; // เช็คว่าเป็น Tablet หรือไม่
 
         if (isTablet) {
           isAndroid = false; // ถ้าเป็น Tablet ให้ reset ค่า isAndroid
         }
-      }
-      else if (Platform.isIOS) {
+      } else if (Platform.isIOS) {
         final deviceInfo = DeviceInfoPlugin();
         final iosInfo = await deviceInfo.iosInfo;
         final model = iosInfo.model?.toLowerCase() ?? '';
@@ -225,10 +230,11 @@ class _LoginPageState extends State<LoginPage> {
       if (isIPad) {
         isAndroid = false;
         isIPhone = false;
-        isTablet = false;  // ทำให้ตัวแปรอื่นๆ เป็น false เมื่อเป็น iPad
+        isTablet = false; // ทำให้ตัวแปรอื่นๆ เป็น false เมื่อเป็น iPad
       }
 
-      print('isAndroid: $isAndroid, isIPhone: $isIPhone, isTablet: $isTablet, isIPad: $isIPad');
+      print(
+          'isAndroid: $isAndroid, isIPhone: $isIPhone, isTablet: $isTablet, isIPad: $isIPad');
     } catch (e) {
       print("Error checking device type: $e");
     }
@@ -248,8 +254,7 @@ class _LoginPageState extends State<LoginPage> {
           print("Model: ${androidInfo.model}");
           print("Android Version: ${androidInfo.version.release}");
           print(isTablet ? "📲 เป็น Tablet" : "📱 เป็น Phone");
-        }
-        else if (Platform.isIOS) {
+        } else if (Platform.isIOS) {
           IosDeviceInfo iosInfo = await deviceInfo.iosInfo;
           bool isIPad = iosInfo.model.toLowerCase().contains("ipad");
 
@@ -295,110 +300,131 @@ class _LoginPageState extends State<LoginPage> {
       },
       child: Scaffold(
         backgroundColor: Colors.transparent,
-        body: SafeArea(
-          child: SizedBox.expand(
-            // กำหนดให้เต็มจอ
-            child: Container(
+        body: Stack(
+          alignment: Alignment.center,
+          children: [
+            Container(
               decoration: BoxDecoration(
                 image: DecorationImage(
                   image: AssetImage('assets/images/logoOrigami/default_bg.png'),
                   fit: BoxFit.cover, // ปรับให้รูปเต็มหน้าจอ
                 ),
               ),
-              child: _forgot ? _forgotWidget() : _loginWidget(),
             ),
-          ),
+            LayoutBuilder(builder: (context, constraints) {
+              return SingleChildScrollView(
+                child: ConstrainedBox(
+                    constraints: BoxConstraints(
+                      minHeight: constraints.maxHeight,
+                    ),
+                    child: _forgot
+                        ? _forgotWidget(constraints)
+                        : _loginWidget(constraints)),
+              );
+            }),
+          ],
         ),
       ),
     );
   }
 
-  Widget _loginWidget() {
+  Widget _loginWidget(BoxConstraints constraints) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 18),
-      child: SingleChildScrollView(
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            Container(
-              width: MediaQuery.of(context).size.width *
-                  0.95, // ทำให้ขนาดภาพปรับตามหน้าจอ
-              constraints: const BoxConstraints(
-                  maxWidth: 400), // จำกัดขนาดไม่ให้ใหญ่เกินไป
-              padding: const EdgeInsets.all(8),
-              child: Image.asset(
-                'assets/images/learning/img_2.png',
+      child: Center(
+        child: Container(
+          width: constraints.maxWidth * 0.85,
+          decoration: BoxDecoration(
+            // color: Colors.black12,
+            borderRadius: BorderRadius.circular(20),
+            // boxShadow: [
+            //   BoxShadow(
+            //     color: Colors.black12,
+            //     blurRadius: 10,
+            //     offset: Offset(0, 4),
+            //   )
+            // ],
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Image.asset(
+                "assets/images/learning/img_2.png", // ใส่โลโก้
                 fit: BoxFit.contain,
               ),
-            ),
-            _isLoading
-                ? Center(
-                    child: LoadingAnimationWidget.horizontalRotatingDots(
-                      size: 75,
-                      color: Colors.white,
-                    ),
-                  )
-                : Column(
-                    children: [
-                      Text(
-                        'Origami',
-                        style: TextStyle(
-                          fontFamily: 'Arial',
-                          color: Colors.white70,
-                          fontWeight: FontWeight.w500,
-                          fontSize: 50,
-                        ),
+              _isLoading
+                  ? Center(
+                      child: LoadingAnimationWidget.horizontalRotatingDots(
+                        size: 75,
+                        color: Colors.white,
                       ),
-                      Text(
-                        'Academy',
-                        style: TextStyle(
-                          fontFamily: 'Arial',
-                          color: Colors.white70,
-                          fontWeight: FontWeight.w700,
-                          fontSize: 70,
-                        ),
-                      ),
-                    ],
-                  ),
-            const SizedBox(height: 24),
-            Form(
-              key: _formKey,
-              child: Column(
-                children: [
-                  _buildTextField(
-                      _usernameController, 'Username', Icons.person),
-                  const SizedBox(height: 18),
-                  _buildPasswordField(),
-                  const SizedBox(height: 8),
-                  Align(
-                    alignment: Alignment.centerRight,
-                    child: TextButton(
-                      onPressed: _onForgotPasswordPressed,
-                      child: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Icon(Icons.lock_open, color: Colors.white, size: 20),
-                          SizedBox(width: 8),
-                          Text(
-                            '$forgotPwdTS',
-                            style: TextStyle(
-                              fontFamily: 'Arial',
-                              color: Colors.white,
-                              fontSize: 14,
-                              fontWeight: FontWeight.w500,
-                            ),
+                    )
+                  : Column(
+                      children: [
+                        Text(
+                          'Origami',
+                          style: TextStyle(
+                            fontFamily: 'Arial',
+                            color: Colors.white70,
+                            fontWeight: FontWeight.w500,
+                            fontSize: (isIPad || isTablet)
+                                ? constraints.maxWidth * 0.08
+                                : 50,
                           ),
-                        ],
+                        ),
+                        Text(
+                          'Academy',
+                          style: TextStyle(
+                            fontFamily: 'Arial',
+                            color: Colors.white70,
+                            fontWeight: FontWeight.w700,
+                            fontSize: (isIPad || isTablet)
+                                ? constraints.maxWidth * 0.1
+                                : 70,
+                          ),
+                        ),
+                      ],
+                    ),
+              SizedBox(height: constraints.maxWidth * 0.05),
+              Form(
+                key: _formKey,
+                child: Column(
+                  children: [
+                    _buildTextField(
+                        _usernameController, 'Username', Icons.person),
+                    const SizedBox(height: 18),
+                    _buildPasswordField(),
+                    const SizedBox(height: 8),
+                    Align(
+                      alignment: Alignment.centerRight,
+                      child: TextButton(
+                        onPressed: _onForgotPasswordPressed,
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Icon(Icons.lock_open,
+                                color: Colors.white, size: 20),
+                            SizedBox(width: 8),
+                            Text(
+                              '$forgotPwdTS',
+                              style: TextStyle(
+                                fontFamily: 'Arial',
+                                color: Colors.white,
+                                fontWeight: FontWeight.w500,
+                              ),
+                            ),
+                          ],
+                        ),
                       ),
                     ),
-                  ),
-                  const SizedBox(height: 16),
-                  _buildLoginButton(),
-                  const SizedBox(height: 30), // ป้องกันปุ่มล้นขอบล่าง
-                ],
+                    const SizedBox(height: 16),
+                    _buildLoginButton(),
+                    const SizedBox(height: 30), // ป้องกันปุ่มล้นขอบล่าง
+                  ],
+                ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );
@@ -408,128 +434,139 @@ class _LoginPageState extends State<LoginPage> {
     setState(() => _forgot = true);
   }
 
-  Widget _forgotWidget() {
+  Widget _forgotWidget(BoxConstraints constraints) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 18),
-      child: SingleChildScrollView(
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            Container(
-              width: MediaQuery.of(context).size.width *
-                  0.95, // ทำให้ขนาดภาพปรับตามหน้าจอ
-              constraints: const BoxConstraints(
-                  maxWidth: 600), // จำกัดขนาดไม่ให้ใหญ่เกินไป
-              padding: const EdgeInsets.all(8),
-              child: Image.asset(
-                'assets/images/learning/img_2.png',
+      child: Center(
+        child: Container(
+          width: constraints.maxWidth * 0.85,
+          decoration: BoxDecoration(
+            // color: Colors.black12,
+            borderRadius: BorderRadius.circular(20),
+            // boxShadow: [
+            //   BoxShadow(
+            //     color: Colors.black12,
+            //     blurRadius: 10,
+            //     offset: Offset(0, 4),
+            //   )
+            // ],
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              Image.asset(
+                "assets/images/learning/img_2.png", // ใส่โลโก้
                 fit: BoxFit.contain,
               ),
-            ),
-            Form(
-              key: _formKey,
-              child: Column(
-                children: [
-                  SizedBox(height: 16),
-                  Text(
-                    'Forgot your password?',
-                    style: TextStyle(
-                      fontFamily: 'Arial',
-                      color: Colors.white,
-                      fontSize: (isIPad || isTablet) ? 40 : 20,
-                      fontWeight: FontWeight.w500,
-                    ),
-                  ),
-                  SizedBox(height: 8),
-                  Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: Text(
-                      '    Please enter your email address to request a password reset.',
+              Form(
+                key: _formKey,
+                child: Column(
+                  children: [
+                    SizedBox(height: 16),
+                    Text(
+                      '$messageforgotPwdTS',
                       style: TextStyle(
                         fontFamily: 'Arial',
-                        color: Colors.orange.shade50,
-                        fontSize: (isIPad || isTablet) ? 24 : 16,
-                        fontWeight: FontWeight.w400,
+                        color: Colors.white,
+                        fontSize: (isIPad || isTablet)
+                            ? constraints.maxWidth * 0.05
+                            : 24,
+                        fontWeight: FontWeight.w500,
                       ),
                     ),
-                  ),
-                  SizedBox(height: 16),
-                  TextFormField(
-                    controller: _forgotController,
-                    inputFormatters: [
-                      FilteringTextInputFormatter.allow(
-                          RegExp(r'[a-zA-Z0-9@#%&*_!$^(),.?":;{}|<>-]')),
-                    ],
-                    style: TextStyle(
-                        fontFamily: 'Arial', color: Color(0xFF555555)),
-                    decoration: InputDecoration(
-                      filled: true,
-                      fillColor: Colors.white,
-                      hintText: 'Email',
-                      hintStyle: TextStyle(
-                          fontFamily: 'Arial', color: Color(0xFF555555)),
-                      prefixIcon: Icon(Icons.email, color: Color(0xFF555555)),
-                    ),
-                  ),
-                  SizedBox(height: 30.0),
-                  Container(
-                    width: double.infinity,
-                    child: ElevatedButton(
-                      style: ElevatedButton.styleFrom(
-                        padding: const EdgeInsets.all(1),
-                        foregroundColor: Colors.red,
-                        backgroundColor: Colors.red,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(10),
+                    SizedBox(height: 8),
+                    Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: Text(
+                        '    $messageRestPwdTS',
+                        style: TextStyle(
+                          fontFamily: 'Arial',
+                          color: Colors.orange.shade50,
+                          fontSize: (isIPad || isTablet)
+                              ? constraints.maxWidth * 0.02
+                              : 16,
+                          fontWeight: FontWeight.w400,
                         ),
                       ),
-                      onPressed: () => _fetchForgetMail(),
-                      child: Padding(
-                        padding: const EdgeInsets.only(
-                            left: 60, right: 60, bottom: 12, top: 12),
-                        child: Text(
-                          'SEND',
-                          style: TextStyle(
-                            fontFamily: 'Arial',
-                            color: Colors.white,
-                            fontSize: 20,
-                            fontWeight: FontWeight.w700,
+                    ),
+                    SizedBox(height: 16),
+                    TextFormField(
+                      controller: _forgotController,
+                      inputFormatters: [
+                        FilteringTextInputFormatter.allow(
+                            RegExp(r'[a-zA-Z0-9@#%&*_!$^(),.?":;{}|<>-]')),
+                      ],
+                      style: TextStyle(
+                          fontFamily: 'Arial', color: Color(0xFF555555)),
+                      decoration: InputDecoration(
+                        filled: true,
+                        fillColor: Colors.white,
+                        hintText: 'Email',
+                        hintStyle: TextStyle(
+                            fontFamily: 'Arial', color: Color(0xFF555555)),
+                        prefixIcon: Icon(Icons.email, color: Color(0xFF555555)),
+                      ),
+                    ),
+                    SizedBox(height: 30.0),
+                    Container(
+                      width: double.infinity,
+                      child: ElevatedButton(
+                        style: ElevatedButton.styleFrom(
+                          padding: const EdgeInsets.all(1),
+                          foregroundColor: Colors.red,
+                          backgroundColor: Colors.red,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(10),
                           ),
                         ),
-                      ),
-                    ),
-                  ),
-                  SizedBox(height: 8),
-                  TextButton(
-                    onPressed: () {
-                      setState(() {
-                        _forgot = false;
-                      });
-                    },
-                    child: Padding(
-                      padding: const EdgeInsets.all(8.0),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.start,
-                        children: [
-                          Icon(Icons.chevron_left,
-                              color: Colors.white, size: 20),
-                          SizedBox(width: 8),
-                          Text(
-                            'Return to login.',
+                        onPressed: () => _fetchForgetMail(),
+                        child: Padding(
+                          padding: const EdgeInsets.only(
+                              left: 60, right: 60, bottom: 12, top: 12),
+                          child: Text(
+                            '$sendTS',
                             style: TextStyle(
                               fontFamily: 'Arial',
                               color: Colors.white,
-                              fontWeight: FontWeight.w500,
+                              fontSize: 20,
+                              fontWeight: FontWeight.w700,
                             ),
                           ),
-                        ],
+                        ),
                       ),
                     ),
-                  ),
-                ],
+                    SizedBox(height: 8),
+                    TextButton(
+                      onPressed: () {
+                        setState(() {
+                          _forgot = false;
+                        });
+                      },
+                      child: Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.start,
+                          children: [
+                            Icon(Icons.chevron_left,
+                                color: Colors.white, size: 20),
+                            SizedBox(width: 8),
+                            Text(
+                              '$returnLoginTS',
+                              style: TextStyle(
+                                fontFamily: 'Arial',
+                                color: Colors.white,
+                                fontWeight: FontWeight.w500,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );
@@ -658,7 +695,8 @@ class _LoginPageState extends State<LoginPage> {
           MaterialPageRoute(
             builder: (context) => AcademyHomePage(
               employee: employee1,
-              Authorization: Authorization, page: 'course',
+              Authorization: Authorization,
+              page: 'course',
             ),
           ),
         );
@@ -739,8 +777,8 @@ class Employee {
   const Employee({
     required this.emp_id,
     required this.emp_code,
-    required this.emp_name,
-    required this.emp_avatar,
+    required this.emp_name, // ชื่อ
+    required this.emp_avatar, // รูปภาพ
     required this.comp_id,
     required this.comp_description,
     required this.comp_logo,

@@ -108,6 +108,11 @@ class _SummaryScoresState extends State<SummaryScores> {
                     text: finishedChallengeTS,
                   ),
                 ],
+                labelStyle:TextStyle(
+                  fontFamily: 'Arial',
+                  fontSize: (isAndroid || isIPhone)?14:28,
+                  fontWeight: FontWeight.w500,
+                ),
                 labelColor: Color(0xFF555555),
                 unselectedLabelColor: Colors.grey.shade400,
                 indicator: MaterialIndicator(

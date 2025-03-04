@@ -118,5 +118,6 @@ String SorryChallengeTS = "Sorry can't do the challenge";
 String AfterTS = "After";
 String BeforeTS = "Before";
 String doingTS = "Doing";
-String notStartTS = "Before";
+String notStartTS = "Not Start";
 String successTS = "Success";
+String AnswersExamTS = "Answers to the exam";

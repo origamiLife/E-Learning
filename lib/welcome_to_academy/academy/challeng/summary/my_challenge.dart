@@ -30,24 +30,15 @@ class _MyChallengeState extends State<MyChallenge> {
   @override
   void initState() {
     super.initState();
-    fetchResult();
-    // totalMinu();
   }
 
-  double convertTimeToMinutes(String timeUsed) {
+  double _convertTimeToMinutes(String timeUsed) {
     List<String> parts = timeUsed.split(":"); // แยกเป็น ["23", "11", "31"]
     double hours = double.parse(parts[0]);
     double minutes = double.parse(parts[1]);
     double seconds = double.parse(parts[2]);
 
     return (hours * 60) + minutes + (seconds / 60); // รวมวินาทีเป็นทศนิยม
-  }
-
-  double totalMinutes = 0;
-  void totalMinu() {
-    String timeUsed = time_used;
-    totalMinutes = convertTimeToMinutes(timeUsed);
-    print("Total Minutes: $totalMinutes"); // 1391.51666 นาที
   }
 
   @override
@@ -58,7 +49,7 @@ class _MyChallengeState extends State<MyChallenge> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      // backgroundColor: Colors.white,
+      backgroundColor: Colors.white,
       body: Padding(
         padding: const EdgeInsets.all(16),
         child: SingleChildScrollView(
@@ -67,32 +58,47 @@ class _MyChallengeState extends State<MyChallenge> {
             children: [
               Container(child: _summary()),
               SizedBox(height: 24),
-              Column(
-                children: [
-                  Row(
-                    children: [
-                      const Icon(Icons.star, color: Colors.amberAccent),
-                      const SizedBox(width: 4),
-                      Expanded(
-                        child: Text(
-                          Top_ChallengeTS ?? '',
-                          style: const TextStyle(
-                            fontFamily: 'Arial',
-                            fontSize: 16,
-                            color: Color(0xFF555555),
-                            fontWeight: FontWeight.w500,
-                          ),
-                          overflow: TextOverflow.ellipsis,
-                          maxLines: 2,
-                        ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 8),
-                  topChalleng(),
-                ],
-              ),
-              _timeStatus(),
+              FutureBuilder<ChallengeRespond>(
+                  future: fetchResultChallenge(),
+                  builder: (context, snapshot) {
+                    return (snapshot.data == null)
+                        ? Center(
+                            child:
+                                LoadingAnimationWidget.horizontalRotatingDots(
+                              size: 50,
+                              color: Colors.white,
+                            ),
+                          )
+                        : Column(
+                            children: [
+                              Row(
+                                children: [
+                                  const Icon(Icons.star,
+                                      color: Colors.amberAccent),
+                                  const SizedBox(width: 4),
+                                  Expanded(
+                                    child: Text(
+                                      Top_ChallengeTS,
+                                      style: TextStyle(
+                                        fontFamily: 'Arial',
+                                        fontSize:
+                                            (isAndroid || isIPhone) ? 16 : 24,
+                                        color: Color(0xFF555555),
+                                        fontWeight: FontWeight.w500,
+                                      ),
+                                      overflow: TextOverflow.ellipsis,
+                                      maxLines: 2,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              const SizedBox(height: 8),
+                              topChallenge(snapshot.data!.topChallenge),
+                              _timeStatus(snapshot.data!.challenge_data,
+                                  snapshot.data!.time_used),
+                            ],
+                          );
+                  }),
               SizedBox(height: 24),
             ],
           ),
@@ -101,26 +107,19 @@ class _MyChallengeState extends State<MyChallenge> {
     );
   }
 
-  Widget topChalleng() {
+  Widget topChallenge(TopChallengeList topChallenge) {
     return Container(
       padding: EdgeInsets.only(top: 4),
-      // decoration: BoxDecoration(
-      //   borderRadius: BorderRadius.circular(10),
-      //   border: Border.all(
-      //     color: Colors.grey.shade300,
-      //     width: 1,
-      //   ),
-      // ),
       child: SizedBox(
-        height: (topChallenge?.topUsers.length ?? 0) > 4 ? 300 : null,
+        height: (topChallenge.top_challenge.length ?? 0) > 4 ? 300 : null,
         child: SingleChildScrollView(
           child: ListView.builder(
             shrinkWrap: true, // ป้องกัน overflow
             physics:
                 NeverScrollableScrollPhysics(), // ปิดการ scroll ซ้อนกับ main ListView
-            itemCount: topChallenge?.topUsers.length ?? 0,
+            itemCount: topChallenge.top_challenge.length ?? 0,
             itemBuilder: (context, index) {
-              final topUsers = topChallenge!.topUsers[index];
+              final topUsers = topChallenge.top_challenge[index];
               return Card(
                 color: Color(0xFFF5F5F5),
                 child: Container(
@@ -154,8 +153,9 @@ class _MyChallengeState extends State<MyChallenge> {
                           Expanded(
                             flex: 1,
                             child: Image.network(topUsers.avatar,
-                                height:
-                                    MediaQuery.of(context).size.width * 0.25,
+                                height: (isAndroid || isIPhone)
+                                    ? MediaQuery.of(context).size.width * 0.25
+                                    : MediaQuery.of(context).size.width * 0.18,
                                 width: double.infinity,
                                 fit: BoxFit.contain,
                                 errorBuilder: (context, error, stackTrace) =>
@@ -180,116 +180,6 @@ class _MyChallengeState extends State<MyChallenge> {
                   ),
                 ),
               );
-              // return Container(
-              //   margin: const EdgeInsets.symmetric(
-              //       vertical: 4, horizontal: 8),
-              //   decoration: BoxDecoration(
-              //     color: const Color(0xFFF1F7F0),
-              //     borderRadius: BorderRadius.circular(4),
-              //     border: Border.all(
-              //         color: const Color(0xFF555555), width: 1),
-              //   ),
-              //   child: Padding(
-              //     padding: const EdgeInsets.all(16),
-              //     child: SingleChildScrollView(
-              //       scrollDirection: Axis.horizontal,
-              //       child: DataTable(
-              //         columnSpacing: 24,
-              //         horizontalMargin: 0,
-              //         headingRowHeight: 40,
-              //         dataRowHeight: 40,
-              //         columns: <DataColumn>[
-              //           _buildDataColumn('#'),
-              //           DataColumn(
-              //             label: SizedBox(
-              //               width: 150,
-              //               child: Text(
-              //                 examinerTS,
-              //                 style: const TextStyle(
-              //                   fontFamily: 'Arial',
-              //                   fontSize: 16,
-              //                   color: Color(0xFF555555),
-              //                   fontWeight: FontWeight.w700,
-              //                 ),
-              //               ),
-              //             ),
-              //           ),
-              //           _buildDataColumn(correctAnswerTS),
-              //           _buildDataColumn(timeUsedTS),
-              //         ],
-              //         rows: [
-              //           DataRow(
-              //             cells: [
-              //               DataCell(
-              //                   Text((index + 1).toString())),
-              //               DataCell(ConstrainedBox(
-              //                 constraints: const BoxConstraints(
-              //                     maxWidth: 150),
-              //                 child: SingleChildScrollView(
-              //                   scrollDirection: Axis.horizontal,
-              //                   child: Row(
-              //                     children: [
-              //                       (topUsers?.avatar == "")
-              //                           ? Image.network(
-              //                               'https://dev.origami.life/uploads/employee/20140715173028man20key.png?v=1738820588',
-              //                               height: 24,
-              //                               fit: BoxFit.contain,
-              //                             )
-              //                           : Image.network(
-              //                               topUsers?.avatar ??
-              //                                   '',
-              //                               height: 24,
-              //                               fit: BoxFit.contain,
-              //                               errorBuilder:
-              //                                   (context, error,
-              //                                       stackTrace) {
-              //                                 return Icon(null);
-              //                               },
-              //                             ),
-              //                       const SizedBox(width: 4),
-              //                       Text(
-              //                         '${topUsers?.firstname ?? ''} ${topUsers?.lastname ?? ''}',
-              //                         style: const TextStyle(
-              //                           fontFamily: 'Arial',
-              //                           fontSize: 16,
-              //                           color: Color(0xFF555555),
-              //                           fontWeight:
-              //                               FontWeight.w300,
-              //                         ),
-              //                       ),
-              //                     ],
-              //                   ),
-              //                 ),
-              //               )),
-              //               DataCell(Center(
-              //                 child: Text(
-              //                   topUsers?.point.toString() ?? '0',
-              //                   style: const TextStyle(
-              //                     fontFamily: 'Arial',
-              //                     fontSize: 16,
-              //                     color: Color(0xFF555555),
-              //                     fontWeight: FontWeight.w500,
-              //                   ),
-              //                 ),
-              //               )),
-              //               DataCell(Center(
-              //                 child: Text(
-              //                   topUsers?.time_used ?? '0s',
-              //                   style: const TextStyle(
-              //                     fontFamily: 'Arial',
-              //                     fontSize: 16,
-              //                     color: Color(0xFF555555),
-              //                     fontWeight: FontWeight.w500,
-              //                   ),
-              //                 ),
-              //               )),
-              //             ],
-              //           ),
-              //         ],
-              //       ),
-              //     ),
-              //   ),
-              // );
             },
           ),
         ),
@@ -297,32 +187,31 @@ class _MyChallengeState extends State<MyChallenge> {
     );
   }
 
-  Widget classList(TopUser topUsers, int index) {
+  Widget classList(TopChallenge topUsers, int index) {
     return Column(
-      // mainAxisAlignment: MainAxisAlignment.start,
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
           '${topUsers.firstname} ${topUsers.lastname}',
           style: TextStyle(
             fontFamily: 'Arial',
-            fontSize: 18,
+            fontSize: (isAndroid || isIPhone)?18:28,
             color: Color(0xFF555555),
             fontWeight: FontWeight.w700,
           ),
           overflow: TextOverflow.ellipsis,
         ),
-        SizedBox(height: 10),
+        SizedBox(height: (isAndroid || isIPhone)?10:18,),
         Row(
-          crossAxisAlignment: CrossAxisAlignment.start,
+          crossAxisAlignment: CrossAxisAlignment.end,
           children: [
             Text(
               '$correctAnswerTS : ',
               style: TextStyle(
                 fontFamily: 'Arial',
-                fontSize: 14.0,
+                fontSize: (isAndroid || isIPhone)?14:24,
                 color: Color(0xFF555555),
-                fontWeight: FontWeight.w700,
+                fontWeight: (isAndroid || isIPhone)?FontWeight.w700:FontWeight.w500,
               ),
               overflow: TextOverflow.ellipsis,
               maxLines: 1,
@@ -332,7 +221,7 @@ class _MyChallengeState extends State<MyChallenge> {
                 topUsers.point,
                 style: TextStyle(
                   fontFamily: 'Arial',
-                  fontSize: 14.0,
+                  fontSize: (isAndroid || isIPhone)?14:24,
                   color: Color(0xFF555555),
                   fontWeight: FontWeight.w500,
                 ),
@@ -340,7 +229,7 @@ class _MyChallengeState extends State<MyChallenge> {
             ),
           ],
         ),
-        SizedBox(height: 10),
+        SizedBox(height: (isAndroid || isIPhone)?10:18,),
         Row(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -348,9 +237,9 @@ class _MyChallengeState extends State<MyChallenge> {
               '$timeUsedTS : ',
               style: TextStyle(
                 fontFamily: 'Arial',
-                fontSize: 14.0,
+                fontSize: (isAndroid || isIPhone)?14:24,
                 color: Color(0xFF555555),
-                fontWeight: FontWeight.w700,
+                fontWeight: (isAndroid || isIPhone)?FontWeight.w700:FontWeight.w500,
               ),
               overflow: TextOverflow.ellipsis,
               maxLines: 1,
@@ -360,7 +249,7 @@ class _MyChallengeState extends State<MyChallenge> {
                 topUsers.time_used,
                 style: TextStyle(
                   fontFamily: 'Arial',
-                  fontSize: 14.0,
+                  fontSize: (isAndroid || isIPhone)?14:24,
                   color: Color(0xFF555555),
                   fontWeight: FontWeight.w500,
                 ),
@@ -369,20 +258,6 @@ class _MyChallengeState extends State<MyChallenge> {
           ],
         ),
       ],
-    );
-  }
-
-  DataColumn _buildDataColumn(String label) {
-    return DataColumn(
-      label: Text(
-        label,
-        style: const TextStyle(
-          fontFamily: 'Arial',
-          fontSize: 16,
-          color: Color(0xFF555555),
-          fontWeight: FontWeight.w700,
-        ),
-      ),
     );
   }
 
@@ -402,11 +277,7 @@ class _MyChallengeState extends State<MyChallenge> {
       ),
       child: Padding(
         padding: const EdgeInsets.all(16),
-        child: Column(
-          children: [
-            _myChallenge(),
-          ],
-        ),
+        child: _myChallenge(),
       ),
     );
   }
@@ -464,16 +335,11 @@ class _MyChallengeState extends State<MyChallenge> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            _question('$correctAnswerTS :'),
-                            _question('$scoreTS :'),
-                            _question('$timeUsedTS :'),
-                            _question('$startChallengeTS :'),
-                            _question('$finishedChallengeTS :'),
-                          ],
-                        ),
+                        _question('$correctAnswerTS :'),
+                        _question('$scoreTS :'),
+                        _question('$timeUsedTS :'),
+                        _question('$startChallengeTS :'),
+                        _question('$finishedChallengeTS :'),
                       ],
                     ),
                   ),
@@ -493,10 +359,9 @@ class _MyChallengeState extends State<MyChallenge> {
                 ],
               ),
               Divider(),
+              if (isTablet || isIPad) SizedBox(height: 16),
               Container(
-                height: (isAndroid || isIPhone)
-                    ? (40 * 2) + 16
-                    : (80 * 2) + 16, // สูงพอสำหรับ 2 แถว + ระยะห่าง
+                height: (40 * 2) + 16,
                 child: SingleChildScrollView(
                   child: Wrap(
                     spacing: (isAndroid || isIPhone) ? 8 : 16,
@@ -790,26 +655,26 @@ class _MyChallengeState extends State<MyChallenge> {
           text,
           style: TextStyle(
             fontFamily: 'Arial',
-            fontSize: 16,
+            fontSize: (isAndroid || isIPhone) ? 16 : 24,
             color: Color(0xFF555555),
             fontWeight: FontWeight.w500,
           ),
           overflow: TextOverflow.ellipsis,
           maxLines: 1,
         ),
-        SizedBox(height: 8),
+        SizedBox(height: (isAndroid || isIPhone) ? 8 : 32),
       ],
     );
   }
 
-  Widget _timeStatus() {
+  Widget _timeStatus(ChallengeData challengeData, String time_used) {
     // String timeString = "00:02:39"; // time_used
     List<String> timeParts = time_used.split(":");
     int hours = int.parse(timeParts[0]);
     int minutes = int.parse(timeParts[1]);
     int seconds = int.parse(timeParts[2]);
 
-    double duration = double.parse(challengeData?.challenge_duration ?? '');
+    double duration = double.parse(challengeData.challenge_duration ?? '');
 
     double totalSeconds = hours * 3600 + minutes * 60 + seconds.toDouble();
     print(totalSeconds);
@@ -834,7 +699,7 @@ class _MyChallengeState extends State<MyChallenge> {
               timeStatusTS,
               style: TextStyle(
                 fontFamily: 'Arial',
-                fontSize: 16,
+                fontSize: (isAndroid || isIPhone)?16:28,
                 color: Color(0xFF555555),
                 fontWeight: FontWeight.w500,
               ),
@@ -845,7 +710,7 @@ class _MyChallengeState extends State<MyChallenge> {
               time_used,
               style: TextStyle(
                 fontFamily: 'Arial',
-                fontSize: 32,
+                fontSize: (isAndroid || isIPhone)?32:48,
                 color: Colors.green,
                 fontWeight: FontWeight.w500,
               ),
@@ -889,7 +754,7 @@ class _MyChallengeState extends State<MyChallenge> {
               '$examDurationTS: ${widget.duration}',
               style: TextStyle(
                 fontFamily: 'Arial',
-                fontSize: 16,
+                fontSize: (isAndroid || isIPhone)?16:24,
                 color: Color(0xFF555555),
                 fontWeight: FontWeight.w300,
               ),
@@ -902,11 +767,7 @@ class _MyChallengeState extends State<MyChallenge> {
 
   //-------------- 2.2 result-challenge---------------------------------------------------------------
 
-  TopChallenge? topChallenge;
-  ChallengeData? challengeData;
-  String total_point = '';
-  String time_used = '';
-  Future<void> fetchResult() async {
+  Future<ChallengeRespond> fetchResultChallenge() async {
     final uri = Uri.parse("$host/api/origami/challenge/result-challenge.php");
     try {
       final response = await http.post(
@@ -919,39 +780,15 @@ class _MyChallengeState extends State<MyChallenge> {
           'request_id': widget.challenge.request_id,
         },
       );
-
       if (response.statusCode == 200) {
         final Map<String, dynamic> jsonResponse = json.decode(response.body);
-        if (jsonResponse['code'] == 200) {
-          setState(() {
-            String total_point0 = jsonResponse['total_point']?.toString() ?? '';
-            String time_used0 = jsonResponse['time_used']?.toString() ?? '';
-            total_point = total_point0;
-            time_used = time_used0;
-            challengeData = jsonResponse['challenge_data'] != null
-                ? ChallengeData.fromJson(jsonResponse['challenge_data'])
-                : null;
-
-            if (jsonResponse['top_challenge'] != null &&
-                jsonResponse['top_challenge']['top_challenge'] != null) {
-              topChallenge =
-                  TopChallenge.fromJson(jsonResponse['top_challenge']);
-              totalMinu();
-              print('Result : ${topChallenge}');
-            } else {
-              topChallenge = null;
-              print('Result Null : ${topChallenge}');
-            }
-          });
-        } else {
-          throw Exception('Empty response data');
-        }
+        return ChallengeRespond.fromJson(jsonResponse);
       } else {
         throw Exception(
             'Failed to load challenge data, status code: ${response.statusCode}');
       }
     } catch (e) {
-      // จับข้อผิดพลาดต่างๆ เช่น การเชื่อมต่อ API หรือการแปลง JSON
+      print('Error fetching challenge data: $e');
       throw Exception('Error fetching challenge data: $e');
     }
   }
@@ -982,5 +819,211 @@ class _MyChallengeState extends State<MyChallenge> {
       print('Error fetching question data: $e');
       throw Exception('Error fetching question data: $e');
     }
+  }
+}
+
+class ChallengeRespond {
+  final String total_point;
+  final String time_used;
+  final TopChallengeList topChallenge;
+  final ChallengeData challenge_data;
+
+  ChallengeRespond({
+    required this.total_point,
+    required this.time_used,
+    required this.topChallenge,
+    required this.challenge_data,
+  });
+
+  factory ChallengeRespond.fromJson(Map<String, dynamic> json) {
+    return ChallengeRespond(
+      total_point: json['total_point'] ?? '',
+      time_used: json['time_used'] ?? '',
+      topChallenge: TopChallengeList.fromJson(json['top_challenge']),
+      challenge_data: ChallengeData.fromJson(json['challenge_data']),
+    );
+  }
+}
+
+class TopChallengeList {
+  final List<TopChallenge> top_challenge;
+
+  TopChallengeList({
+    required this.top_challenge,
+  });
+
+  factory TopChallengeList.fromJson(Map<String, dynamic> json) {
+    return TopChallengeList(
+      top_challenge: (json['top_challenge'] as List?)
+              ?.map((e) => TopChallenge.fromJson(e))
+              .toList() ??
+          [],
+    );
+  }
+}
+
+class TopChallenge {
+  final String avatar;
+  final String firstname;
+  final String lastname;
+  final String point;
+  final String time_used;
+  final String emp_id;
+
+  TopChallenge({
+    required this.avatar,
+    required this.firstname,
+    required this.lastname,
+    required this.point,
+    required this.time_used,
+    required this.emp_id,
+  });
+
+  factory TopChallenge.fromJson(Map<String, dynamic> json) {
+    return TopChallenge(
+      avatar: json['avatar'],
+      firstname: json['firstname'],
+      lastname: json['lastname'],
+      point: json['point'],
+      time_used: json['time_used'],
+      emp_id: json['emp_id'],
+    );
+  }
+}
+
+class ChallengeData {
+  final String challenge_id;
+  final String challenge_name;
+  final String specific_question;
+  final String question_type;
+  final String challenge_duration;
+  final String duration_point;
+  final String challenge_random_question;
+  final String used_point;
+  final String cheat_answer;
+  final String challenge_start;
+  final String challenge_end;
+  final String timer_start;
+  final String challenge_last_question;
+  final String timer_finish;
+  final String check_request_status;
+  final String challenge_question_part;
+  final bool finish;
+  final String start_question;
+  final List<QuestionAnswer> question_answer;
+
+  ChallengeData({
+    required this.challenge_id,
+    required this.challenge_name,
+    required this.specific_question,
+    required this.question_type,
+    required this.challenge_duration,
+    required this.duration_point,
+    required this.challenge_random_question,
+    required this.used_point,
+    required this.cheat_answer,
+    required this.challenge_start,
+    required this.challenge_end,
+    required this.timer_start,
+    required this.challenge_last_question,
+    required this.timer_finish,
+    required this.check_request_status,
+    required this.challenge_question_part,
+    required this.finish,
+    required this.start_question,
+    required this.question_answer,
+  });
+
+  factory ChallengeData.fromJson(Map<String, dynamic> json) {
+    return ChallengeData(
+      challenge_id: json['challenge_id'] ?? '',
+      challenge_name: json['challenge_name'] ?? '',
+      specific_question: json['specific_question'] ?? '',
+      question_type: json['question_type'] ?? '',
+      challenge_duration: json['challenge_duration'] ?? '',
+      duration_point: json['duration_point'] ?? '',
+      challenge_random_question: json['challenge_random_question'] ?? '',
+      used_point: json['used_point'] ?? '',
+      cheat_answer: json['cheat_answer'] ?? '',
+      challenge_start: json['challenge_start'] ?? '',
+      challenge_end: json['challenge_end'] ?? '',
+      timer_start: json['timer_start'] ?? '',
+      challenge_last_question: json['challenge_last_question'] ?? '',
+      timer_finish: json['timer_finish'] ?? '',
+      check_request_status: json['check_request_status'] ?? '',
+      challenge_question_part: json['challenge_question_part'] ?? '',
+      finish: json['finish'] ?? false,
+      start_question: json['start_question'] ?? '',
+      question_answer: (json['question_answer'] as List?)
+              ?.map((e) => QuestionAnswer.fromJson(e))
+              .toList() ??
+          [],
+    );
+  }
+}
+
+class QuestionAnswer {
+  final String question_index;
+  final String question_no;
+  final String question_answer;
+  final String correct_value;
+  final String correct_pt;
+  final CorrectAns? correct_ans;
+
+  QuestionAnswer({
+    required this.question_index,
+    required this.question_no,
+    required this.question_answer,
+    required this.correct_value,
+    required this.correct_pt,
+    this.correct_ans,
+  });
+
+  factory QuestionAnswer.fromJson(Map<String, dynamic> json) {
+    return QuestionAnswer(
+      question_index: json['question_index'] ?? '',
+      question_no: json['question_no'] ?? '',
+      question_answer: json['question_answer'] ?? '',
+      correct_value: json['correct_value'] ?? '',
+      correct_pt: json['correct_pt'] ?? '',
+      correct_ans: json['correct_ans'] is Map<String, dynamic>
+          ? CorrectAns.fromJson(json['correct_ans'])
+          : null, // ถ้าเป็น "" ให้กำหนดเป็น null
+    );
+  }
+}
+
+class CorrectAns {
+  final String challenge_id;
+  final String question_no;
+  final String correct_value;
+  final String answer_correct;
+  final String correct_point;
+  final String used_time;
+  final String found_answer;
+  final String status;
+
+  CorrectAns({
+    required this.challenge_id,
+    required this.question_no,
+    required this.correct_value,
+    required this.answer_correct,
+    required this.correct_point,
+    required this.used_time,
+    required this.found_answer,
+    required this.status,
+  });
+
+  factory CorrectAns.fromJson(Map<String, dynamic> json) {
+    return CorrectAns(
+      challenge_id: json['challenge_id'] ?? '',
+      question_no: json['question_no'] ?? '',
+      correct_value: json['correct_value'] ?? '',
+      answer_correct: json['answer_correct'] ?? '',
+      correct_point: json['correct_point'] ?? '',
+      used_time: json['used_time'] ?? '',
+      found_answer: json['found_answer'] ?? '',
+      status: json['status'] ?? '',
+    );
   }
 }

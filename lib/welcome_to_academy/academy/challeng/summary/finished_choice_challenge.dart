@@ -84,7 +84,7 @@ class _FinishedChoiceChallengeState extends State<FinishedChoiceChallenge> {
           children: [
             Flexible(
               child: Text(
-                'Q${widget.Qno}. ',
+                '$AnswersExamTS',
                 style: TextStyle(
                   fontFamily: 'Arial',
                   fontSize: 24,

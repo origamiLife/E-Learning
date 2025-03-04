@@ -1,3 +1,4 @@
+import 'package:academy/welcome_to_academy/tesseract_ocr/tesseract_ocr.dart';
 import 'package:http/http.dart' as http;
 import 'package:html/parser.dart' show parse;
 import 'package:carousel_slider/carousel_slider.dart';
@@ -298,6 +299,16 @@ class _AcademyHomePageState extends State<AcademyHomePage> {
   Widget _buildPopularEvents() {
     return Column(
       children: [
+        ElevatedButton.icon(onPressed: (){
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(
+              builder: (context) => ImagePickerScreen(empName: widget.employee.emp_name, empAvatar: widget.employee.emp_avatar,
+
+              ),
+            ),
+          );
+        }, label: Icon(Icons.camera)),
         _buildSearchField(),
         // SizedBox(height: 8),
         Expanded(
@@ -662,21 +673,7 @@ class _AcademyHomePageState extends State<AcademyHomePage> {
                             overflow: TextOverflow.ellipsis,
                             maxLines: 2,
                           ),
-                          Text(
-                            academyItem.academy_date == "Time Out"
-                                ? '$timeoutTS'
-                                : '$startTS : ${academyItem.academy_date}',
-                            style: TextStyle(
-                              fontFamily: 'Arial',
-                              fontSize: 18,
-                              color: academyItem.academy_date == "Time Out"
-                                  ? Colors.red
-                                  : const Color(0xFF555555),
-                            ),
-                            overflow: TextOverflow.ellipsis,
-                            maxLines: 1,
-                          ),
-                          const SizedBox(height: 8),
+                          const SizedBox(height: 16),
                           Column(
                             children: List.generate(
                               academyItem.academy_coach_data.length,
@@ -706,7 +703,7 @@ class _AcademyHomePageState extends State<AcademyHomePage> {
                                           coachData.name ?? '',
                                           style: TextStyle(
                                             fontFamily: 'Arial',
-                                            fontSize: 16,
+                                            fontSize: 24,
                                             fontWeight: FontWeight.w500,
                                             color: const Color(0xFF555555),
                                           ),
@@ -719,6 +716,22 @@ class _AcademyHomePageState extends State<AcademyHomePage> {
                                 );
                               },
                             ),
+                          ),
+                          const SizedBox(height: 16),
+                          Text(
+                            academyItem.academy_date == "Time Out"
+                                ? '$timeoutTS'
+                                : '$startTS : ${academyItem.academy_date}',
+                            style: TextStyle(
+                              fontFamily: 'Arial',
+                              fontSize: 20,
+                              color: academyItem.academy_date == "Time Out"
+                                  ? Colors.red
+                                  : const Color(0xFF555555),
+                              fontWeight: FontWeight.w500,
+                            ),
+                            overflow: TextOverflow.ellipsis,
+                            maxLines: 1,
                           ),
                         ],
                       ),

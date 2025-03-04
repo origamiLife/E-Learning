@@ -190,10 +190,6 @@ class _EvaluateModuleState extends State<EvaluateModule>
   }
 
   Widget _Head(HeaderData headerData, FastView fastView) {
-    final document = parse(headerData.academy_description);
-    final plainText =
-        parse(document.body?.text ?? '').documentElement?.text ?? '';
-
     return Column(
       children: <Widget>[
         Padding(

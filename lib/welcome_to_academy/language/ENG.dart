@@ -103,6 +103,7 @@ Future<void> ENG() async {
   AfterTS = "After";
   BeforeTS = "Before";
   doingTS = "Doing";
-  notStartTS = "Before";
+  notStartTS = "Not Start";
   successTS = "Success";
+  AnswersExamTS = "Answers to the exam";
 }
