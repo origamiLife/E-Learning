@@ -81,9 +81,9 @@ class _SummaryScoresState extends State<SummaryScores> {
               context,
               MaterialPageRoute(
                 builder: (context) => AcademyHomePage(
-                  employee: widget.employee,
-                  Authorization: widget.Authorization, page: 'challenge',
-                ),
+                    employee: widget.employee,
+                    Authorization: widget.Authorization,
+                    page: 'challenge'),
               ),
             );
           },
@@ -93,40 +93,41 @@ class _SummaryScoresState extends State<SummaryScores> {
         children: [
           Container(
               color: Colors.grey.shade100, height: 4, width: double.infinity),
-          DefaultTabController(
-            animationDuration: Duration(milliseconds: 300),
-            length: 2,
-            initialIndex: 0,
-            child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16),
-              child: TabBar(
-                tabs: [
-                  Tab(
-                    text: myChallengeTS,
-                  ),
-                  Tab(
-                    text: finishedChallengeTS,
-                  ),
-                ],
-                labelStyle:TextStyle(
-                  fontFamily: 'Arial',
-                  fontSize: (isAndroid || isIPhone)?14:28,
-                  fontWeight: FontWeight.w500,
-                ),
-                labelColor: Color(0xFF555555),
-                unselectedLabelColor: Colors.grey.shade400,
-                indicator: MaterialIndicator(
-                  height: 5,
-                  topLeftRadius: 8,
-                  topRightRadius: 8,
-                  horizontalPadding: 50,
-                  tabPosition: TabPosition.bottom,
-                  color: Color(0xFF555555),
-                ),
-                onTap: _onItemTapped,
-              ),
-            ),
-          ),
+          // DefaultTabController(
+          //   animationDuration: Duration(milliseconds: 300),
+          //   length: 2,
+          //   initialIndex: 0,
+          //   child: Padding(
+          //     padding: const EdgeInsets.symmetric(horizontal: 16),
+          //     child: TabBar(
+          //       tabs: [
+          //         Tab(
+          //           text: myChallengeTS,
+          //         ),
+          //         Tab(
+          //           text: finishedChallengeTS,
+          //         ),
+          //       ],
+          //       labelStyle:TextStyle(
+          //         fontFamily: 'Arial',
+          //         fontSize: isMobile?14:28,
+          //         fontWeight: FontWeight.w500,
+          //         color: Color(0xFF556785),
+          //       ),
+          //       labelColor: Color(0xFF555555),
+          //       unselectedLabelColor: Colors.grey.shade400,
+          //       indicator: MaterialIndicator(
+          //         height: 5,
+          //         topLeftRadius: 8,
+          //         topRightRadius: 8,
+          //         horizontalPadding: 50,
+          //         tabPosition: TabPosition.bottom,
+          //         color: Color(0xFF555555),
+          //       ),
+          //       onTap: _onItemTapped,
+          //     ),
+          //   ),
+          // ),
           // SizedBox(height: 8),
           // Container(color:Colors.grey.shade100,height: 4,width: double.infinity),
           Expanded(

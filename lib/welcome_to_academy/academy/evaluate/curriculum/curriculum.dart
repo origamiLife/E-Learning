@@ -11,10 +11,12 @@ class Curriculum extends StatefulWidget {
     required this.employee,
     required this.academy,
     required this.Authorization,
+    required this.callback,
   });
   final Employee employee;
   final AcademyRespond academy;
   final String Authorization;
+  final VoidCallback callback;
   @override
   _CurriculumState createState() => _CurriculumState();
 }
@@ -47,7 +49,28 @@ class _CurriculumState extends State<Curriculum> {
     return FutureBuilder<CurriculumData>(
       future: fetchCurriculum(),
       builder: (context, snapshot) {
-        if (snapshot.hasError) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              CircularProgressIndicator(
+                color: Color(0xFFFF9900),
+              ),
+              SizedBox(
+                width: 12,
+              ),
+              Text(
+                '$loadingTS...',
+                style: TextStyle(
+                  fontFamily: 'Arial',
+                  fontSize: 16,
+                  fontWeight: FontWeight.w700,
+                  color: Color(0xFF555555),
+                ),
+              ),
+            ],
+          );
+        } else if (snapshot.hasError) {
           return Center(child: Text('Error: ${snapshot.error}'));
         } else if (!snapshot.hasData) {
           return Center(
@@ -73,7 +96,7 @@ class _CurriculumState extends State<Curriculum> {
     return Container(
       color: Colors.grey.shade50,
       child: Padding(
-        padding: const EdgeInsets.all(16),
+        padding: const EdgeInsets.only(left: 8,right: 8),
         child: SingleChildScrollView(
           child: Column(
             children: List.generate(curriculum.curriculumData.length, (index) {
@@ -90,46 +113,7 @@ class _CurriculumState extends State<Curriculum> {
                       });
                     },
                     child: (isSwitch == true)
-                        ? Card(
-                            color: Colors.white,
-                            child: Container(
-                              padding: EdgeInsets.only(
-                                  left: 6, right: 6, top: 10, bottom: 10),
-                              decoration: BoxDecoration(
-                                color: Colors.white,
-                                borderRadius: BorderRadius.circular(10),
-                              ),
-                              child: Row(
-                                children: [
-                                  Expanded(
-                                    child: Text(
-                                      course.courseSubject,
-                                      style: TextStyle(
-                                        fontFamily: 'Arial',
-                                        fontSize: 18.0,
-                                        color: Color(0xFF555555),
-                                        fontWeight: FontWeight.w700,
-                                      ),
-                                    ),
-                                  ),
-                                  Text(course.coursePercent,
-                                      style: TextStyle(
-                                        fontFamily: 'Arial',
-                                        color: Color(0xFF555555),
-                                      )),
-                                  SizedBox(
-                                    width: 4,
-                                  ),
-                                  Icon(
-                                    Icons.keyboard_arrow_down,
-                                    color: Color(0xFF555555),
-                                    size: 30,
-                                  )
-                                ],
-                              ),
-                            ),
-                          )
-                        : Container(
+                        ? Container(
                             padding: EdgeInsets.all(8),
                             // color: Colors.transparent,
                             decoration: BoxDecoration(
@@ -145,24 +129,51 @@ class _CurriculumState extends State<Curriculum> {
                                       fontFamily: 'Arial',
                                       fontSize: 16,
                                       color: Color(0xFF555555),
-                                      fontWeight: FontWeight.w700,
+                                      fontWeight: FontWeight.w500,
                                     ),
-                                    overflow: TextOverflow.ellipsis,
-                                    maxLines: 1,
                                   ),
                                 ),
-                                Text(course.coursePercent,
-                                    style: TextStyle(
-                                      fontFamily: 'Arial',
-                                      color: Color(0xFF555555),
-                                    )),
                                 SizedBox(
                                   width: 4,
                                 ),
                                 Icon(
                                   Icons.keyboard_arrow_down,
                                   color: Color(0xFF555555),
-                                  size: 30,
+                                  // size: 30,
+                                )
+                              ],
+                            ),
+                          )
+                        : Container(
+                            padding: EdgeInsets.all(8),
+                            // color: Colors.transparent,
+                            decoration: BoxDecoration(
+                              color: Colors.transparent,
+                              borderRadius: BorderRadius.circular(20),
+                            ),
+                            child: Row(
+                              // crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Expanded(
+                                  child: Text(
+                                    '${course.courseSubject}  ${course.coursePercent}',
+                                    style: TextStyle(
+                                      fontFamily: 'Arial',
+                                      fontSize: 16,
+                                      color: Color(0xFF555555),
+                                      fontWeight: FontWeight.w500,
+                                    ),
+                                    overflow: TextOverflow.ellipsis,
+                                    maxLines: 2,
+                                  ),
+                                ),
+                                SizedBox(
+                                  width: 4,
+                                ),
+                                Icon(
+                                  Icons.keyboard_arrow_down,
+                                  color: Color(0xFF555555),
+                                  // size: 30,
                                 )
                               ],
                             ),
@@ -183,7 +194,7 @@ class _CurriculumState extends State<Curriculum> {
                                 child: Container(
                                   decoration: BoxDecoration(
                                     color: Colors.white,
-                                    borderRadius: BorderRadius.circular(15),
+                                    borderRadius: BorderRadius.circular(10),
                                     boxShadow: [
                                       BoxShadow(
                                         color: Colors.grey.withOpacity(0.5),
@@ -200,22 +211,28 @@ class _CurriculumState extends State<Curriculum> {
                                           CrossAxisAlignment.start,
                                       children: [
                                         Expanded(
-                                          flex: 2,
-                                          child: Image.network(
-                                            topic.topicCover,
-                                            width: double.infinity,
-                                            fit: BoxFit.contain,
-                                            errorBuilder:
-                                                (context, error, stackTrace) {
-                                              return Icon(Icons.info, size: 40);
-                                            },
+                                          flex: isMobile ? 2 : 1,
+                                          child: ClipRRect(
+                                            borderRadius:
+                                                BorderRadius.circular(8),
+                                            child: Image.network(
+                                              topic.topicCover,
+                                              width: double.infinity,
+                                              height: (isMobile)?100:150,
+                                              fit: BoxFit.cover,
+                                              errorBuilder:
+                                                  (context, error, stackTrace) {
+                                                return Icon(Icons.info,
+                                                    size: 40);
+                                              },
+                                            ),
                                           ),
                                         ),
                                         SizedBox(
                                           width: 8,
                                         ),
                                         Expanded(
-                                          flex: 3,
+                                          flex: (isMobile)?3:5,
                                           child: classList(topic),
                                         ),
                                       ],
@@ -228,12 +245,9 @@ class _CurriculumState extends State<Curriculum> {
                     }),
                   ),
                   SizedBox(
-                    height: 8,
+                    height: 4,
                   ),
                   Divider(),
-                  SizedBox(
-                    height: 8,
-                  ),
                 ],
               );
             }),
@@ -243,24 +257,46 @@ class _CurriculumState extends State<Curriculum> {
     );
   }
 
+  IconData _getTopicIcon(String type) {
+    if (type == 'Video') return Icons.videocam_outlined;
+    if (type == 'Youtube') return Icons.ondemand_video_outlined;
+    if (type == 'Document') return Icons.paste;
+    if (type == 'PDF') return Icons.picture_as_pdf_outlined;
+    if (type == 'Workshop') return Icons.handshake_outlined;
+    if (type == 'Challenge') return FontAwesomeIcons.trophy;
+    if (type == 'External Link') return Icons.link;
+    return Icons.info_outline;
+  }
+
   Widget classList(Topic topic) {
     return Column(
       mainAxisAlignment: MainAxisAlignment.start,
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        SingleChildScrollView(
-          scrollDirection: Axis.horizontal,
-          child: Text(
-            topic.topicName,
-            style: TextStyle(
-              fontFamily: 'Arial',
-              fontSize: 16.0,
-              color: Color(0xFF555555),
-              fontWeight: FontWeight.w700,
-            ),
-            overflow: TextOverflow.ellipsis,
-            maxLines: 1,
+        // SingleChildScrollView(
+        //   scrollDirection: Axis.horizontal,
+        //   child: Text(
+        //     topic.topicName,
+        //     style: TextStyle(
+        //       fontFamily: 'Arial',
+        //       fontSize: 14.0,
+        //       color: Color(0xFF555555),
+        //       fontWeight: FontWeight.w700,
+        //     ),
+        //     overflow: TextOverflow.ellipsis,
+        //     maxLines: 2,
+        //   ),
+        // ),
+        Text(
+          topic.topicName,
+          style: TextStyle(
+            fontFamily: 'Arial',
+            fontSize: 14.0,
+            color: Color(0xFF555555),
+            fontWeight: FontWeight.w500,
           ),
+          overflow: TextOverflow.ellipsis,
+          maxLines: 2,
         ),
         SizedBox(height: 8),
         Row(
@@ -269,55 +305,62 @@ class _CurriculumState extends State<Curriculum> {
               flex: 3,
               child: Row(
                 children: [
-                  Icon(
-                    (topic.topicType == 'Video')
-                        ? Icons.video_collection_outlined
-                        : (topic.topicType == 'PDF')
-                            ? Icons.picture_as_pdf_outlined
-                            : Icons.ondemand_video_outlined,
-                    color: Colors.amber,
-                  ),
+                  if (topic.topicType == 'Challenge')
+                    Icon(
+                      FontAwesomeIcons.trophy,
+                      color: Colors.amber,
+                      size: 16,
+                    )
+                  else
+                    Icon(
+                      _getTopicIcon(topic.topicType),
+                      color: Colors.amber,
+                      size: 20,
+                    ),
                   SizedBox(
-                    width: 8,
+                    width: topic.topicType == 'Challenge' ? 12 : 8,
                   ),
                   Flexible(
                     child: Text(
                       topic.topicType,
                       style: TextStyle(
                         fontFamily: 'Arial',
-                        fontSize: 14.0,
+                        fontSize: 12.0,
                         color: Color(0xFF555555),
-                        fontWeight: FontWeight.w700,
+                        fontWeight: FontWeight.w500,
                       ),
                     ),
                   ),
                 ],
               ),
             ),
-            Expanded(
-              flex: 2,
-              child: Container(
-                decoration: BoxDecoration(
-                  color: (topic.topicOpen == "Y")?Colors.orange.shade200:Colors.black26,
-                  borderRadius: BorderRadius.circular(10),
-                ),
-                child: Padding(
-                  padding: EdgeInsets.all(4),
-                  child: Center(
-                    child: Text(
-                      topic.topicButton,
-                      style: TextStyle(
-                        fontFamily: 'Arial',
-                        fontSize: 12.0,
-                        color: Colors.white,
+            if (topic.topicType != 'Workshop')
+              Expanded(
+                flex: 2,
+                child: Container(
+                  decoration: BoxDecoration(
+                    color: (topic.topicOpen == "Y")
+                        ? Colors.orange.shade200
+                        : Colors.black26,
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  child: Padding(
+                    padding: EdgeInsets.all(4),
+                    child: Center(
+                      child: Text(
+                        topic.topicButton,
+                        style: TextStyle(
+                          fontFamily: 'Arial',
+                          fontSize: 12.0,
+                          color: Colors.white,
+                        ),
+                        overflow: TextOverflow.ellipsis,
+                        maxLines: 1,
                       ),
-                      overflow: TextOverflow.ellipsis,
-                      maxLines: 1,
                     ),
                   ),
                 ),
               ),
-            ),
           ],
         ),
         Row(
@@ -325,6 +368,7 @@ class _CurriculumState extends State<Curriculum> {
             Icon(
               Icons.access_time,
               color: Colors.amber,
+              size: 20,
             ),
             SizedBox(
               width: 8,
@@ -334,88 +378,98 @@ class _CurriculumState extends State<Curriculum> {
                 topic.topicDuration,
                 style: TextStyle(
                   fontFamily: 'Arial',
+                  fontSize: 12.0,
                   color: Color(0xFF555555),
                 ),
               ),
             ),
           ],
         ),
-        Row(
-          children: [
-            Expanded(
-              flex: 3,
-              child: Row(
-                children: [
-                  Icon(
-                    Icons.people_alt_outlined,
-                    color: Colors.amber,
+        const SizedBox(height: 2),
+        if (topic.topicType == 'Workshop')
+          Row(
+            children: [
+              const Icon(
+                FontAwesomeIcons.chalkboardTeacher,
+                color: Colors.amber,
+                size: 15,
+              ),
+              const SizedBox(
+                width: 14,
+              ),
+              Flexible(
+                child: Text(
+                  topic.topicView,
+                  style: const TextStyle(
+                    fontFamily: 'Arial',
+                    fontSize: 12.0,
+                    color: Color(0xFF555555),
                   ),
-                  SizedBox(
-                    width: 4,
-                  ),
-                  Flexible(
-                    child: SingleChildScrollView(
-                      scrollDirection: Axis.horizontal,
-                      child: Text(
-                        topic.topicView,
-                        style: GoogleFonts.nunito(
-                          color: Color(0xFF555555),
+                ),
+              ),
+            ],
+          )
+        else
+          Row(
+            children: [
+              Expanded(
+                flex: 3,
+                child: Row(
+                  children: [
+                    const Icon(
+                      FontAwesomeIcons.chalkboardTeacher,
+                      color: Colors.amber,
+                      size: 15,
+                    ),
+                    const SizedBox(
+                      width: 14,
+                    ),
+                    Flexible(
+                      child: SingleChildScrollView(
+                        scrollDirection: Axis.horizontal,
+                        child: Text(
+                          topic.topicView,
+                          style: TextStyle(
+                            fontFamily: 'Arial',
+                            fontSize: 12.0,
+                            color: Color(0xFF555555),
+                          ),
                         ),
                       ),
-                    ),
-                  )
-                ],
+                    )
+                  ],
+                ),
               ),
-            ),
-            Expanded(
-              flex: 2,
-              child: Row(
-                children: [
-                  Icon(
-                    Icons.hourglass_bottom,
-                    color: Colors.amber,
-                  ),
-                  SizedBox(
-                    width: 4,
-                  ),
-                  Flexible(
-                    child: SingleChildScrollView(
-                      scrollDirection: Axis.horizontal,
-                      child: Text(topic.topicPercent,
-                          style: GoogleFonts.nunito(
+              Expanded(
+                flex: 2,
+                child: Row(
+                  children: [
+                    Icon(
+                      Icons.hourglass_bottom,
+                      color: Colors.amber,
+                      size: 20,
+                    ),
+                    SizedBox(
+                      width: 4,
+                    ),
+                    Flexible(
+                      child: SingleChildScrollView(
+                        scrollDirection: Axis.horizontal,
+                        child: Text(
+                          topic.topicPercent,
+                          style: TextStyle(
+                            fontFamily: 'Arial',
+                            fontSize: 12.0,
                             color: Color(0xFF555555),
-                          )),
-                    ),
-                  )
-                ],
+                          ),
+                        ),
+                      ),
+                    )
+                  ],
+                ),
               ),
-            ),
-          ],
-        ),
-        // Align(
-        //   alignment: Alignment.centerRight,
-        //   child: Padding(
-        //     padding: EdgeInsets.only(right: 8, top: 4),
-        //     child: Container(
-        //       decoration: BoxDecoration(
-        //         color: Colors.black26,
-        //       ),
-        //       child: Padding(
-        //         padding: EdgeInsets.all(4),
-        //         child: Text(
-        //           topic.topicButton,
-        //           style: TextStyle(
-        //             fontFamily: 'Arial',
-        //             fontSize: 12.0,
-        //             color: Colors.white,
-        //           ),
-        //           overflow: TextOverflow.ellipsis,
-        //           maxLines: 1,
-        //         ),
-        //       ),
-        //     ),
-        //   ),
-        // ),
+            ],
+          ),
       ],
     );
   }

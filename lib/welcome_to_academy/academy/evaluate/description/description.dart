@@ -59,7 +59,28 @@ class _DescriptionState extends State<Description> {
     return FutureBuilder<List<DescriptionData>>(
       future: fetchDescription(),
       builder: (context, snapshot) {
-        if (snapshot.hasError) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              CircularProgressIndicator(
+                color: Color(0xFFFF9900),
+              ),
+              SizedBox(
+                width: 12,
+              ),
+              Text(
+                '$loadingTS...',
+                style: TextStyle(
+                  fontFamily: 'Arial',
+                  fontSize: 16,
+                  fontWeight: FontWeight.w700,
+                  color: Color(0xFF555555),
+                ),
+              ),
+            ],
+          );
+        } else if (snapshot.hasError) {
           return Center(child: Text('Error: ${snapshot.error}'));
         } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
           return Center(
@@ -86,7 +107,7 @@ class _DescriptionState extends State<Description> {
     return Container(
       color: Colors.grey.shade50,
       child: Padding(
-        padding: EdgeInsets.all(16.0),
+        padding: const EdgeInsets.only(left: 8, right: 8),
         child: SingleChildScrollView(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -94,11 +115,6 @@ class _DescriptionState extends State<Description> {
               Column(
                 children: List.generate(description.length, (index) {
                   String video_count = description[index].video_count;
-                  String document_count = description[index].document_count;
-                  String youtube_count = description[index].youtube_count;
-                  String challenge_count = description[index].challenge_count;
-                  String link_count = description[index].link_count;
-                  String event_count = description[index].event_count;
                   return Column(
                     children: [
                       InkWell(
@@ -111,40 +127,40 @@ class _DescriptionState extends State<Description> {
                           });
                         },
                         child: (isSwitch == true)
-                            ? Card(
-                                color: Colors.white,
-                                child: Container(
-                                  padding: EdgeInsets.only(
-                                      left: 6, right: 6, top: 10, bottom: 10),
-                                  decoration: BoxDecoration(
-                                    color: Colors.white,
-                                    borderRadius: BorderRadius.circular(10),
-                                  ),
-                                  child: Row(
-                                    children: [
-                                      Expanded(
-                                        child: Text(
+                            ? Column(
+                              children: [
+                                Container(
+                                    padding: EdgeInsets.all(8),
+                                    // color: Colors.transparent,
+                                    decoration: BoxDecoration(
+                                      color: Colors.transparent,
+                                      borderRadius: BorderRadius.circular(20),
+                                    ),
+                                    child: Row(
+                                      children: [
+                                        Expanded(
+                                            child: Text(
                                           description[index].course_subject,
                                           style: TextStyle(
                                             fontFamily: 'Arial',
-                                            fontSize: 18.0,
+                                            fontSize: 16,
                                             color: Color(0xFF555555),
-                                            fontWeight: FontWeight.w700,
+                                            fontWeight: FontWeight.w500,
                                           ),
-                                        ),
-                                      ),
-                                      SizedBox(
-                                        width: 4,
-                                      ),
-                                      Icon(
-                                        Icons.keyboard_arrow_down,
-                                        color: Color(0xFF555555),
-                                        size: 30,
-                                      )
-                                    ],
+                                        )),
+                                        SizedBox(width: 4),
+                                        Icon(
+                                          Icons.keyboard_arrow_down,
+                                          color: Color(0xFF555555),
+                                          // size: 30,
+                                        )
+                                      ],
+                                    ),
                                   ),
-                                ),
-                              )
+                                SizedBox(height: 4),
+                                Divider()
+                              ],
+                            )
                             : Container(
                                 padding: EdgeInsets.all(8),
                                 // color: Colors.transparent,
@@ -159,15 +175,13 @@ class _DescriptionState extends State<Description> {
                                         description[index].course_subject,
                                         style: TextStyle(
                                           fontFamily: 'Arial',
-                                          fontSize: 18.0,
+                                          fontSize: 16,
                                           color: Color(0xFF555555),
-                                          fontWeight: FontWeight.w700,
+                                          fontWeight: FontWeight.w500,
                                         ),
                                       ),
                                     ),
-                                    SizedBox(
-                                      width: 4,
-                                    ),
+                                    SizedBox(width: 4),
                                     Icon(
                                       Icons.keyboard_arrow_down,
                                       color: Color(0xFF555555),
@@ -177,368 +191,83 @@ class _DescriptionState extends State<Description> {
                                 ),
                               ),
                       ),
-                      (isSwitch == false)
-                          ? Card(
-                              color: Color(0xFFF5F5F5),
-                              child: Container(
-                                decoration: BoxDecoration(
-                                  color: Colors.white,
-                                  borderRadius: BorderRadius.circular(15),
-                                  boxShadow: [
-                                    BoxShadow(
-                                      color: Colors.grey.withOpacity(0.5),
-                                      spreadRadius: 0,
-                                      blurRadius: 0,
-                                      offset: Offset(0, 3), // x, y
-                                    ),
-                                  ],
+                      if (isSwitch == false)
+                        Card(
+                          color: Color(0xFFF5F5F5),
+                          child: Container(
+                            decoration: BoxDecoration(
+                              color: Colors.white,
+                              borderRadius: BorderRadius.circular(10),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: Colors.grey.withOpacity(0.5),
+                                  spreadRadius: 0,
+                                  blurRadius: 0,
+                                  offset: Offset(0, 3), // x, y
                                 ),
-                                child: Padding(
-                                  padding: const EdgeInsets.all(8.0),
-                                  child: Column(
+                              ],
+                            ),
+                            child: Padding(
+                              padding: const EdgeInsets.all(8.0),
+                              child: Column(
+                                children: [
+                                  Container(
+                                    alignment: Alignment.centerLeft,
+                                    // color: Colors.transparent,
+                                    decoration: BoxDecoration(
+                                      color: Colors.transparent,
+                                      borderRadius: BorderRadius.circular(20),
+                                    ),
+                                    child: Text(
+                                      "$WYLTS",
+                                      style: TextStyle(
+                                        fontFamily: 'Arial',
+                                        color: Color(0xFF555555),
+                                        fontWeight: FontWeight.w700,
+                                      ),
+                                      overflow: TextOverflow.ellipsis,
+                                      maxLines: 1,
+                                    ),
+                                  ),
+                                  SizedBox(height: 8),
+                                  Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
                                     children: [
-                                      Container(
-                                        alignment: Alignment.centerLeft,
-                                        // color: Colors.transparent,
-                                        decoration: BoxDecoration(
-                                          color: Colors.transparent,
-                                          borderRadius:
-                                              BorderRadius.circular(20),
-                                        ),
-                                        child: Text(
-                                          "$WYLTS",
-                                          style: TextStyle(
-                                            fontFamily: 'Arial',
-                                            color: Color(0xFF555555),
-                                            fontWeight: FontWeight.w700,
-                                          ),
-                                          overflow: TextOverflow.ellipsis,
-                                          maxLines: 1,
-                                        ),
-                                      ),
-                                      SizedBox(height: 8),
                                       Column(
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.start,
-                                        children: [
-                                          Column(
-                                            children: List.generate(
-                                                description[index]
-                                                    .topic_section
-                                                    .length, (indexI) {
-                                              return Container(
-                                                alignment: Alignment.centerLeft,
-                                                child: Padding(
-                                                  padding:
-                                                      const EdgeInsets.only(
-                                                          bottom: 4),
-                                                  child: Text(
-                                                    "   ${description[index].topic_section[indexI]}",
-                                                    style: TextStyle(
-                                                      fontFamily: 'Arial',
-                                                      color: Color(0xFF555555),
-                                                    ),
-                                                    overflow:
-                                                        TextOverflow.ellipsis,
-                                                    maxLines: 1,
-                                                  ),
+                                        children: List.generate(
+                                            description[index]
+                                                .topic_section
+                                                .length, (indexI) {
+                                          return Container(
+                                            alignment: Alignment.centerLeft,
+                                            child: Padding(
+                                              padding: const EdgeInsets.only(
+                                                  bottom: 4),
+                                              child: Text(
+                                                "   ${description[index].topic_section[indexI]}",
+                                                style: TextStyle(
+                                                  fontFamily: 'Arial',
+                                                  color: Color(0xFF555555),
                                                 ),
-                                              );
-                                            }),
-                                          ),
-                                          SizedBox(
-                                            height: 16,
-                                          ),
-                                          Container(
-                                            padding: EdgeInsets.all(4),
-                                            decoration: BoxDecoration(
-                                              color: Colors.white,
-                                              border: Border.all(
-                                                  color: Colors.grey),
-                                              borderRadius:
-                                                  BorderRadius.circular(10),
+                                                overflow: TextOverflow.ellipsis,
+                                                maxLines: 1,
+                                              ),
                                             ),
-                                            child: Column(
-                                              crossAxisAlignment:
-                                                  CrossAxisAlignment.start,
-                                              children: [
-                                                Text(
-                                                  courseIncludesTS,
-                                                  style: TextStyle(
-                                                    fontFamily: 'Arial',
-                                                    // fontSize: 16.0,
-                                                    color: Color(0xFF555555),
-                                                    fontWeight: FontWeight.w700,
-                                                  ),
-                                                ),
-                                                SizedBox(
-                                                  height: 8,
-                                                ),
-                                                Padding(
-                                                  padding:
-                                                      const EdgeInsets.only(
-                                                          left: 4.0),
-                                                  child: Column(
-                                                    children: [
-                                                      video_count == "0"
-                                                          ? Container()
-                                                          : Padding(
-                                                              padding:
-                                                                  const EdgeInsets
-                                                                      .only(
-                                                                      bottom:
-                                                                          8.0),
-                                                              child: Row(
-                                                                children: [
-                                                                  Icon(
-                                                                    Icons
-                                                                        .video_collection_outlined,
-                                                                    color: Color(
-                                                                        0xFF555555),
-                                                                  ),
-                                                                  SizedBox(
-                                                                    width: 8,
-                                                                  ),
-                                                                  Text(
-                                                                    "${description[index].video_count} $videoTS",
-                                                                    style:
-                                                                        TextStyle(
-                                                                      fontFamily:
-                                                                          'Arial',
-                                                                      color: Colors
-                                                                          .grey,
-                                                                      fontWeight:
-                                                                          FontWeight
-                                                                              .w500,
-                                                                    ),
-                                                                  ),
-                                                                ],
-                                                              ),
-                                                            ),
-                                                      document_count == "0"
-                                                          ? Container()
-                                                          : Padding(
-                                                              padding:
-                                                                  const EdgeInsets
-                                                                      .only(
-                                                                      bottom:
-                                                                          8.0),
-                                                              child: Row(
-                                                                children: [
-                                                                  Icon(
-                                                                    Icons
-                                                                        .file_copy_outlined,
-                                                                    color: Color(
-                                                                        0xFF555555),
-                                                                  ),
-                                                                  SizedBox(
-                                                                    width: 8,
-                                                                  ),
-                                                                  Text(
-                                                                    "${document_count} File",
-                                                                    style:
-                                                                        TextStyle(
-                                                                      fontFamily:
-                                                                          'Arial',
-                                                                      color: Colors
-                                                                          .grey,
-                                                                      fontWeight:
-                                                                          FontWeight
-                                                                              .w700,
-                                                                    ),
-                                                                  ),
-                                                                ],
-                                                              ),
-                                                            ),
-                                                      youtube_count == "0"
-                                                          ? Container()
-                                                          : Padding(
-                                                              padding:
-                                                                  const EdgeInsets
-                                                                      .only(
-                                                                      bottom:
-                                                                          8.0),
-                                                              child: Row(
-                                                                children: [
-                                                                  Icon(
-                                                                    Icons
-                                                                        .ondemand_video_outlined,
-                                                                    color: Color(
-                                                                        0xFF555555),
-                                                                  ),
-                                                                  SizedBox(
-                                                                    width: 8,
-                                                                  ),
-                                                                  Text(
-                                                                    "${youtube_count} Video",
-                                                                    style:
-                                                                        TextStyle(
-                                                                      fontFamily:
-                                                                          'Arial',
-                                                                      color: Colors
-                                                                          .grey,
-                                                                      fontWeight:
-                                                                          FontWeight
-                                                                              .w500,
-                                                                    ),
-                                                                  ),
-                                                                ],
-                                                              ),
-                                                            ),
-                                                      challenge_count == "0"
-                                                          ? Container()
-                                                          : Padding(
-                                                              padding:
-                                                                  const EdgeInsets
-                                                                      .only(
-                                                                      bottom:
-                                                                          8.0),
-                                                              child: Row(
-                                                                children: [
-                                                                  Icon(
-                                                                    Icons
-                                                                        .emoji_events_outlined,
-                                                                    color: Color(
-                                                                        0xFF555555),
-                                                                  ),
-                                                                  SizedBox(
-                                                                    width: 8,
-                                                                  ),
-                                                                  Text(
-                                                                    "${challenge_count} Challenge",
-                                                                    style:
-                                                                        TextStyle(
-                                                                      fontFamily:
-                                                                          'Arial',
-                                                                      color: Colors
-                                                                          .grey,
-                                                                      fontWeight:
-                                                                          FontWeight
-                                                                              .w500,
-                                                                    ),
-                                                                  ),
-                                                                ],
-                                                              ),
-                                                            ),
-                                                      link_count == "0"
-                                                          ? Container()
-                                                          : Padding(
-                                                              padding:
-                                                                  const EdgeInsets
-                                                                      .only(
-                                                                      bottom:
-                                                                          8.0),
-                                                              child: Row(
-                                                                children: [
-                                                                  Icon(
-                                                                    Icons
-                                                                        .link_outlined,
-                                                                    color: Color(
-                                                                        0xFF555555),
-                                                                  ),
-                                                                  SizedBox(
-                                                                    width: 8,
-                                                                  ),
-                                                                  Text(
-                                                                    "${link_count} Link",
-                                                                    style:
-                                                                        TextStyle(
-                                                                      fontFamily:
-                                                                          'Arial',
-                                                                      color: Colors
-                                                                          .grey,
-                                                                      fontWeight:
-                                                                          FontWeight
-                                                                              .w500,
-                                                                    ),
-                                                                  ),
-                                                                ],
-                                                              ),
-                                                            ),
-                                                      event_count == "0"
-                                                          ? Container()
-                                                          : Padding(
-                                                              padding:
-                                                                  const EdgeInsets
-                                                                      .only(
-                                                                      bottom:
-                                                                          8.0),
-                                                              child: Row(
-                                                                children: [
-                                                                  Icon(
-                                                                    Icons
-                                                                        .event_note,
-                                                                    color: Color(
-                                                                        0xFF555555),
-                                                                  ),
-                                                                  SizedBox(
-                                                                    width: 8,
-                                                                  ),
-                                                                  Flexible(
-                                                                    child: Text(
-                                                                      "${event_count} Event",
-                                                                      style:
-                                                                          TextStyle(
-                                                                        fontFamily:
-                                                                            'Arial',
-                                                                        color: Colors
-                                                                            .grey,
-                                                                        fontWeight:
-                                                                            FontWeight.w500,
-                                                                      ),
-                                                                    ),
-                                                                  ),
-                                                                ],
-                                                              ),
-                                                            ),
-                                                      Padding(
-                                                        padding:
-                                                            const EdgeInsets
-                                                                .only(
-                                                                bottom: 8.0),
-                                                        child: Row(
-                                                          children: [
-                                                            Icon(
-                                                              Icons
-                                                                  .school_outlined,
-                                                              color: Color(
-                                                                  0xFF555555),
-                                                            ),
-                                                            SizedBox(
-                                                              width: 8,
-                                                            ),
-                                                            Flexible(
-                                                              child: Text(
-                                                                "$certificateTS",
-                                                                style:
-                                                                    TextStyle(
-                                                                  fontFamily:
-                                                                      'Arial',
-                                                                  color: Colors
-                                                                      .grey,
-                                                                  fontWeight:
-                                                                      FontWeight
-                                                                          .w500,
-                                                                ),
-                                                              ),
-                                                            ),
-                                                          ],
-                                                        ),
-                                                      ),
-                                                    ],
-                                                  ),
-                                                ),
-                                              ],
-                                            ),
-                                          ),
-                                        ],
+                                          );
+                                        }),
                                       ),
+                                      SizedBox(
+                                        height: 16,
+                                      ),
+                                      Inclu(video_count, description, index),
                                     ],
                                   ),
-                                ),
+                                ],
                               ),
-                            )
-                          : Container(),
+                            ),
+                          ),
+                        )
                     ],
                   );
                 }),
@@ -546,6 +275,215 @@ class _DescriptionState extends State<Description> {
             ],
           ),
         ),
+      ),
+    );
+  }
+
+  Widget Inclu(
+      String video_count, List<DescriptionData> description, int index) {
+    String video_count = description[index].video_count;
+    String document_count = description[index].document_count;
+    String youtube_count = description[index].youtube_count;
+    String challenge_count = description[index].challenge_count;
+    String link_count = description[index].link_count;
+    String event_count = description[index].event_count;
+    return Container(
+      padding: EdgeInsets.all(8),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        border: Border.all(color: Colors.grey),
+        borderRadius: BorderRadius.circular(10),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            courseIncludesTS,
+            style: TextStyle(
+              fontFamily: 'Arial',
+              // fontSize: 16.0,
+              color: Color(0xFF555555),
+              fontWeight: FontWeight.w700,
+            ),
+          ),
+          SizedBox(
+            height: 8,
+          ),
+          Column(
+            children: [
+              video_count == "0"
+                  ? Container()
+                  : Padding(
+                      padding: EdgeInsets.only(bottom: 8.0),
+                      child: Row(
+                        children: [
+                          Icon(
+                            Icons.video_collection_outlined,
+                            color: Color(0xFF555555),
+                          ),
+                          SizedBox(
+                            width: 8,
+                          ),
+                          Text(
+                            "${description[index].video_count} $videoTS",
+                            style: TextStyle(
+                              fontFamily: 'Arial',
+                              color: Colors.grey,
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+              document_count == "0"
+                  ? Container()
+                  : Padding(
+                      padding: const EdgeInsets.only(bottom: 8.0),
+                      child: Row(
+                        children: [
+                          Icon(
+                            Icons.file_copy_outlined,
+                            color: Color(0xFF555555),
+                          ),
+                          SizedBox(
+                            width: 8,
+                          ),
+                          Text(
+                            "${document_count} File",
+                            style: TextStyle(
+                              fontFamily: 'Arial',
+                              color: Colors.grey,
+                              fontWeight: FontWeight.w700,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+              youtube_count == "0"
+                  ? Container()
+                  : Padding(
+                      padding: const EdgeInsets.only(bottom: 8.0),
+                      child: Row(
+                        children: [
+                          Icon(
+                            Icons.ondemand_video_outlined,
+                            color: Color(0xFF555555),
+                          ),
+                          SizedBox(
+                            width: 8,
+                          ),
+                          Text(
+                            "${youtube_count} Video",
+                            style: TextStyle(
+                              fontFamily: 'Arial',
+                              color: Colors.grey,
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+              challenge_count == "0"
+                  ? Container()
+                  : Padding(
+                      padding: const EdgeInsets.only(bottom: 8.0),
+                      child: Row(
+                        children: [
+                          Icon(
+                            Icons.emoji_events_outlined,
+                            color: Color(0xFF555555),
+                          ),
+                          SizedBox(
+                            width: 8,
+                          ),
+                          Text(
+                            "${challenge_count} Challenge",
+                            style: TextStyle(
+                              fontFamily: 'Arial',
+                              color: Colors.grey,
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+              link_count == "0"
+                  ? Container()
+                  : Padding(
+                      padding: const EdgeInsets.only(bottom: 8.0),
+                      child: Row(
+                        children: [
+                          Icon(
+                            Icons.link_outlined,
+                            color: Color(0xFF555555),
+                          ),
+                          SizedBox(
+                            width: 8,
+                          ),
+                          Text(
+                            "${link_count} Link",
+                            style: TextStyle(
+                              fontFamily: 'Arial',
+                              color: Colors.grey,
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+              event_count == "0"
+                  ? Container()
+                  : Padding(
+                      padding: const EdgeInsets.only(bottom: 8.0),
+                      child: Row(
+                        children: [
+                          Icon(
+                            Icons.event_note,
+                            color: Color(0xFF555555),
+                          ),
+                          SizedBox(
+                            width: 8,
+                          ),
+                          Flexible(
+                            child: Text(
+                              "${event_count} Event",
+                              style: TextStyle(
+                                fontFamily: 'Arial',
+                                color: Colors.grey,
+                                fontWeight: FontWeight.w500,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+              Padding(
+                padding: const EdgeInsets.only(bottom: 8.0),
+                child: Row(
+                  children: [
+                    Icon(
+                      Icons.school_outlined,
+                      color: Color(0xFF555555),
+                    ),
+                    SizedBox(
+                      width: 8,
+                    ),
+                    Flexible(
+                      child: Text(
+                        "$certificateTS",
+                        style: TextStyle(
+                          fontFamily: 'Arial',
+                          color: Colors.grey,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ],
       ),
     );
   }

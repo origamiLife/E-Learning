@@ -56,7 +56,7 @@ class _MyChallengeState extends State<MyChallenge> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Container(child: _summary()),
+              Container(child: _myChallenge()),
               SizedBox(height: 24),
               FutureBuilder<ChallengeRespond>(
                   future: fetchResultChallenge(),
@@ -81,8 +81,7 @@ class _MyChallengeState extends State<MyChallenge> {
                                       Top_ChallengeTS,
                                       style: TextStyle(
                                         fontFamily: 'Arial',
-                                        fontSize:
-                                            (isAndroid || isIPhone) ? 16 : 24,
+                                        fontSize: isMobile ? 16 : 24,
                                         color: Color(0xFF555555),
                                         fontWeight: FontWeight.w500,
                                       ),
@@ -125,12 +124,12 @@ class _MyChallengeState extends State<MyChallenge> {
                 child: Container(
                   decoration: BoxDecoration(
                     color: Colors.white,
-                    borderRadius: BorderRadius.circular(15),
+                    borderRadius: BorderRadius.circular(10),
                     boxShadow: [
                       BoxShadow(
                         color: Colors.grey.withOpacity(0.5),
                         spreadRadius: 0,
-                        blurRadius: 2,
+                        blurRadius: 1,
                         offset: Offset(0, 3), // x, y
                       ),
                     ],
@@ -153,7 +152,7 @@ class _MyChallengeState extends State<MyChallenge> {
                           Expanded(
                             flex: 1,
                             child: Image.network(topUsers.avatar,
-                                height: (isAndroid || isIPhone)
+                                height: isMobile
                                     ? MediaQuery.of(context).size.width * 0.25
                                     : MediaQuery.of(context).size.width * 0.18,
                                 width: double.infinity,
@@ -172,7 +171,7 @@ class _MyChallengeState extends State<MyChallenge> {
                           width: 8,
                         ),
                         Expanded(
-                          flex: 3,
+                          flex: (isMobile) ? 3 : 5,
                           child: classList(topUsers, index),
                         ),
                       ],
@@ -195,13 +194,15 @@ class _MyChallengeState extends State<MyChallenge> {
           '${topUsers.firstname} ${topUsers.lastname}',
           style: TextStyle(
             fontFamily: 'Arial',
-            fontSize: (isAndroid || isIPhone)?18:28,
+            fontSize: isMobile ? 18 : 28,
             color: Color(0xFF555555),
             fontWeight: FontWeight.w700,
           ),
           overflow: TextOverflow.ellipsis,
         ),
-        SizedBox(height: (isAndroid || isIPhone)?10:18,),
+        SizedBox(
+          height: isMobile ? 10 : 18,
+        ),
         Row(
           crossAxisAlignment: CrossAxisAlignment.end,
           children: [
@@ -209,9 +210,9 @@ class _MyChallengeState extends State<MyChallenge> {
               '$correctAnswerTS : ',
               style: TextStyle(
                 fontFamily: 'Arial',
-                fontSize: (isAndroid || isIPhone)?14:24,
+                fontSize: isMobile ? 14 : 24,
                 color: Color(0xFF555555),
-                fontWeight: (isAndroid || isIPhone)?FontWeight.w700:FontWeight.w500,
+                fontWeight: isMobile ? FontWeight.w700 : FontWeight.w500,
               ),
               overflow: TextOverflow.ellipsis,
               maxLines: 1,
@@ -221,7 +222,7 @@ class _MyChallengeState extends State<MyChallenge> {
                 topUsers.point,
                 style: TextStyle(
                   fontFamily: 'Arial',
-                  fontSize: (isAndroid || isIPhone)?14:24,
+                  fontSize: isMobile ? 14 : 24,
                   color: Color(0xFF555555),
                   fontWeight: FontWeight.w500,
                 ),
@@ -229,7 +230,9 @@ class _MyChallengeState extends State<MyChallenge> {
             ),
           ],
         ),
-        SizedBox(height: (isAndroid || isIPhone)?10:18,),
+        SizedBox(
+          height: isMobile ? 10 : 18,
+        ),
         Row(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -237,9 +240,9 @@ class _MyChallengeState extends State<MyChallenge> {
               '$timeUsedTS : ',
               style: TextStyle(
                 fontFamily: 'Arial',
-                fontSize: (isAndroid || isIPhone)?14:24,
+                fontSize: isMobile ? 14 : 24,
                 color: Color(0xFF555555),
-                fontWeight: (isAndroid || isIPhone)?FontWeight.w700:FontWeight.w500,
+                fontWeight: isMobile ? FontWeight.w700 : FontWeight.w500,
               ),
               overflow: TextOverflow.ellipsis,
               maxLines: 1,
@@ -249,7 +252,7 @@ class _MyChallengeState extends State<MyChallenge> {
                 topUsers.time_used,
                 style: TextStyle(
                   fontFamily: 'Arial',
-                  fontSize: (isAndroid || isIPhone)?14:24,
+                  fontSize: isMobile ? 14 : 24,
                   color: Color(0xFF555555),
                   fontWeight: FontWeight.w500,
                 ),
@@ -258,27 +261,6 @@ class _MyChallengeState extends State<MyChallenge> {
           ],
         ),
       ],
-    );
-  }
-
-  Widget _summary() {
-    return Container(
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(15),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.grey.withOpacity(0.5),
-            spreadRadius: 0,
-            blurRadius: 2,
-            offset: Offset(0, 3), // x, y
-          ),
-        ],
-      ),
-      child: Padding(
-        padding: const EdgeInsets.all(16),
-        child: _myChallenge(),
-      ),
     );
   }
 
@@ -326,86 +308,104 @@ class _MyChallengeState extends State<MyChallenge> {
           );
         } else if (snapshot.hasData) {
           final data = snapshot.data!;
-          return Column(
-            children: [
-              Row(
+          return Container(
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(15),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.grey.withOpacity(0.5),
+                  spreadRadius: 0,
+                  blurRadius: 2,
+                  offset: Offset(0, 3), // x, y
+                ),
+              ],
+            ),
+            child: Padding(
+              padding: const EdgeInsets.all(16),
+              child: Column(
                 children: [
-                  Expanded(
-                    flex: 4,
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        _question('$correctAnswerTS :'),
-                        _question('$scoreTS :'),
-                        _question('$timeUsedTS :'),
-                        _question('$startChallengeTS :'),
-                        _question('$finishedChallengeTS :'),
-                      ],
-                    ),
+                  Row(
+                    children: [
+                      Expanded(
+                        flex: 4,
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            _question('$correctAnswerTS :'),
+                            _question('$scoreTS :'),
+                            _question('$timeUsedTS :'),
+                            _question('$startChallengeTS :'),
+                            _question('$finishedChallengeTS :'),
+                          ],
+                        ),
+                      ),
+                      Expanded(
+                        flex: 5,
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            _question('${data.first.correct}'),
+                            _question('${data.first.used_point}'),
+                            _question('${data.first.challenge_duration}'),
+                            _question('${data.first.challenge_start}'),
+                            _question('${data.first.challenge_end}'),
+                          ],
+                        ),
+                      ),
+                    ],
                   ),
-                  Expanded(
-                    flex: 5,
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        _question('${data.first.correct}'),
-                        _question('${data.first.used_point}'),
-                        _question('${data.first.challenge_duration}'),
-                        _question('${data.first.challenge_start}'),
-                        _question('${data.first.challenge_end}'),
-                      ],
+                  Divider(),
+                  if (!isMobile) SizedBox(height: 16),
+                  Container(
+                    height: (40 * 2) + 16,
+                    child: SingleChildScrollView(
+                      child: Wrap(
+                        spacing: isMobile ? 8 : 16,
+                        runSpacing: isMobile ? 8 : 16,
+                        children:
+                            List.generate(widget.isQuestion.length, (index) {
+                          final dataQ = widget.isQuestion[index];
+                          Color cardColor;
+                          if (dataQ.question_status == 'Y') {
+                            cardColor = Color(0xFF00C789);
+                          } else if (dataQ.question_status == 'N') {
+                            cardColor = Color(0xFFEE546C);
+                          } else {
+                            cardColor = Color(0xFFC0C4CC);
+                          }
+                          return InkWell(
+                            onTap: () {
+                              _showDialog(widget.isQuestion);
+                            },
+                            child: Container(
+                              height: isMobile ? 40 : 80,
+                              width: isMobile ? 40 : 80,
+                              alignment: Alignment.center,
+                              decoration: BoxDecoration(
+                                color: cardColor,
+                                borderRadius: BorderRadius.circular(10),
+                              ),
+                              child: Text(
+                                '${index + 1}',
+                                style: TextStyle(
+                                  fontFamily: 'Arial',
+                                  fontSize: isMobile ? 16 : 20,
+                                  color: Colors.white,
+                                  fontWeight: FontWeight.w700,
+                                ),
+                                overflow: TextOverflow.ellipsis,
+                                maxLines: 2,
+                              ),
+                            ),
+                          );
+                        }),
+                      ),
                     ),
                   ),
                 ],
               ),
-              Divider(),
-              if (isTablet || isIPad) SizedBox(height: 16),
-              Container(
-                height: (40 * 2) + 16,
-                child: SingleChildScrollView(
-                  child: Wrap(
-                    spacing: (isAndroid || isIPhone) ? 8 : 16,
-                    runSpacing: (isAndroid || isIPhone) ? 8 : 16,
-                    children: List.generate(widget.isQuestion.length, (index) {
-                      final dataQ = widget.isQuestion[index];
-                      Color cardColor;
-                      if (dataQ.question_status == 'Y') {
-                        cardColor = Color(0xFF00C789);
-                      } else if (dataQ.question_status == 'N') {
-                        cardColor = Color(0xFFEE546C);
-                      } else {
-                        cardColor = Color(0xFFC0C4CC);
-                      }
-                      return InkWell(
-                        onTap: () {
-                          _showDialog(widget.isQuestion);
-                        },
-                        child: Container(
-                          height: (isAndroid || isIPhone) ? 40 : 80,
-                          width: (isAndroid || isIPhone) ? 40 : 80,
-                          alignment: Alignment.center,
-                          decoration: BoxDecoration(
-                            color: cardColor,
-                            borderRadius: BorderRadius.circular(10),
-                          ),
-                          child: Text(
-                            '${index + 1}',
-                            style: TextStyle(
-                              fontFamily: 'Arial',
-                              fontSize: (isAndroid || isIPhone) ? 16 : 20,
-                              color: Colors.white,
-                              fontWeight: FontWeight.w700,
-                            ),
-                            overflow: TextOverflow.ellipsis,
-                            maxLines: 2,
-                          ),
-                        ),
-                      );
-                    }),
-                  ),
-                ),
-              ),
-            ],
+            ),
           );
         } else {
           return const Center(
@@ -450,7 +450,7 @@ class _MyChallengeState extends State<MyChallenge> {
                               "$challengeSectionTS",
                               style: TextStyle(
                                 fontFamily: 'Arial',
-                                fontSize: (isAndroid || isIPhone) ? 20 : 30,
+                                fontSize: isMobile ? 20 : 30,
                                 fontWeight: FontWeight.w700,
                                 color: Color(0xFF555555),
                               ),
@@ -461,7 +461,7 @@ class _MyChallengeState extends State<MyChallenge> {
                               "$questionTS: ${isQuestion.length}",
                               style: TextStyle(
                                 fontFamily: 'Arial',
-                                fontSize: (isAndroid || isIPhone) ? 16 : 24,
+                                fontSize: isMobile ? 16 : 24,
                                 color: Color(0xFF555555),
                               ),
                               textAlign: TextAlign.center,
@@ -473,8 +473,8 @@ class _MyChallengeState extends State<MyChallenge> {
                                     MediaQuery.of(context).size.width * 0.8,
                               ),
                               child: Wrap(
-                                  spacing: (isAndroid || isIPhone) ? 8 : 16,
-                                  runSpacing: (isAndroid || isIPhone) ? 8 : 16,
+                                  spacing: isMobile ? 8 : 16,
+                                  runSpacing: isMobile ? 8 : 16,
                                   children:
                                       List.generate(isQuestion.length, (index) {
                                     final dataQ = isQuestion[index];
@@ -508,10 +508,8 @@ class _MyChallengeState extends State<MyChallenge> {
                                         );
                                       },
                                       child: Container(
-                                        height:
-                                            (isAndroid || isIPhone) ? 40 : 80,
-                                        width:
-                                            (isAndroid || isIPhone) ? 40 : 80,
+                                        height: isMobile ? 40 : 80,
+                                        width: isMobile ? 40 : 80,
                                         alignment: Alignment.center,
                                         decoration: BoxDecoration(
                                           color: cardColor,
@@ -522,9 +520,7 @@ class _MyChallengeState extends State<MyChallenge> {
                                           '${index + 1}',
                                           style: TextStyle(
                                             fontFamily: 'Arial',
-                                            fontSize: (isAndroid || isIPhone)
-                                                ? 16
-                                                : 20,
+                                            fontSize: isMobile ? 16 : 20,
                                             color: Colors.white,
                                             fontWeight: FontWeight.w700,
                                           ),
@@ -540,84 +536,9 @@ class _MyChallengeState extends State<MyChallenge> {
                             Divider(),
                             Row(
                               children: [
-                                Expanded(
-                                  child: Row(
-                                    children: [
-                                      Container(
-                                        padding: EdgeInsets.all(8),
-                                        color: Color(0xFF00C789),
-                                      ),
-                                      SizedBox(width: 8),
-                                      Flexible(
-                                        child: Text(
-                                          '$correctTS',
-                                          style: TextStyle(
-                                            fontFamily: 'Arial',
-                                            fontSize: (isAndroid || isIPhone)
-                                                ? 14
-                                                : 20,
-                                            color: Color(0xFF555555),
-                                            fontWeight: FontWeight.w700,
-                                          ),
-                                          overflow: TextOverflow.ellipsis,
-                                          maxLines: 2,
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                                Expanded(
-                                  child: Row(
-                                    children: [
-                                      Container(
-                                        padding: EdgeInsets.all(8),
-                                        color: Color(0xFFEE546C),
-                                      ),
-                                      SizedBox(width: 8),
-                                      Flexible(
-                                        child: Text(
-                                          '$incorrectTS',
-                                          style: TextStyle(
-                                            fontFamily: 'Arial',
-                                            fontSize: (isAndroid || isIPhone)
-                                                ? 14
-                                                : 20,
-                                            color: Color(0xFF555555),
-                                            fontWeight: FontWeight.w700,
-                                          ),
-                                          overflow: TextOverflow.ellipsis,
-                                          maxLines: 2,
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                                Expanded(
-                                  child: Row(
-                                    children: [
-                                      Container(
-                                        padding: EdgeInsets.all(8),
-                                        color: Color(0xFFC0C4CC),
-                                      ),
-                                      SizedBox(width: 8),
-                                      Flexible(
-                                        child: Text(
-                                          '$noResultTS',
-                                          style: TextStyle(
-                                            fontFamily: 'Arial',
-                                            fontSize: (isAndroid || isIPhone)
-                                                ? 14
-                                                : 20,
-                                            color: Color(0xFF555555),
-                                            fontWeight: FontWeight.w700,
-                                          ),
-                                          overflow: TextOverflow.ellipsis,
-                                          maxLines: 2,
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                ),
+                                _buildLegend(Color(0xFF00C789), '$correctTS'),
+                                _buildLegend(Color(0xFFEE546C), '$incorrectTS'),
+                                _buildLegend(Color(0xFFC0C4CC), '$noResultTS'),
                               ],
                             ),
                           ],
@@ -636,7 +557,7 @@ class _MyChallengeState extends State<MyChallenge> {
                           padding: const EdgeInsets.only(right: 4, top: 4),
                           child: Icon(
                             Icons.clear,
-                            size: (isAndroid || isIPhone) ? 22 : 45,
+                            size: isMobile ? 22 : 45,
                             color: Colors.red,
                           ),
                         )),
@@ -648,6 +569,24 @@ class _MyChallengeState extends State<MyChallenge> {
         });
   }
 
+  Widget _buildLegend(Color color, String label) {
+    return Expanded(
+      child: Row(
+        children: [
+          Container(width: 16, height: 16, color: color),
+          SizedBox(width: 8),
+          Flexible(
+            child: Text(
+              label,
+              overflow: TextOverflow.ellipsis,
+              maxLines: 2,
+            ),
+          )
+        ],
+      ),
+    );
+  }
+
   Widget _question(String text) {
     return Column(
       children: [
@@ -655,14 +594,14 @@ class _MyChallengeState extends State<MyChallenge> {
           text,
           style: TextStyle(
             fontFamily: 'Arial',
-            fontSize: (isAndroid || isIPhone) ? 16 : 24,
+            fontSize: isMobile ? 16 : 24,
             color: Color(0xFF555555),
             fontWeight: FontWeight.w500,
           ),
           overflow: TextOverflow.ellipsis,
           maxLines: 1,
         ),
-        SizedBox(height: (isAndroid || isIPhone) ? 8 : 32),
+        SizedBox(height: isMobile ? 8 : 32),
       ],
     );
   }
@@ -699,7 +638,7 @@ class _MyChallengeState extends State<MyChallenge> {
               timeStatusTS,
               style: TextStyle(
                 fontFamily: 'Arial',
-                fontSize: (isAndroid || isIPhone)?16:28,
+                fontSize: isMobile ? 16 : 28,
                 color: Color(0xFF555555),
                 fontWeight: FontWeight.w500,
               ),
@@ -710,7 +649,7 @@ class _MyChallengeState extends State<MyChallenge> {
               time_used,
               style: TextStyle(
                 fontFamily: 'Arial',
-                fontSize: (isAndroid || isIPhone)?32:48,
+                fontSize: isMobile ? 32 : 48,
                 color: Colors.green,
                 fontWeight: FontWeight.w500,
               ),
@@ -754,7 +693,7 @@ class _MyChallengeState extends State<MyChallenge> {
               '$examDurationTS: ${widget.duration}',
               style: TextStyle(
                 fontFamily: 'Arial',
-                fontSize: (isAndroid || isIPhone)?16:24,
+                fontSize: isMobile ? 16 : 24,
                 color: Color(0xFF555555),
                 fontWeight: FontWeight.w300,
               ),

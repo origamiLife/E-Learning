@@ -81,9 +81,19 @@ class _ChallengeStartTimeState extends State<ChallengeStartTime>
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.white,
       body: Column(
         children: [
-          _buildSearchField(),
+          Padding(
+            padding: const EdgeInsets.only(right: 8,top: 4,bottom: 8),
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                Expanded(flex:3,child: _buildSearchField()),
+                Expanded(flex:1,child: _DropdownStatus('Please select')),
+              ],
+            ),
+          ),
           Expanded(
             child: Padding(
               padding: const EdgeInsets.only(left: 8, right: 8),
@@ -129,12 +139,9 @@ class _ChallengeStartTimeState extends State<ChallengeStartTime>
                     // ✅ ใช้ snapshot.data โดยตรง
                     List<GetChallenge> challengeList = snapshot.data!;
                     return SingleChildScrollView(
-                      child: Padding(
-                        padding: const EdgeInsets.all(8.0),
-                        child: (isAndroid || isIPhone)
-                            ? _challengeListSlim(challengeList)
-                            : _challengeListBig(challengeList),
-                      ),
+                      child: isMobile
+                          ? _challengeListSlim(challengeList)
+                          : _challengeListBig(challengeList),
                     );
                   }
                 },
@@ -148,392 +155,64 @@ class _ChallengeStartTimeState extends State<ChallengeStartTime>
 
   Widget _buildSearchField() {
     return Padding(
-      padding: const EdgeInsets.only(left: 8, right: 8),
-      child: Container(
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(100),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withOpacity(0.2),
-              blurRadius: 8,
-              offset: Offset(0, 4),
-            ),
-          ],
-        ),
-        child: TextFormField(
-          controller: _searchController,
-          keyboardType: TextInputType.text,
-          style: TextStyle(
-            fontFamily: 'Arial',
-            color: Color(0xFF555555),
-            fontSize: 14,
-          ),
-          decoration: InputDecoration(
-            isDense: true,
-            filled: true,
-            fillColor: Colors.white,
-            contentPadding: EdgeInsets.symmetric(horizontal: 24, vertical: 14),
-            hintText: '$SearchTS...',
-            hintStyle: TextStyle(
+        padding: const EdgeInsets.only(left: 8, right: 8),
+        child: Container(
+          height: 40,
+          // decoration: BoxDecoration(
+          //   color: Colors.white,
+          //   borderRadius: BorderRadius.circular(100),
+          //   boxShadow: [
+          //     BoxShadow(
+          //       color: Colors.black.withOpacity(0.2), // สีเงา
+          //       blurRadius: 1, // ความฟุ้งของเงา
+          //       offset: Offset(0, 4), // การเยื้องของเงา (แนวแกน X, Y)
+          //     ),
+          //   ],
+          // ),
+          child: TextFormField(
+            controller: _searchController,
+            keyboardType: TextInputType.text,
+            style: const TextStyle(
               fontFamily: 'Arial',
-              fontSize: 14,
               color: Color(0xFF555555),
+              fontSize: 14,
             ),
-            border: InputBorder.none,
-            suffixIcon: Padding(
-              padding: EdgeInsets.only(right: 8.0),
-              child: Icon(
-                Icons.search,
-                size: 24,
+            decoration: InputDecoration(
+              isDense: true,
+              filled: true,
+              fillColor: Colors.white,
+              contentPadding:
+              const EdgeInsets.symmetric(horizontal: 24, vertical: 14),
+              hintText: '$SearchTS...',
+              hintStyle: const TextStyle(
+                  fontFamily: 'Arial', fontSize: 14, color: Color(0xFF555555)),
+              border: InputBorder.none, // เอาขอบปกติออก
+              suffixIcon: const Padding(
+                padding: EdgeInsets.only(right: 8.0),
+                child: Icon(
+                  Icons.search,
+                  size: 24,
+                  color: Colors.grey,
+                ),
               ),
-            ),
-            enabledBorder: OutlineInputBorder(
-              borderSide: BorderSide(
-                color: Colors.black38,
-                width: 1,
+              enabledBorder: OutlineInputBorder(
+                borderSide: BorderSide(
+                  color: Colors.grey.shade300,
+                  width: 1,
+                ),
+                borderRadius: BorderRadius.circular(10),
               ),
-              borderRadius: BorderRadius.circular(50),
-            ),
-            focusedBorder: OutlineInputBorder(
-              borderSide: BorderSide(
-                color: Colors.black38,
-                width: 1,
+              focusedBorder: OutlineInputBorder(
+                borderSide: BorderSide(
+                  color: Colors.grey.shade300,
+                  width: 1,
+                ),
+                borderRadius: BorderRadius.circular(10),
               ),
-              borderRadius: BorderRadius.circular(50),
             ),
           ),
-        ),
-      ),
-    );
+        ));
   }
-
-  // Widget _challengeTable(List<GetChallenge> filteredChallenges) {
-  //   return SingleChildScrollView(
-  //     child: GridView.builder(
-  //       padding: EdgeInsets.all(10),
-  //       gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-  //         crossAxisCount: (isAndroid || isIPhone) ? 2 : 4,
-  //         childAspectRatio: 0.75,
-  //         crossAxisSpacing: 10,
-  //         mainAxisSpacing: 10,
-  //       ),
-  //       itemCount: filteredChallenges.length,
-  //       shrinkWrap: true,
-  //       physics: NeverScrollableScrollPhysics(),
-  //       itemBuilder: (context, index) {
-  //         final challenge = filteredChallenges[index];
-  //         return InkWell(
-  //           onTap: () {
-  //             DateTime parsedDate =
-  //                 DateFormat('yyyy-MM-dd').parse(formattedDate);
-  //
-  //             // ตรวจสอบว่าค่า challenge_start ไม่เป็น null ก่อน
-  //             String? challengeStartStr = getChallenges[index].challenge_start;
-  //             if (challengeStartStr != null && challengeStartStr.isNotEmpty) {
-  //               DateTime dateStartChallenge = DateFormat('yyyy-MM-dd')
-  //                   .parse(challengeStartStr); // Convert to DateTime
-  //               DateTime currentDate = DateFormat('yyyy-MM-dd')
-  //                   .parse(formattedDate); // Convert to DateTime
-  //               if (currentDate.isAfter(dateStartChallenge) ||
-  //                   currentDate.isAtSameMomentAs(dateStartChallenge)) {
-  //                 ScaffoldMessenger.of(context).showSnackBar(
-  //                   SnackBar(
-  //                     content: Text(
-  //                       '$exitApp2TS',
-  //                       style:
-  //                           TextStyle(fontFamily: 'Arial', color: Colors.white),
-  //                     ),
-  //                     // duration: maxDuration,
-  //                   ),
-  //                 );
-  //               } else {
-  //                 QuickAlert.show(
-  //                   context: context,
-  //                   type: QuickAlertType.confirm,
-  //                   title: '$AreYouReadyTS',
-  //                   width: MediaQuery.of(context).size.width > 600 ? 590 : 400,
-  //                   confirmBtnText: '$startTS',
-  //                   confirmBtnColor: Colors.blue,
-  //                   confirmBtnTextStyle: const TextStyle(
-  //                     fontSize: 18,
-  //                     color: Colors.white,
-  //                     fontWeight: FontWeight.w700,
-  //                   ),
-  //                   cancelBtnText: '$CancelTS',
-  //                   cancelBtnTextStyle: const TextStyle(
-  //                     fontSize: 18,
-  //                     color: Colors.grey,
-  //                     fontWeight: FontWeight.w700,
-  //                   ),
-  //                   customAsset: 'assets/images/learning/student.png',
-  //                   onCancelBtnTap: () => Navigator.pop(context),
-  //                   onConfirmBtnTap: () {
-  //                     String? challengeStartStr = getChallenges[index].challenge_start;
-  //                     String? challengeEndStr = getChallenges[index].challenge_end;
-  //                     if (challengeStartStr.isNotEmpty) {
-  //                       DateTime dateStartChallenge = DateFormat('yyyy-MM-dd')
-  //                           .parse(challengeStartStr);
-  //                       DateTime dateEndChallenge = DateFormat('yyyy-MM-dd')
-  //                           .parse(challengeEndStr);
-  //                       DateTime currentDate = DateFormat('yyyy-MM-dd')
-  //                           .parse(formattedDate); // Convert to DateTime
-  //                       print(currentDate.isAfter(dateStartChallenge));
-  //                       print(currentDate.isAtSameMomentAs(dateStartChallenge));
-  //                       if (currentDate.isAfter(dateStartChallenge) ||
-  //                           currentDate.isAtSameMomentAs(dateStartChallenge)) {
-  //                         QuickAlert.show(
-  //                           context: context,
-  //                           type: QuickAlertType.confirm,
-  //                           title: '$AreYouReadyTS',
-  //                           width: MediaQuery.of(context).size.width > 600 ? 590 : 400,
-  //                           confirmBtnText: '$startTS',
-  //                           confirmBtnColor: Colors.blue,
-  //                           confirmBtnTextStyle: const TextStyle(
-  //                             fontSize: 18,
-  //                             color: Colors.white,
-  //                             fontWeight: FontWeight.w700,
-  //                           ),
-  //                           cancelBtnText: '$CancelTS',
-  //                           cancelBtnTextStyle: const TextStyle(
-  //                             fontSize: 18,
-  //                             color: Colors.grey,
-  //                             fontWeight: FontWeight.w700,
-  //                           ),
-  //                           customAsset: 'assets/images/learning/student.png',
-  //                           onCancelBtnTap: () => Navigator.pop(context),
-  //                           onConfirmBtnTap: () {
-  //                             Navigator.push(
-  //                               context,
-  //                               MaterialPageRoute(
-  //                                 builder: (context) => ChallengePage(
-  //                                   employee: widget.employee,
-  //                                   Authorization: widget.Authorization,
-  //                                   initialMinutes: double.tryParse(
-  //                                       getChallenges[index].challenge_duration) ??
-  //                                       0,
-  //                                   getchallenge: getChallenges[index],
-  //                                 ),
-  //                               ),
-  //                             );
-  //                             //     .then((_) {
-  //                             //   Navigator.pop(context);
-  //                             //   fetchGetChallenge();
-  //                             //   futureChallenges = fetchGetChallenge();
-  //                             //   futureChallenges.then((challenges) {
-  //                             //     setState(() {
-  //                             //       allChallenges = challenges;
-  //                             //       filteredChallenges = challenges;
-  //                             //     });
-  //                             //   });
-  //                             // });
-  //                           },
-  //                           widget: Column(
-  //                             crossAxisAlignment: CrossAxisAlignment.start,
-  //                             children: [
-  //                               SizedBox(height: 8),
-  //                               _textWidget('$challengeTS:', challenge.challenge_name),
-  //                               _textWidget(
-  //                                   '$DescriptionTS:', challenge.challenge_description),
-  //                               _textWidget('$RuleTS:', challenge.challenge_rule),
-  //                               _textWidget('$DurationTS ($MinTS):',
-  //                                   challenge.challenge_duration),
-  //                               _textWidget(
-  //                                   '$PartTS:', challenge.challenge_question_part),
-  //                               _textWidget('$NumberQuestionsTS:',
-  //                                   '${challenge.specific_question} $questionTS'),
-  //                             ],
-  //                           ),
-  //                         );
-  //                       } else {
-  //                         if(currentDate.isAfter(dateEndChallenge)){
-  //                           SnackBar(
-  //                             duration: Duration(seconds: 2),
-  //                             content: Column(
-  //                               mainAxisAlignment: MainAxisAlignment.center,
-  //                               children: [
-  //                                 Text(
-  //                                   "$SorryChallengeTS,",
-  //                                   style: TextStyle(
-  //                                     fontFamily: 'Arial', color: Colors.white,fontSize: 16,),
-  //                                 ),
-  //                                 SizedBox(height: 16),
-  //                                 Text(
-  //                                   "$BeforeTS : ${dateStartChallenge}",
-  //                                   style: TextStyle(
-  //                                     fontFamily: 'Arial', color: Colors.white,fontSize: 16,),
-  //                                 ),
-  //                               ],
-  //                             ),
-  //                           );
-  //                         }else{
-  //                           ScaffoldMessenger.of(context).showSnackBar(
-  //                             SnackBar(
-  //                               duration: Duration(seconds: 2),
-  //                               content: Column(
-  //                                 mainAxisAlignment: MainAxisAlignment.center,
-  //                                 children: [
-  //                                   Text(
-  //                                     "$SorryChallengeTS,",
-  //                                     style: TextStyle(
-  //                                       fontFamily: 'Arial', color: Colors.white,fontSize: 16,fontWeight: FontWeight.w700,),
-  //                                   ),
-  //                                   SizedBox(height: 16),
-  //                                   Text(
-  //                                     "$AfterTS : ${dateStartChallenge}",
-  //                                     style: TextStyle(
-  //                                       fontFamily: 'Arial', color: Colors.white,fontSize: 16,fontWeight: FontWeight.w700,),
-  //                                   ),
-  //                                 ],
-  //                               ),
-  //                               // duration: maxDuration,
-  //                             ),
-  //                           );
-  //                         }
-  //                       }
-  //                     } else {
-  //                       print("challenge_start เป็นค่า null หรือว่าง");
-  //                     }
-  //                   },
-  //                   widget: Column(
-  //                     crossAxisAlignment: CrossAxisAlignment.start,
-  //                     children: [
-  //                       SizedBox(height: 8),
-  //                       _textWidget('$challengeTS:', challenge.challenge_name),
-  //                       _textWidget(
-  //                           '$DescriptionTS:', challenge.challenge_description),
-  //                       _textWidget('$RuleTS:', challenge.challenge_rule),
-  //                       _textWidget('$DurationTS ($MinTS):',
-  //                           challenge.challenge_duration),
-  //                       _textWidget(
-  //                           '$PartTS:', challenge.challenge_question_part),
-  //                       _textWidget('$NumberQuestionsTS:',
-  //                           '${challenge.specific_question} $questionTS'),
-  //                     ],
-  //                   ),
-  //                 );
-  //               }
-  //             } else {
-  //               print("challenge_start เป็นค่า null หรือว่าง");
-  //             }
-  //           },
-  //           child: Container(
-  //             decoration: BoxDecoration(
-  //               color: Colors.white,
-  //               border: Border.all(color: Colors.grey),
-  //               borderRadius: BorderRadius.circular(10),
-  //             ),
-  //             child: Column(
-  //               crossAxisAlignment: CrossAxisAlignment.stretch,
-  //               children: [
-  //                 // รูปภาพของ Challenge
-  //                 Expanded(
-  //                   child: ClipRRect(
-  //                     borderRadius: BorderRadius.circular(8.0),
-  //                     child: Image.network(
-  //                       challenge.challenge_logo,
-  //                       width: double.infinity, // ความกว้างเต็มจอ
-  //                       fit: BoxFit.contain,
-  //                       errorBuilder: (context, error, stackTrace) {
-  //                         return Icon(Icons.error, size: 40, color: Colors.red);
-  //                       },
-  //                     ),
-  //                   ),
-  //                 ),
-  //                 SizedBox(height: (isIPad || isTablet) ? 16 : 8),
-  //                 // ข้อมูล Challenge
-  //                 Padding(
-  //                   padding: EdgeInsets.symmetric(horizontal: 8),
-  //                   child: Column(
-  //                     crossAxisAlignment: CrossAxisAlignment.start,
-  //                     children: [
-  //                       Text(
-  //                         challenge.challenge_name,
-  //                         style: TextStyle(
-  //                           fontFamily: 'Arial',
-  //                           fontSize: (isIPad || isTablet) ? 18 : 16,
-  //                           fontWeight: FontWeight.w700,
-  //                           color: Color(0xFF555555),
-  //                         ),
-  //                         maxLines: 2,
-  //                         overflow: TextOverflow.ellipsis,
-  //                       ),
-  //                       SizedBox(height: (isIPad || isTablet) ? 8 : 4),
-  //                       Padding(
-  //                         padding: EdgeInsets.only(
-  //                             left: (isIPad || isTablet) ? 12 : 1,
-  //                             right: (isIPad || isTablet) ? 12 : 1),
-  //                         child: Row(
-  //                           children: [
-  //                             Icon(Icons.check_box_outlined,
-  //                                 color: Colors.amber, size: 20),
-  //                             SizedBox(width: 6),
-  //                             Text('0/0',
-  //                                 style: TextStyle(
-  //                                     fontFamily: 'Arial',
-  //                                     fontSize: (isIPad || isTablet) ? 18 : 14,
-  //                                     color: Color(0xFF555555))),
-  //                             Spacer(),
-  //                             Icon(Icons.star, color: Colors.amber, size: 20),
-  //                             SizedBox(width: 6),
-  //                             Text('0/0',
-  //                                 style: TextStyle(
-  //                                     fontFamily: 'Arial',
-  //                                     fontSize: (isIPad || isTablet) ? 18 : 14,
-  //                                     color: Color(0xFF555555))),
-  //                           ],
-  //                         ),
-  //                       ),
-  //                       SizedBox(height: (isIPad || isTablet) ? 8 : 4),
-  //                       Padding(
-  //                         padding: EdgeInsets.only(
-  //                             left: (isIPad || isTablet) ? 12 : 1,
-  //                             right: (isIPad || isTablet) ? 12 : 1),
-  //                         child: Row(
-  //                           children: [
-  //                             FaIcon(FontAwesomeIcons.trophy,
-  //                                 size: 20, color: Colors.amber),
-  //                             SizedBox(width: 6),
-  //                             Text(challenge.challenge_point_value,
-  //                                 style: TextStyle(
-  //                                     fontFamily: 'Arial',
-  //                                     fontSize: (isIPad || isTablet) ? 18 : 14,
-  //                                     color: Color(0xFF555555))),
-  //                             Spacer(),
-  //                             Icon(Icons.access_time,
-  //                                 color: Colors.amber, size: 20),
-  //                             SizedBox(width: 6),
-  //                             Text(challenge.challenge_duration,
-  //                                 style: TextStyle(
-  //                                     fontFamily: 'Arial',
-  //                                     fontSize: (isIPad || isTablet) ? 18 : 14,
-  //                                     color: Color(0xFF555555))),
-  //                           ],
-  //                         ),
-  //                       ),
-  //                       SizedBox(height: (isIPad || isTablet) ? 16 : 8),
-  //                       Center(
-  //                         child: Text(
-  //                           '${challenge.challenge_start} - ${challenge.challenge_end}',
-  //                           style: TextStyle(
-  //                               fontFamily: 'Arial',
-  //                               fontSize: (isIPad || isTablet) ? 18 : 14,
-  //                               color: Color(0xFF555555)),
-  //                           textAlign: TextAlign.center,
-  //                         ),
-  //                       ),
-  //                     ],
-  //                   ),
-  //                 ),
-  //                 SizedBox(height: 4),
-  //               ],
-  //             ),
-  //           ),
-  //         );
-  //       },
-  //     ),
-  //   );
-  // }
 
   Widget _textWidget(String title, String subject) {
     return Padding(
@@ -551,17 +230,17 @@ class _ChallengeStartTimeState extends State<ChallengeStartTime>
                   title,
                   style: TextStyle(
                     fontFamily: 'Arial',
-                    fontSize: (isIPad || isTablet) ? 20 : 14,
+                    fontSize: (!isMobile) ? 20 : 14,
                     color: Colors.black54,
                     fontWeight: FontWeight.w700,
                   ),
                 ),
-                SizedBox(height: (isIPad || isTablet) ? 8 : 2),
+                SizedBox(height: (!isMobile) ? 8 : 2),
                 Text(
                   subject,
                   style: TextStyle(
                     fontFamily: 'Arial',
-                    fontSize: (isIPad || isTablet) ? 20 : 14,
+                    fontSize: (!isMobile) ? 20 : 14,
                     color: Colors.black45,
                   ),
                   maxLines: 6,
@@ -577,105 +256,127 @@ class _ChallengeStartTimeState extends State<ChallengeStartTime>
 
   //android,iphone
   Widget _challengeListSlim(List<GetChallenge> filteredChallenges) {
-    return ListView.builder(
+    return ListView.separated(
+      padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 4),
       shrinkWrap: true,
       physics: const NeverScrollableScrollPhysics(),
       itemCount: filteredChallenges.length,
+      separatorBuilder: (_, __) => Container(padding: EdgeInsets.all(4)),
       itemBuilder: (context, index) {
         final challenge = filteredChallenges[index];
-        return Card(
-          color: Color(0xFFF5F5F5),
-          margin: const EdgeInsets.symmetric(vertical: 4),
-          child: GestureDetector(
-            onTap: () => btnGetchalleng(challenge),
-            child: Container(
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(15),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.grey.withOpacity(0.5),
-                    blurRadius: 2,
-                    offset: Offset(0, 3),
-                  ),
-                ],
-              ),
-              padding: const EdgeInsets.all(8),
-              child: Row(
-                children: [
-                  ClipRRect(
-                    borderRadius: BorderRadius.circular(10),
-                    child: Image.network(
-                      challenge.challenge_logo,
-                      height: 100,
-                      width: 100,
-                      fit: BoxFit.cover,
-                      errorBuilder: (context, error, stackTrace) {
-                        return Icon(Icons.error, size: 80, color: Colors.red);
-                      },
+        return InkWell(
+          onTap: () => btnGetchalleng(challenge),
+          child: Container(
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(10),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.grey.withOpacity(0.3),
+                  spreadRadius: 3,
+                  blurRadius: 1,
+                  offset: Offset(1, 2),
+                ),
+              ],
+            ),
+            padding: const EdgeInsets.all(12),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  children: [
+                    const SizedBox(width: 8),
+                    Expanded(
+                      child: Container(
+                        // padding: EdgeInsets.all(4),
+                        height: 120,
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(4),
+                          border: Border.all(
+                            color: const Color(0xFF555555),
+                            width: 0.1,
+                          ),
+                        ),
+                        child: ClipRRect(
+                          borderRadius: BorderRadius.circular(10),
+                          child: Image.network(
+                            challenge.challenge_logo,
+                            height: 100,
+                            width: 100,
+                            fit: BoxFit.cover,
+                            errorBuilder: (context, error, stackTrace) {
+                              return Icon(Icons.error, size: 80, color: Colors.red);
+                            },
+                          ),
+                        ),
+                      ),
                     ),
-                  ),
-                  const SizedBox(width: 16),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          challenge.challenge_name,
-                          style: const TextStyle(
-                            fontFamily: 'Arial',
-                            fontSize: 16,
-                            fontWeight: FontWeight.w700,
-                            color: Color(0xFF555555),
+                    const SizedBox(width: 16),
+                    Expanded(
+                      flex: 2,
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            challenge.challenge_name,
+                            style: const TextStyle(
+                              fontFamily: 'Arial',
+                              fontSize: 14,
+                              fontWeight: FontWeight.w700,
+                              color: Color(0xFF555555),
+                            ),
+                            overflow: TextOverflow.ellipsis,
+                            maxLines: 2,
                           ),
-                          overflow: TextOverflow.ellipsis,
-                          maxLines: 2,
-                        ),
-                        const SizedBox(height: 4),
-                        Text(
-                          '$startTS: ${challenge.challenge_start}',
-                          style: const TextStyle(
-                            fontFamily: 'Arial',
-                            fontSize: 14,
-                            color: Color(0xFF555555),
+                          const SizedBox(height: 4),
+                          Text(
+                            '$startTS: ${challenge.challenge_start}',
+                            style: const TextStyle(
+                              fontFamily: 'Arial',
+                              fontSize: 12,
+                              color: Color(0xFF555555),
+                            ),
+                            overflow: TextOverflow.ellipsis,
                           ),
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                        const SizedBox(height: 4),
-                        Text(
-                          '$endTS: ${challenge.challenge_end}',
-                          style: const TextStyle(
-                            fontFamily: 'Arial',
-                            fontSize: 14,
-                            color: Color(0xFF555555),
+                          const SizedBox(height: 4),
+                          Text(
+                            '$endTS: ${challenge.challenge_end}',
+                            style: const TextStyle(
+                              fontFamily: 'Arial',
+                              fontSize: 12,
+                              color: Color(0xFF555555),
+                            ),
+                            overflow: TextOverflow.ellipsis,
                           ),
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                        const SizedBox(height: 4),
-                        Text(
-                          (challenge.challenge_status == 'success')
-                              ? successTS
-                              : (challenge.challenge_status == 'time_out')
-                                  ? timeoutTS
-                                  : (challenge.challenge_status == 'not_start')
-                                      ? notStartTS
-                                      : doingTS,
-                          style: TextStyle(
-                            fontFamily: 'Arial',
-                            fontSize: 14,
-                            fontWeight: FontWeight.w600,
-                            color: (challenge.challenge_status == 'doing' ||
-                                    challenge.challenge_status == 'not_start')
-                                ? Color(0xFF00C789)
-                                : Color(0xFFEE546C),
+                          const SizedBox(height: 4),
+                          Text(
+                            (challenge.challenge_status == 'success')
+                                ? successTS
+                                : (challenge.challenge_status == 'time_out')
+                                    ? timeoutTS
+                                    : (challenge.challenge_status == 'not_start')
+                                        ? notStartTS
+                                        : doingTS,
+                            style: TextStyle(
+                              fontFamily: 'Arial',
+                              fontSize: 12,
+                              fontWeight: FontWeight.w600,
+                              color: (challenge.challenge_status == 'doing' ||
+                                      challenge.challenge_status == 'not_start')
+                                  ? Color(0xFF00C789)
+                                  : Color(0xFFEE546C),
+                            ),
+                            overflow: TextOverflow.ellipsis,
                           ),
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                      ],
+                        ],
+                      ),
                     ),
-                  ),
-                ],
-              ),
+                  ],
+                ),
+                const SizedBox(height: 4),
+                const Divider(),
+              ],
             ),
           ),
         );
@@ -685,128 +386,130 @@ class _ChallengeStartTimeState extends State<ChallengeStartTime>
 
   //tablet, ipad
   Widget _challengeListBig(List<GetChallenge> filteredChallenges) {
-    return ListView.builder(
+    return ListView.separated(
+      padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 4),
       shrinkWrap: true,
-      physics: NeverScrollableScrollPhysics(),
+      physics: const NeverScrollableScrollPhysics(),
       itemCount: filteredChallenges.length,
+      separatorBuilder: (_, __) => Container(padding: EdgeInsets.all(4)),
       itemBuilder: (context, index) {
         final challenge = filteredChallenges[index];
-        return Card(
-          color: Color(0xFFF5F5F5),
-          child: GestureDetector(
-            onTap: () => btnGetchalleng(challenge),
-            child: Container(
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(15),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.grey.withOpacity(0.5),
-                    spreadRadius: 0,
-                    blurRadius: 2,
-                    offset: Offset(0, 3), // x, y
-                  ),
-                ],
-              ),
-              child: Padding(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 8.0, vertical: 8.0),
-                child: Column(
+        return InkWell(
+          onTap: () => btnGetchalleng(challenge),
+          child: Container(
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(10),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.grey.withOpacity(0.3),
+                  spreadRadius: 3,
+                  blurRadius: 1,
+                  offset: Offset(1, 2),
+                ),
+              ],
+            ),
+            padding: const EdgeInsets.all(8),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Row(
-                      children: [
-                        const SizedBox(width: 8),
-                        ClipRRect(
+                    Expanded(
+                      flex: 1,
+                      child: Container(
+                        padding: EdgeInsets.all(4),
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(4),
+                          border: Border.all(
+                            color: const Color(0xFF555555),
+                            width: 0.1,
+                          ),
+                        ),
+                        child: ClipRRect(
                           borderRadius: BorderRadius.circular(10),
-                          child: Container(
-                            decoration: BoxDecoration(
-                              border: Border.all(
-                                  color: Color(0xFF555555), width: 0.2),
-                            ),
-                            child: Image.network(
-                              challenge.challenge_logo,
-                              width: 200,
-                              height: 200,
-                              fit: BoxFit.contain,
-                              errorBuilder: (context, error, stackTrace) =>
-                                  Icon(Icons.error, size: 50),
-                            ),
+                          child: Image.network(
+                            challenge.challenge_logo,
+                            width: double.infinity,
+                            height: 180,
+                            fit: BoxFit.cover,
+                            errorBuilder: (context, error, stackTrace) =>
+                                Icon(Icons.error, size: 50),
                           ),
                         ),
-                        const SizedBox(width: 16),
-                        Expanded(
-                          flex: 3,
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                challenge.challenge_name,
-                                style: TextStyle(
-                                  fontFamily: 'Arial',
-                                  color: const Color(0xFF555555),
-                                  fontSize: 24,
-                                  fontWeight: FontWeight.w700,
-                                ),
-                                overflow: TextOverflow.ellipsis,
-                                maxLines: 2,
-                              ),
-                              const SizedBox(height: 8),
-                              Text(
-                                '$startTS: ${challenge.challenge_start}',
-                                style: const TextStyle(
-                                  fontFamily: 'Arial',
-                                  fontSize: 24,
-                                  color: Color(0xFF555555),
-                                ),
-                                overflow: TextOverflow.ellipsis,
-                                maxLines: 1,
-                              ),
-                              const SizedBox(height: 8),
-                              Text(
-                                '$endTS: ${challenge.challenge_end}',
-                                style: const TextStyle(
-                                  fontFamily: 'Arial',
-                                  fontSize: 24,
-                                  color: Color(0xFF555555),
-                                ),
-                                overflow: TextOverflow.ellipsis,
-                                maxLines: 1,
-                              ),
-                              SizedBox(height: 8),
-                              Text(
-                                (challenge.challenge_status == 'success')
-                                    ? '$successTS'
-                                    : (challenge.challenge_status == 'time_out')
-                                        ? '$timeoutTS'
-                                        : (challenge.challenge_status ==
-                                                'not_start')
-                                            ? '$notStartTS'
-                                            : '$doingTS',
-                                style: TextStyle(
-                                  fontFamily: 'Arial',
-                                  fontSize: 20,
-                                  color:
-                                      (challenge.challenge_status == 'doing' ||
-                                              challenge.challenge_status ==
-                                                  'not_start')
-                                          ? Color(0xFF00C789)
-                                          : Color(0xFFEE546C),
-                                ),
-                                overflow: TextOverflow.ellipsis,
-                                maxLines: 1,
-                              ),
-                              const SizedBox(height: 16),
-                            ],
-                          ),
-                        ),
-                      ],
+                      ),
                     ),
-                    const SizedBox(height: 8),
-                    const Divider(),
+                    const SizedBox(width: 16),
+                    Expanded(
+                      flex: 4,
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          const SizedBox(height: 8),
+                          Text(
+                            challenge.challenge_name,
+                            style: TextStyle(
+                              fontFamily: 'Arial',
+                              color: const Color(0xFF555555),
+                              fontSize: 22,
+                              fontWeight: FontWeight.w700,
+                            ),
+                            overflow: TextOverflow.ellipsis,
+                            maxLines: 3,
+                          ),
+                          const SizedBox(height: 8),
+                          Text(
+                            '$startTS: ${challenge.challenge_start}',
+                            style: const TextStyle(
+                              fontFamily: 'Arial',
+                              fontSize: 18,
+                              color: Color(0xFF555555),
+                            ),
+                            overflow: TextOverflow.ellipsis,
+                            maxLines: 1,
+                          ),
+                          const SizedBox(height: 8),
+                          Text(
+                            '$endTS: ${challenge.challenge_end}',
+                            style: const TextStyle(
+                              fontFamily: 'Arial',
+                              fontSize: 18,
+                              color: Color(0xFF555555),
+                            ),
+                            overflow: TextOverflow.ellipsis,
+                            maxLines: 1,
+                          ),
+                          SizedBox(height: 8),
+                          Text(
+                            (challenge.challenge_status == 'success')
+                                ? '$successTS'
+                                : (challenge.challenge_status == 'time_out')
+                                    ? '$timeoutTS'
+                                    : (challenge.challenge_status == 'not_start')
+                                        ? '$notStartTS'
+                                        : '$doingTS',
+                            style: TextStyle(
+                              fontFamily: 'Arial',
+                              fontSize: 18,
+                              color: (challenge.challenge_status == 'doing' ||
+                                      challenge.challenge_status == 'not_start')
+                                  ? Color(0xFF00C789)
+                                  : Color(0xFFEE546C),
+                            ),
+                            overflow: TextOverflow.ellipsis,
+                            maxLines: 1,
+                          ),
+                          const SizedBox(height: 16),
+                        ],
+                      ),
+                    ),
                   ],
                 ),
-              ),
+                const SizedBox(height: 8),
+                // const Divider(),
+              ],
             ),
           ),
         );
@@ -875,8 +578,8 @@ class _ChallengeStartTimeState extends State<ChallengeStartTime>
         // ตรวจสอบว่ามี context อยู่หรือไม่
         if (currentDate.isAfter(dateStartChallenge) ||
             currentDate.isAtSameMomentAs(dateStartChallenge)) {
-          if (challenge.challenge_status == 'doing' ||
-              challenge.challenge_status == 'not_start') {
+          if (challenge.challenge_status != 'doing' ||
+              challenge.challenge_status != 'not_start') {
             Navigator.push(
               context,
               MaterialPageRoute(
@@ -998,14 +701,14 @@ class _ChallengeStartTimeState extends State<ChallengeStartTime>
               Padding(
                 padding: const EdgeInsets.all(16.0),
                 child: SizedBox(
-                  width: MediaQuery.of(context).size.width > 600 ? 590 : 400,
+                  width: isMobile ? 400 : 580,
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       // Image (similar to customAsset)
                       Image.asset(
                         'assets/images/learning/student.png',
-                        height: 150,
+                        height: 180,
                         width: double.infinity,
                         fit: BoxFit.cover,
                       ),
@@ -1105,6 +808,79 @@ class _ChallengeStartTimeState extends State<ChallengeStartTime>
       ),
     );
   }
+
+  Widget _DropdownStatus(String value) {
+    return Container(
+      height: 40,
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(10),
+        color: Colors.white,
+        border: Border.all(
+          color: Colors.grey.shade300,
+          width: 1.0,
+        ),
+      ),
+      child: DropdownButton2<ModelDropdownAcademy>(
+        isExpanded: true,
+        hint: Text(
+          value,
+          style: TextStyle(
+            fontFamily: 'Arial',
+            color: Colors.grey,
+            fontSize: 14,
+          ),
+        ),
+        style: TextStyle(
+          fontFamily: 'Arial',
+          color: Colors.grey,
+          fontSize: 14,
+        ),
+        items: _modelStatus
+            .map((ModelDropdownAcademy status) =>
+            DropdownMenuItem<ModelDropdownAcademy>(
+              value: status,
+              child: Text(
+                status.name,
+                style: TextStyle(
+                  fontFamily: 'Arial',
+                  fontSize: 14,
+                ),
+              ),
+            ))
+            .toList(),
+        value: selectedStatus,
+        onChanged: (value) {
+          setState(() {
+            selectedStatus = value;
+          });
+        },
+        underline: SizedBox.shrink(),
+        iconStyleData: IconStyleData(
+          icon: Icon(Icons.arrow_drop_down,
+              color: Color(0xFF555555), size: 30),
+          iconSize: 30,
+        ),
+        buttonStyleData: ButtonStyleData(
+          padding: const EdgeInsets.symmetric(vertical: 2),
+        ),
+        dropdownStyleData: DropdownStyleData(
+          maxHeight: 200,
+        ),
+        menuItemStyleData: MenuItemStyleData(
+          height: 33,
+        ),
+      ),
+    );
+  }
+
+  ModelDropdownAcademy? selectedStatus;
+  List<ModelDropdownAcademy> _modelStatus = [
+    ModelDropdownAcademy(id: '001', name: 'All'),
+    ModelDropdownAcademy(id: '001', name: 'Success'),
+    ModelDropdownAcademy(id: '001', name: 'Doing'),
+    ModelDropdownAcademy(id: '001', name: 'Timed Out'),
+    ModelDropdownAcademy(id: '001', name: 'Not Start'),
+  ];
 
   Future<List<GetChallenge>> fetchGetChallenge() async {
     final uri = Uri.parse("$host/api/origami/challenge/get-challenge.php");

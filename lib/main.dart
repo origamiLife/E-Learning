@@ -7,11 +7,13 @@ import 'package:hive/hive.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 
 String host = 'https://www.origami.life';
+String authorization = 'ori20#17gami';
 int selectedRadio = 2;
 bool isAndroid = false;
 bool isTablet = false;
 bool isIPad = false;
 bool isIPhone = false;
+bool isMobile = false;
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized(); // รอการ initialize
@@ -31,47 +33,6 @@ void main() async {
     home: MyApp(),
   ));
 }
-
-// Future<void> secureScreen() async {
-//   if (Platform.isAndroid) {
-//     // ใช้ MethodChannel สำหรับ FLAG_SECURE (แทน FlutterWindowManager)
-//     const platform = MethodChannel('com.origami.learning/screen');
-//     try {
-//       await platform.invokeMethod('enableSecure');
-//     } on PlatformException catch (e) {
-//       debugPrint('Failed to enable secure screen: ${e.message}');
-//     }
-//   }
-// }
-
-// Future<void> checkDeviceType(BuildContext? context) async {
-//   try {
-//     if (Platform.isAndroid) {
-//       isAndroid = true;
-//       final shortestSide = context != null
-//           ? MediaQuery.of(context).size.shortestSide
-//           : WidgetsBinding.instance.platformDispatcher.views.first.physicalSize.shortestSide /
-//           WidgetsBinding.instance.platformDispatcher.views.first.devicePixelRatio;
-//
-//       isTablet = shortestSide >= 600;
-//       print("Android Device: ${isTablet ? "Tablet" : "Phone"}");
-//     }
-//     else if (Platform.isIOS) {
-//       final deviceInfo = DeviceInfoPlugin();
-//       final iosInfo = await deviceInfo.iosInfo;
-//       final model = iosInfo.model?.toLowerCase() ?? '';
-//
-//       isIPad = model.contains("ipad");
-//       isIPhone = model.contains("iphone");
-//
-//       print("iOS Device: ${isIPad ? "iPad" : isIPhone ? "iPhone" : "Unknown"}");
-//     }
-//
-//     print('isAndroid: $isAndroid, isIPhone: $isIPhone, isTablet: $isTablet, isIPad: $isIPad');
-//   } catch (e) {
-//     print("Error checking device type: $e");
-//   }
-// }
 
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
@@ -100,8 +61,9 @@ class MyApp extends StatelessWidget {
         ),
       ),
       home: const LoginPage(
-        num: 0,
+        num: 0, // num 1 ยังไม่ได้ login
         popPage: 0,
+        company_id: 0,
       ),
     );
   }
@@ -112,9 +74,11 @@ class LoginPage extends StatefulWidget {
     super.key,
     required this.num,
     required this.popPage,
+    this.company_id,
   });
   final int num;
   final int popPage;
+  final int? company_id;
 
   @override
   State<LoginPage> createState() => _LoginPageState();
@@ -129,16 +93,24 @@ class _LoginPageState extends State<LoginPage> {
   DateTime? lastPressed;
   bool isPass = true;
   bool _forgot = false;
+  bool _begin = false;
 
   @override
   void initState() {
     super.initState();
+    print(widget.num);
+    print(widget.popPage);
+    print(widget.company_id);
+    _fetchComponent();
     allTranslate();
     loadCredentials();
     WidgetsBinding.instance.addPostFrameCallback((_) {
       checkDeviceType(context);
-      getDeviceInfo(context);
+      getDeviceInfo(context: context);
     });
+    // WidgetsBinding.instance.addPostFrameCallback((_) {
+    //   getDeviceInfo(context: context);
+    // });
     _forgotController.addListener(() {
       forgot_mail = _forgotController.text;
       print("Current text: ${_forgotController.text}");
@@ -240,92 +212,151 @@ class _LoginPageState extends State<LoginPage> {
     }
   }
 
-  Future<void> getDeviceInfo(BuildContext context) async {
+  Future<void> getDeviceInfo({BuildContext? context}) async {
     try {
-      if (Platform.isAndroid || Platform.isIOS) {
-        DeviceInfoPlugin deviceInfo = DeviceInfoPlugin();
+      final DeviceInfoPlugin deviceInfo = DeviceInfoPlugin();
 
-        if (Platform.isAndroid) {
-          AndroidDeviceInfo androidInfo = await deviceInfo.androidInfo;
-          bool isTablet = MediaQuery.of(context).size.shortestSide >= 600;
+      if (Platform.isAndroid) {
+        AndroidDeviceInfo androidInfo = await deviceInfo.androidInfo;
 
-          print("📱 Android Device Info:");
-          print("Brand: ${androidInfo.brand}");
-          print("Model: ${androidInfo.model}");
-          print("Android Version: ${androidInfo.version.release}");
-          print(isTablet ? "📲 เป็น Tablet" : "📱 เป็น Phone");
-        } else if (Platform.isIOS) {
-          IosDeviceInfo iosInfo = await deviceInfo.iosInfo;
-          bool isIPad = iosInfo.model.toLowerCase().contains("ipad");
+        // ใช้ MediaQuery ถ้ามี context
+        bool isTablet = false;
+        if (context != null) {
+          isTablet = MediaQuery.of(context).size.shortestSide >= 600;
+        } else {
+          // ใช้ WidgetsBinding ถ้าไม่มี context (เช่นเรียกใน initState)
+          final shortestSide =
+              WidgetsBinding.instance.window.physicalSize.shortestSide /
+                  WidgetsBinding.instance.window.devicePixelRatio;
+          isTablet = shortestSide >= 600;
+        }
 
-          print("🍏 iOS Device Info:");
-          print("Model: ${iosInfo.model}");
-          print("System Name: ${iosInfo.systemName}");
-          print("iOS Version: ${iosInfo.systemVersion}");
-          print(isIPad ? "📲 เป็น iPad" : "📱 เป็น iPhone");
+        debugPrint("📱 Android Device Info:");
+        debugPrint("Brand: ${androidInfo.brand}");
+        debugPrint("Model: ${androidInfo.model}");
+        debugPrint("Android Version: ${androidInfo.version.release}");
+        debugPrint(isTablet ? "📲 เป็น Tablet" : "📱 เป็น Phone");
+      } else if (Platform.isIOS) {
+        IosDeviceInfo iosInfo = await deviceInfo.iosInfo;
+
+        // ตรวจสอบว่าเป็น iPad
+        bool isIPad = iosInfo.model.toLowerCase().contains("ipad");
+
+        debugPrint("🍏 iOS Device Info:");
+        debugPrint("Model: ${iosInfo.model}");
+        debugPrint("System Name: ${iosInfo.systemName}");
+        debugPrint("iOS Version: ${iosInfo.systemVersion}");
+        debugPrint(isIPad ? "📲 เป็น iPad🍏" : "📲 เป็น iPhone🍏");
+        if (isAndroid == true || isIPhone == true) {
+          isMobile = true;
+        } else {
+          isMobile = false;
         }
       } else {
-        print("❌ ไม่รองรับอุปกรณ์นี้");
+        debugPrint("❌ ไม่รองรับอุปกรณ์นี้");
       }
     } catch (e) {
-      print("⚠️ Error checking device type: $e");
+      debugPrint("⚠️ Error checking device type: $e");
     }
+  }
+
+  Future<void> _loadBegin() async {
+    await Future.delayed(Duration(seconds: 5));
+    _begin = true;
   }
 
   @override
   Widget build(BuildContext context) {
-    return PopScope(
-      onPopInvoked: (didPop) {
-        if (!didPop) {
-          final now = DateTime.now();
-          final maxDuration = Duration(seconds: 2);
-          final isWarning =
-              lastPressed == null || now.difference(lastPressed!) > maxDuration;
-
-          if (isWarning) {
-            lastPressed = now;
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                content: Text(
-                  '$exitApp2TS',
-                  style: TextStyle(fontFamily: 'Arial', color: Colors.white),
-                ),
-                duration: maxDuration,
-              ),
-            );
-          } else {
-            SystemNavigator.pop();
-          }
-        }
-      },
-      child: Scaffold(
-        backgroundColor: Colors.transparent,
-        body: Stack(
-          alignment: Alignment.center,
-          children: [
-            Container(
-              decoration: BoxDecoration(
-                image: DecorationImage(
-                  image: AssetImage('assets/images/logoOrigami/default_bg.png'),
-                  fit: BoxFit.cover, // ปรับให้รูปเต็มหน้าจอ
+    if (_begin == false && _isLoading) {
+      _loadBegin();
+      return Scaffold(
+        backgroundColor: Colors.white,
+        body: Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              Container(
+                color: Colors.white,
+                width: MediaQuery.of(context).size.width * 0.5,
+                child: Image.network(
+                  logoComponent, // ใส่โลโก้
+                  width: MediaQuery.of(context).size.width * 0.5,
+                  fit: BoxFit.contain,
+                  errorBuilder: (context, error, stackTrace) {
+                    return Container();
+                  },
                 ),
               ),
-            ),
-            LayoutBuilder(builder: (context, constraints) {
-              return SingleChildScrollView(
-                child: ConstrainedBox(
-                    constraints: BoxConstraints(
-                      minHeight: constraints.maxHeight,
-                    ),
-                    child: _forgot
-                        ? _forgotWidget(constraints)
-                        : _loginWidget(constraints)),
-              );
-            }),
-          ],
+              SizedBox(height: 16),
+              Container(
+                color: Colors.white,
+                child: Center(
+                  child: LoadingAnimationWidget.horizontalRotatingDots(
+                    size: 65,
+                    color: Colors.orange,
+                  ),
+                ),
+              ),
+            ],
+          ),
         ),
-      ),
-    );
+      );
+    } else {
+      return PopScope(
+        onPopInvoked: (didPop) {
+          if (!didPop) {
+            final now = DateTime.now();
+            final maxDuration = Duration(seconds: 2);
+            final isWarning = lastPressed == null ||
+                now.difference(lastPressed!) > maxDuration;
+
+            if (isWarning) {
+              lastPressed = now;
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  content: Text(
+                    '$exitApp2TS',
+                    style: TextStyle(fontFamily: 'Arial', color: Colors.white),
+                  ),
+                  duration: maxDuration,
+                ),
+              );
+            } else {
+              SystemNavigator.pop();
+            }
+          }
+        },
+        child: Scaffold(
+          backgroundColor: Colors.transparent,
+          body: Stack(
+            alignment: Alignment.center,
+            children: [
+              Container(
+                decoration: BoxDecoration(
+                  image: DecorationImage(
+                    image:
+                        NetworkImage(backgroudComponent),
+                    fit: BoxFit.cover, // ปรับให้รูปเต็มหน้าจอ
+                  ),
+                ),
+              ),
+              LayoutBuilder(builder: (context, constraints) {
+                return SingleChildScrollView(
+                  child: ConstrainedBox(
+                      constraints: BoxConstraints(
+                        minHeight: constraints.maxHeight,
+                      ),
+                      child: _forgot
+                          ? _forgotWidget(constraints)
+                          : _loginWidget(constraints)),
+                );
+              }),
+            ],
+          ),
+        ),
+      );
+    }
   }
 
   Widget _loginWidget(BoxConstraints constraints) {
@@ -333,7 +364,7 @@ class _LoginPageState extends State<LoginPage> {
       padding: const EdgeInsets.symmetric(horizontal: 18),
       child: Center(
         child: Container(
-          width: constraints.maxWidth * 0.85,
+          // width: constraints.maxWidth * ((!isMobile) ? 0.85 : 0.55),
           decoration: BoxDecoration(
             // color: Colors.black12,
             borderRadius: BorderRadius.circular(20),
@@ -346,46 +377,63 @@ class _LoginPageState extends State<LoginPage> {
             // ],
           ),
           child: Column(
-            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              Image.asset(
-                "assets/images/learning/img_2.png", // ใส่โลโก้
-                fit: BoxFit.contain,
-              ),
-              _isLoading
-                  ? Center(
-                      child: LoadingAnimationWidget.horizontalRotatingDots(
-                        size: 75,
-                        color: Colors.white,
+              if (isMobile)
+                Image.network(
+                  logoComponent, // ใส่โลโก้
+                  width: 300,
+                  fit: BoxFit.contain,
+                  errorBuilder: (context, error, stackTrace) {
+                    return Container(
+                      color: Colors.transparent,
+                      child: Center(
+                        child: LoadingAnimationWidget.horizontalRotatingDots(
+                          size: 65,
+                          color: Colors.orange,
+                        ),
                       ),
-                    )
-                  : Column(
-                      children: [
-                        Text(
-                          'Origami',
-                          style: TextStyle(
-                            fontFamily: 'Arial',
-                            color: Colors.white70,
-                            fontWeight: FontWeight.w500,
-                            fontSize: (isIPad || isTablet)
-                                ? constraints.maxWidth * 0.08
-                                : 50,
-                          ),
+                    );
+                  },
+                )
+              else
+                Image.network(
+                  logoComponent, // ใส่โลโก้
+                  width: 400,
+                  fit: BoxFit.contain,
+                  errorBuilder: (context, error, stackTrace) {
+                    return Container(
+                      color: Colors.transparent,
+                      child: Center(
+                        child: LoadingAnimationWidget.horizontalRotatingDots(
+                          size: 65,
+                          color: Colors.orange,
                         ),
-                        Text(
-                          'Academy',
-                          style: TextStyle(
-                            fontFamily: 'Arial',
-                            color: Colors.white70,
-                            fontWeight: FontWeight.w700,
-                            fontSize: (isIPad || isTablet)
-                                ? constraints.maxWidth * 0.1
-                                : 70,
-                          ),
-                        ),
-                      ],
-                    ),
-              SizedBox(height: constraints.maxWidth * 0.05),
+                      ),
+                    );
+                  },
+                ),
+              if (isMobile)
+                Text(
+                  titleComponent,
+                  style: const TextStyle(
+                    fontFamily: 'Arial',
+                    color: Colors.white,
+                    fontWeight: FontWeight.w500,
+                    fontSize: 40,
+                  ),
+                ),
+              // if (isMobile)
+              //   Text(
+              //     'ACADEMY',
+              //     style: TextStyle(
+              //       fontFamily: 'Arial',
+              //       color: Colors.white,
+              //       fontWeight: FontWeight.w700,
+              //       fontSize: isMobile ? 70 : 100,
+              //     ),
+              //   )
+              SizedBox(height: constraints.maxWidth * 0.09),
               Form(
                 key: _formKey,
                 child: Column(
@@ -454,9 +502,12 @@ class _LoginPageState extends State<LoginPage> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              Image.asset(
-                "assets/images/learning/img_2.png", // ใส่โลโก้
+              Image.network(
+                logoComponent, // ใส่โลโก้
                 fit: BoxFit.contain,
+                errorBuilder: (context, error, stackTrace) {
+                  return Container();
+                },
               ),
               Form(
                 key: _formKey,
@@ -468,9 +519,7 @@ class _LoginPageState extends State<LoginPage> {
                       style: TextStyle(
                         fontFamily: 'Arial',
                         color: Colors.white,
-                        fontSize: (isIPad || isTablet)
-                            ? constraints.maxWidth * 0.05
-                            : 24,
+                        fontSize: !isMobile ? constraints.maxWidth * 0.05 : 24,
                         fontWeight: FontWeight.w500,
                       ),
                     ),
@@ -482,9 +531,8 @@ class _LoginPageState extends State<LoginPage> {
                         style: TextStyle(
                           fontFamily: 'Arial',
                           color: Colors.orange.shade50,
-                          fontSize: (isIPad || isTablet)
-                              ? constraints.maxWidth * 0.02
-                              : 16,
+                          fontSize:
+                              !isMobile ? constraints.maxWidth * 0.02 : 16,
                           fontWeight: FontWeight.w400,
                         ),
                       ),
@@ -641,6 +689,59 @@ class _LoginPageState extends State<LoginPage> {
     );
   }
 
+  void _showFullScreenImage(List<Employee> employee) {
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      barrierColor: Colors.black87,
+      builder: (context) {
+        return Dialog(
+            backgroundColor: Colors.white,
+            insetPadding: EdgeInsets.all(18), // ขยายเต็มจอ
+            child: GridView.builder(
+                padding: const EdgeInsets.all(8),
+                shrinkWrap: true,
+                physics: const NeverScrollableScrollPhysics(),
+                itemCount: employee.length,
+                gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                  crossAxisCount: isMobile ? 2 : 3, // 2 รูปต่อแถว
+                  crossAxisSpacing: 8,
+                  mainAxisSpacing: 8,
+                  childAspectRatio: 1, // อัตราส่วนกว้าง/สูง (ปรับได้ตามต้องการ)
+                ),
+                itemBuilder: (context, index) {
+                  return GestureDetector(
+                      onTap: () async {
+                        await Future.delayed(Duration(seconds: 1));
+                        Navigator.pushReplacement(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => AcademyHomePage(
+                              employee: employee[index],
+                              Authorization: authorization,
+                              page: 'course',
+                              company_id: index,
+                            ),
+                          ),
+                        );
+                        // Navigator.pop(context); // ปิด Dialog เมื่อแตะที่รูป
+                      },
+                      child: Card(
+                        child: Image.network(
+                          employee[index].comp_logo,
+                          fit: BoxFit.contain,
+                          width: 50,
+                          height: 50,
+                          errorBuilder: (context, error, stackTrace) {
+                            return Icon(Icons.error);
+                          },
+                        ),
+                      ));
+                }));
+      },
+    );
+  }
+
   Future<void> _login() async {
     // _loadSelectedRadio();
     String username = _usernameController.text;
@@ -650,8 +751,8 @@ class _LoginPageState extends State<LoginPage> {
     if (username.isEmpty && password.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text('$checkPwdTS',
-              style: TextStyle(
+          content: Text(checkPwdTS,
+              style: const TextStyle(
                 fontFamily: 'Arial',
                 color: Colors.white,
               )),
@@ -669,7 +770,8 @@ class _LoginPageState extends State<LoginPage> {
       uri,
       body: {
         // 'username': 'chakrit@trandar.com',
-        // 'password': '@HengL!ke08',
+        // 'password': '@HengL!ke08'
+        'auth_password': 'ori20#17gami',
         'username': username,
         'password': password,
       },
@@ -677,29 +779,30 @@ class _LoginPageState extends State<LoginPage> {
 
     if (response.statusCode == 200) {
       final jsonResponse = jsonDecode(response.body);
-      if (jsonResponse['status'] == true) {
-        final String Authorization = jsonResponse['Authorization'];
-        final List<dynamic> employeeJson = jsonResponse['employee_data'];
+      if (jsonResponse['status'] == 200) {
+        final List employeeJson = jsonResponse['employee_data'];
         List<Employee> employee = [];
         setState(() {
           employee =
               employeeJson.map((json) => Employee.fromJson(json)).toList();
-        });
-        setState(() {
           _isLoading = true;
         });
-        await Future.delayed(Duration(seconds: 1));
-        final Employee employee1 = employee[0];
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(
-            builder: (context) => AcademyHomePage(
-              employee: employee1,
-              Authorization: Authorization,
-              page: 'course',
+        if (widget.num == 1) {
+          _showFullScreenImage(employee);
+        } else {
+          await Future.delayed(const Duration(seconds: 1));
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(
+              builder: (context) => AcademyHomePage(
+                employee: employee[widget.company_id??0],
+                Authorization: authorization,
+                page: 'course',
+                company_id: widget.company_id??0,
+              ),
             ),
-          ),
-        );
+          );
+        }
       } else {
         final String error_message = jsonResponse['message'];
         ScaffoldMessenger.of(context).showSnackBar(
@@ -756,6 +859,46 @@ class _LoginPageState extends State<LoginPage> {
       throw Exception('Failed to load projects');
     }
   }
+
+  String logoComponent = '';
+  String titleComponent = '';
+  String backgroudComponent = '';
+  Future<void> _fetchComponent() async {
+    final uri = Uri.parse("$host/api/origami/e-learning/component.php");
+    final response = await http.post(
+      uri,
+      body: {
+        'auth_password': authorization,
+      },
+    );
+    if (response.statusCode == 200) {
+      final jsonResponse = jsonDecode(response.body);
+      if (jsonResponse['status'] == 200) {
+        setState(() {
+          logoComponent = jsonResponse['logo'];
+          titleComponent = jsonResponse['title'];
+          backgroudComponent = jsonResponse['backgroud'];
+        });
+
+      } else {
+        final message = jsonResponse['message'];
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(
+              message,
+              style: TextStyle(
+                fontFamily: 'Arial',
+                color: Colors.white,
+              ),
+            ),
+          ),
+        );
+      }
+    } else {
+      throw Exception('Failed to load projects');
+    }
+  }
+
 }
 
 class Employee {
@@ -764,15 +907,12 @@ class Employee {
   final String emp_name;
   final String emp_avatar;
   final String comp_id;
-  final String comp_description;
+  final String comp_name;
   final String comp_logo;
-  final String dept_id;
-  final String dept_description;
-  final String dna_id;
-  final String dna_name;
+  final String dept_name;
   final String dna_color;
-  final String dna_logo;
   final String password_verify;
+  final String endpoint;
 
   const Employee({
     required this.emp_id,
@@ -780,15 +920,12 @@ class Employee {
     required this.emp_name, // ชื่อ
     required this.emp_avatar, // รูปภาพ
     required this.comp_id,
-    required this.comp_description,
+    required this.comp_name,
     required this.comp_logo,
-    required this.dept_id,
-    required this.dept_description,
-    required this.dna_id,
-    required this.dna_name,
+    required this.dept_name,
     required this.dna_color,
-    required this.dna_logo,
     required this.password_verify,
+    required this.endpoint,
   });
 
   factory Employee.fromJson(Map<String, dynamic> json) {
@@ -798,15 +935,12 @@ class Employee {
       emp_name: json['emp_name'] ?? '',
       emp_avatar: json['emp_avatar'] ?? '',
       comp_id: json['comp_id'] ?? '',
-      comp_description: json['comp_description'] ?? '',
+      comp_name: json['comp_name'] ?? '',
       comp_logo: json['comp_logo'] ?? '',
-      dept_id: json['dept_id'] ?? '',
-      dept_description: json['dept_description'] ?? '',
-      dna_id: json['dna_id'] ?? '',
-      dna_name: json['dna_name'] ?? '',
+      dept_name: json['dept_name'] ?? '',
       dna_color: json['dna_color'] ?? '',
-      dna_logo: json['dna_logo'] ?? '',
       password_verify: json['password_verify'] ?? '',
+      endpoint: json['endpoint'] ?? '',
     );
   }
 }

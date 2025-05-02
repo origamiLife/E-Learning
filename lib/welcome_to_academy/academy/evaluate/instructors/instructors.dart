@@ -18,6 +18,8 @@ class Instructors extends StatefulWidget {
 }
 
 class _InstructorsState extends State<Instructors> {
+  bool isSwitch = false;
+
   Future<List<Instructor>> fetchInstructors() async {
     final uri = Uri.parse("$host/api/origami/academy/instructors.php");
     final response = await http.post(
@@ -54,21 +56,42 @@ class _InstructorsState extends State<Instructors> {
     return FutureBuilder<List<Instructor>>(
       future: fetchInstructors(),
       builder: (context, snapshot) {
-        if (snapshot.hasError) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              CircularProgressIndicator(
+                color: Color(0xFFFF9900),
+              ),
+              SizedBox(
+                width: 12,
+              ),
+              Text(
+                '$loadingTS...',
+                style: TextStyle(
+                  fontFamily: 'Arial',
+                  fontSize: 16,
+                  fontWeight: FontWeight.w700,
+                  color: Color(0xFF555555),
+                ),
+              ),
+            ],
+          );
+        } else if (snapshot.hasError) {
           return Center(child: Text('Error: ${snapshot.error}'));
         } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
           return Center(
               child: Text(
-            NotFoundDataTS,
-            style: TextStyle(
-              fontFamily: 'Arial',
-              fontSize: 16.0,
-              color: const Color(0xFF555555),
-              fontWeight: FontWeight.w700,
-            ),
-            overflow: TextOverflow.ellipsis,
-            maxLines: 1,
-          ));
+                NotFoundDataTS,
+                style: TextStyle(
+                  fontFamily: 'Arial',
+                  fontSize: 16.0,
+                  color: const Color(0xFF555555),
+                  fontWeight: FontWeight.w700,
+                ),
+                overflow: TextOverflow.ellipsis,
+                maxLines: 1,
+              ));
         } else {
           return _getContentWidget(snapshot.data!);
         }
@@ -81,46 +104,99 @@ class _InstructorsState extends State<Instructors> {
       child: Container(
         color: Colors.grey.shade50,
         child: Padding(
-          padding: const EdgeInsets.all(16),
+          padding: const EdgeInsets.only(left: 8,right: 8),
           child: SingleChildScrollView(
             child: Column(
               children: List.generate(instructor.length, (index) {
                 return Column(
                   children: [
-                    // Container(
-                    //   // color: Colors.transparent,
-                    //   decoration: BoxDecoration(
-                    //     color: Colors.transparent,
-                    //     borderRadius: BorderRadius.circular(20),
-                    //   ),
-                    //   child: Row(
-                    //     children: [
-                    //       Expanded(
-                    //         child: Text(
-                    //           '$InstructorsTS : ${instructor[index].courseSubject}',
-                    //           style: TextStyle(
-                    //             fontFamily: 'Arial',
-                    //             fontSize: 18.0,
-                    //             color: Color(0xFF555555),
-                    //             fontWeight: FontWeight.w700,
-                    //           ),
-                    //         ),
-                    //       ),
-                    //     ],
-                    //   ),
-                    // ),
-                    // SizedBox(height: 8),
+                    InkWell(
+                      borderRadius: BorderRadius.circular(10),
+                      onTap: () {
+                        setState(() {
+                          (isSwitch == false)
+                              ? isSwitch = true
+                              : isSwitch = false;
+                        });
+                      },
+                      child: (isSwitch == true)
+                          ? Container(
+                        padding: EdgeInsets.all(8),
+                        // color: Colors.transparent,
+                        decoration: BoxDecoration(
+                          color: Colors.transparent,
+                          borderRadius: BorderRadius.circular(20),
+                        ),
+                        child: Row(
+                          children: [
+                            Expanded(
+                              child: Text(
+                                instructor[index].courseSubject,
+                                style: TextStyle(
+                                  fontFamily: 'Arial',
+                                  fontSize: 16,
+                                  color: Color(0xFF555555),
+                                  fontWeight: FontWeight.w500,
+                                ),
+                              ),
+                            ),
+                            SizedBox(
+                              width: 4,
+                            ),
+                            Icon(
+                              Icons.keyboard_arrow_down,
+                              color: Color(0xFF555555),
+                              // size: 30,
+                            )
+                          ],
+                        ),
+                      )
+                          : Container(
+                        padding: EdgeInsets.all(8),
+                        // color: Colors.transparent,
+                        decoration: BoxDecoration(
+                          color: Colors.transparent,
+                          borderRadius: BorderRadius.circular(20),
+                        ),
+                        child: Row(
+                          // crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Expanded(
+                              child: Text(
+                                '${instructor[index].courseSubject}',
+                                style: TextStyle(
+                                  fontFamily: 'Arial',
+                                  fontSize: 16,
+                                  color: Color(0xFF555555),
+                                  fontWeight: FontWeight.w500,
+                                ),
+                                overflow: TextOverflow.ellipsis,
+                                maxLines: 2,
+                              ),
+                            ),
+                            SizedBox(
+                              width: 4,
+                            ),
+                            Icon(
+                              Icons.keyboard_arrow_down,
+                              color: Color(0xFF555555),
+                              // size: 30,
+                            )
+                          ],
+                        ),
+                      ),
+                    ),
                     Column(
                       children: List.generate(
                           instructor[index].coachData.length, (indexI) {
                         final coachData = instructor[index].coachData[indexI];
-                        return Card(
+                        return (isSwitch == false)?Card(
                           color: Color(0xFFF5F5F5),
                           child: InkWell(
                             child: Container(
                               decoration: BoxDecoration(
                                 color: Colors.white,
-                                borderRadius: BorderRadius.circular(15),
+                                borderRadius: BorderRadius.circular(10),
                                 boxShadow: [
                                   BoxShadow(
                                     color: Colors.grey.withOpacity(0.5),
@@ -140,12 +216,14 @@ class _InstructorsState extends State<Instructors> {
                                     //   fit: BoxFit.cover,
                                     // ),
                                     Expanded(
-                                      flex: 1,
+                                      flex: isMobile ? 2 : 1,
                                       child: Image.network(
                                         coachData.coach_image,
+                                        height: (isMobile)?120:180,
                                         width: double.infinity,
                                         fit: BoxFit.contain,
-                                        errorBuilder: (context, error, stackTrace) {
+                                        errorBuilder:
+                                            (context, error, stackTrace) {
                                           return Icon(Icons.info, size: 40);
                                         },
                                       ),
@@ -154,12 +232,12 @@ class _InstructorsState extends State<Instructors> {
                                       width: 8,
                                     ),
                                     Expanded(
-                                      flex: 2,
+                                      flex: (isMobile)?3:5,
                                       child: Column(
                                         mainAxisAlignment:
-                                            MainAxisAlignment.start,
+                                        MainAxisAlignment.start,
                                         crossAxisAlignment:
-                                            CrossAxisAlignment.start,
+                                        CrossAxisAlignment.start,
                                         children: [
                                           Text(
                                             coachData.coach_name,
@@ -225,7 +303,7 @@ class _InstructorsState extends State<Instructors> {
                                               Expanded(
                                                 child: SingleChildScrollView(
                                                   scrollDirection:
-                                                      Axis.horizontal,
+                                                  Axis.horizontal,
                                                   child: Row(
                                                     children: [
                                                       Icon(
@@ -241,7 +319,7 @@ class _InstructorsState extends State<Instructors> {
                                                         style: TextStyle(
                                                           fontFamily: 'Arial',
                                                           color:
-                                                              Color(0xFF555555),
+                                                          Color(0xFF555555),
                                                         ),
                                                       )
                                                     ],
@@ -251,7 +329,7 @@ class _InstructorsState extends State<Instructors> {
                                               Expanded(
                                                 child: SingleChildScrollView(
                                                   scrollDirection:
-                                                      Axis.horizontal,
+                                                  Axis.horizontal,
                                                   child: Row(
                                                     children: [
                                                       Icon(
@@ -266,7 +344,7 @@ class _InstructorsState extends State<Instructors> {
                                                         style: TextStyle(
                                                           fontFamily: 'Arial',
                                                           color:
-                                                              Color(0xFF555555),
+                                                          Color(0xFF555555),
                                                         ),
                                                       )
                                                     ],
@@ -283,16 +361,13 @@ class _InstructorsState extends State<Instructors> {
                               ),
                             ),
                           ),
-                        );
+                        ):Container();
                       }),
                     ),
                     SizedBox(
-                      height: 8,
+                      height: 4,
                     ),
                     Divider(),
-                    SizedBox(
-                      height: 8,
-                    ),
                   ],
                 );
               }),

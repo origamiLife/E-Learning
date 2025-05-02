@@ -43,42 +43,63 @@ class _CertificationState extends State<Certification> {
     return FutureBuilder<List<CertificationData>>(
       future: fetchCertification(),
       builder: (context, snapshot) {
-        if (snapshot.hasError) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              CircularProgressIndicator(
+                color: Color(0xFFFF9900),
+              ),
+              SizedBox(
+                width: 12,
+              ),
+              Text(
+                '$loadingTS...',
+                style: TextStyle(
+                  fontFamily: 'Arial',
+                  fontSize: 16,
+                  fontWeight: FontWeight.w700,
+                  color: Color(0xFF555555),
+                ),
+              ),
+            ],
+          );
+        } else if (snapshot.hasError) {
           return Center(
               child: Text(
-            'Error: ${snapshot.error}',
-            style: TextStyle(
-              fontFamily: 'Arial',
-              color: Color(0xFF555555),
-            ),
-          ));
+                'Error: ${snapshot.error}',
+                style: TextStyle(
+                  fontFamily: 'Arial',
+                  color: Color(0xFF555555),
+                ),
+              ));
         } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
           return Center(
               child: Text(
-            NotFoundDataTS,
-            style: TextStyle(
-              fontFamily: 'Arial',
-              fontSize: 16.0,
-              color: const Color(0xFF555555),
-              fontWeight: FontWeight.w700,
-            ),
-            overflow: TextOverflow.ellipsis,
-            maxLines: 1,
-          ));
+                NotFoundDataTS,
+                style: TextStyle(
+                  fontFamily: 'Arial',
+                  fontSize: 16.0,
+                  color: const Color(0xFF555555),
+                  fontWeight: FontWeight.w700,
+                ),
+                overflow: TextOverflow.ellipsis,
+                maxLines: 1,
+              ));
         } else {
           return (snapshot.data!.first.certificationList.isEmpty)
               ? Center(
-                  child: Text(
-                  NotFoundDataTS,
-                  style: TextStyle(
-                    fontFamily: 'Arial',
-                    fontSize: 16.0,
-                    color: const Color(0xFF555555),
-                    fontWeight: FontWeight.w700,
-                  ),
-                  overflow: TextOverflow.ellipsis,
-                  maxLines: 1,
-                ))
+              child: Text(
+                NotFoundDataTS,
+                style: TextStyle(
+                  fontFamily: 'Arial',
+                  fontSize: 16.0,
+                  color: const Color(0xFF555555),
+                  fontWeight: FontWeight.w700,
+                ),
+                overflow: TextOverflow.ellipsis,
+                maxLines: 1,
+              ))
               : _getContentWidget(snapshot.data!);
         }
       },
@@ -89,7 +110,7 @@ class _CertificationState extends State<Certification> {
     return Container(
       color: Colors.grey.shade50,
       child: Padding(
-        padding: const EdgeInsets.all(16),
+        padding: const EdgeInsets.only(left: 8,right: 8),
         child: SingleChildScrollView(
           child: Column(
             children: List.generate(listCertification.length, (index) {
@@ -106,66 +127,66 @@ class _CertificationState extends State<Certification> {
                     },
                     child: (isSwitch == true)
                         ? Card(
-                            color: Colors.white,
-                            child: Container(
-                              padding: EdgeInsets.only(
-                                  left: 6, right: 6, top: 10, bottom: 10),
-                              decoration: BoxDecoration(
-                                color: Colors.white,
-                                borderRadius: BorderRadius.circular(10),
-                              ),
-                              child: Row(
-                                children: [
-                                  Expanded(
-                                    child: Text(
-                                      certification.courseName,
-                                      style: TextStyle(
-                                        fontFamily: 'Arial',
-                                        fontSize: 18.0,
-                                        color: Color(0xFF555555),
-                                        fontWeight: FontWeight.w700,
-                                      ),
-                                    ),
-                                  ),
-                                  Icon(
-                                    Icons.keyboard_arrow_down,
-                                    color: Color(0xFF555555),
-                                    size: 30,
-                                  )
-                                ],
-                              ),
-                            ),
-                          )
-                        : Container(
-                            padding: EdgeInsets.all(8),
-                            // color: Colors.transparent,
-                            decoration: BoxDecoration(
-                              color: Colors.transparent,
-                              borderRadius: BorderRadius.circular(20),
-                            ),
-                            child: Row(
-                              children: [
-                                Expanded(
-                                  child: Text(
-                                    certification.courseName,
-                                    style: TextStyle(
-                                      fontFamily: 'Arial',
-                                      fontSize: 16,
-                                      color: Color(0xFF555555),
-                                      fontWeight: FontWeight.w700,
-                                    ),
-                                    overflow: TextOverflow.ellipsis,
-                                    maxLines: 1,
-                                  ),
-                                ),
-                                Icon(
-                                  Icons.keyboard_arrow_down,
+                      color: Colors.white,
+                      child: Container(
+                        padding: EdgeInsets.only(
+                            left: 6, right: 6, top: 10, bottom: 10),
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                        child: Row(
+                          children: [
+                            Expanded(
+                              child: Text(
+                                certification.courseName,
+                                style: TextStyle(
+                                  fontFamily: 'Arial',
+                                  fontSize: 18.0,
                                   color: Color(0xFF555555),
-                                  size: 30,
-                                )
-                              ],
+                                  fontWeight: FontWeight.w700,
+                                ),
+                              ),
+                            ),
+                            Icon(
+                              Icons.keyboard_arrow_down,
+                              color: Color(0xFF555555),
+                              size: 30,
+                            )
+                          ],
+                        ),
+                      ),
+                    )
+                        : Container(
+                      padding: EdgeInsets.all(8),
+                      // color: Colors.transparent,
+                      decoration: BoxDecoration(
+                        color: Colors.transparent,
+                        borderRadius: BorderRadius.circular(20),
+                      ),
+                      child: Row(
+                        children: [
+                          Expanded(
+                            child: Text(
+                              certification.courseName,
+                              style: TextStyle(
+                                fontFamily: 'Arial',
+                                fontSize: 16,
+                                color: Color(0xFF555555),
+                                fontWeight: FontWeight.w700,
+                              ),
+                              overflow: TextOverflow.ellipsis,
+                              maxLines: 1,
                             ),
                           ),
+                          Icon(
+                            Icons.keyboard_arrow_down,
+                            color: Color(0xFF555555),
+                            size: 30,
+                          )
+                        ],
+                      ),
+                    ),
                   ),
                   if (!isSwitch) _buildCertificationList(certification),
                   SizedBox(height: 8),
@@ -230,10 +251,10 @@ class _CertificationState extends State<Certification> {
               child: Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Expanded(flex: 2, child: _buildCertificateImage(certificate)),
+                  Expanded(flex: isMobile ? 2 : 1, child: _buildCertificateImage(certificate)),
                   SizedBox(width: 8),
                   Expanded(
-                      flex: 3, child: _buildCertificateDetails(certificate)),
+                      flex: isMobile ? 3 : 5, child: _buildCertificateDetails(certificate)),
                 ],
               ),
             ),
@@ -315,7 +336,7 @@ class _CertificationState extends State<Certification> {
                   child: Text(
                     condition.condition,
                     style:
-                        _getTextStyle(14.0, FontWeight.w400, Color(0xFF555555)),
+                    _getTextStyle(14.0, FontWeight.w400, Color(0xFF555555)),
                     // overflow: TextOverflow.ellipsis,
                     maxLines: 1,
                   ),
@@ -453,8 +474,8 @@ class CertificationData {
       courseId: json['course_id'] ?? '',
       courseName: json['course_name'] ?? '',
       certificationList: (json['cerification_list'] as List?)
-              ?.map((item) => CertificationList.fromJson(item))
-              .toList() ??
+          ?.map((item) => CertificationList.fromJson(item))
+          .toList() ??
           [],
     );
   }
@@ -481,8 +502,8 @@ class CertificationList {
       certificationName: json['certification_name'] ?? '',
       certificationDescription: json['certification_description'] ?? '',
       certificationCondition: (json['certification_condition'] as List?)
-              ?.map((item) => CertificationCondition.fromJson(item))
-              .toList() ??
+          ?.map((item) => CertificationCondition.fromJson(item))
+          .toList() ??
           [],
       canDownload: json['can_download'] ?? '',
     );

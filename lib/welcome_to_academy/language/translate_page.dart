@@ -58,7 +58,7 @@ class _TranslatePageState extends State<TranslatePage> {
         foregroundColor: Color(0xFFFF9900),
         backgroundColor: Colors.white,
         title: Container(
-          alignment: (isAndroid || isIPhone)
+          alignment: isMobile
               ? Alignment.centerLeft
               : Alignment.center,
           child: Text(

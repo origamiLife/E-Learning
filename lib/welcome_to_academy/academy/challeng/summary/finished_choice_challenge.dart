@@ -103,7 +103,7 @@ class _FinishedChoiceChallengeState extends State<FinishedChoiceChallenge> {
   Widget _getContentWidget() {
     return SafeArea(
       child: Padding(
-        padding: EdgeInsets.all(isIPad || isTablet ? 24 : 16),
+        padding: EdgeInsets.all(!isMobile ? 24 : 16),
         child: SingleChildScrollView(
           child: FutureBuilder<QuestionData>(
             future: fetchQuestionData(),
@@ -145,7 +145,7 @@ class _FinishedChoiceChallengeState extends State<FinishedChoiceChallenge> {
           child: Column(
             children: [
               _questionRow(questionData),
-              if (isIPad || isTablet) SizedBox(height: 28),
+              if (!isMobile) SizedBox(height: 28),
               _imageCarousel(questionData),
               SizedBox(height: 8),
               _choice(questionData.question.choice, isQuestion,
@@ -168,7 +168,7 @@ class _FinishedChoiceChallengeState extends State<FinishedChoiceChallenge> {
           'Q${questionData.question.question_seq}. ',
           style: TextStyle(
               fontFamily: 'Arial',
-              fontSize: (isIPad || isTablet) ? 32 : 18,
+              fontSize: (!isMobile) ? 32 : 18,
               color: Color(0xFF555555),
               fontWeight: FontWeight.w700),
         ),
@@ -177,7 +177,7 @@ class _FinishedChoiceChallengeState extends State<FinishedChoiceChallenge> {
             questionData.question.question_text,
             style: TextStyle(
                 fontFamily: 'Arial',
-                fontSize: (isIPad || isTablet) ? 24 : 16,
+                fontSize: (!isMobile) ? 24 : 16,
                 color: Color(0xFF555555),
                 fontWeight: FontWeight.w700),
             overflow: TextOverflow.ellipsis,
@@ -219,7 +219,7 @@ class _FinishedChoiceChallengeState extends State<FinishedChoiceChallenge> {
               itemBuilder: (context, index, realIndex) {
                 return Padding(
                   padding: EdgeInsets.symmetric(
-                      vertical: isIPad || isTablet ? 24 : 12),
+                      vertical: !isMobile ? 24 : 12),
                   child: GestureDetector(
                     onTap: () {
                       _showFullScreenImage(
@@ -329,7 +329,7 @@ class _FinishedChoiceChallengeState extends State<FinishedChoiceChallenge> {
                 choice.choice_text,
                 style: TextStyle(
                   fontFamily: 'Arial',
-                  fontSize: (isIPad || isTablet) ? 24 : 16,
+                  fontSize: (!isMobile) ? 24 : 16,
                   color: Color(0xFF555555),
                   fontWeight: FontWeight.w500,
                 ),
@@ -370,7 +370,7 @@ class _FinishedChoiceChallengeState extends State<FinishedChoiceChallenge> {
                 choice.choice_text,
                 style: TextStyle(
                   fontFamily: 'Arial',
-                  fontSize: (isIPad || isTablet) ? 24 : 16,
+                  fontSize: (!isMobile) ? 24 : 16,
                   color: Color(0xFF555555),
                   fontWeight: FontWeight.w500,
                 ),
@@ -451,7 +451,7 @@ class _FinishedChoiceChallengeState extends State<FinishedChoiceChallenge> {
                               "$challengeSectionTS",
                               style: TextStyle(
                                 fontFamily: 'Arial',
-                                fontSize: (isAndroid || isIPhone) ? 20 : 30,
+                                fontSize: isMobile ? 20 : 30,
                                 fontWeight: FontWeight.w700,
                                 color: Color(0xFF555555),
                               ),
@@ -462,7 +462,7 @@ class _FinishedChoiceChallengeState extends State<FinishedChoiceChallenge> {
                               "$questionTS: ${isQuestion.length}",
                               style: TextStyle(
                                 fontFamily: 'Arial',
-                                fontSize: (isAndroid || isIPhone) ? 16 : 24,
+                                fontSize: isMobile ? 16 : 24,
                                 color: Color(0xFF555555),
                               ),
                               textAlign: TextAlign.center,
@@ -474,8 +474,8 @@ class _FinishedChoiceChallengeState extends State<FinishedChoiceChallenge> {
                                     MediaQuery.of(context).size.width * 0.8,
                               ),
                               child: Wrap(
-                                  spacing: (isAndroid || isIPhone) ? 8 : 16,
-                                  runSpacing: (isAndroid || isIPhone) ? 8 : 16,
+                                  spacing: isMobile ? 8 : 16,
+                                  runSpacing: isMobile ? 8 : 16,
                                   children:
                                       List.generate(isQuestion.length, (index) {
                                     final dataQ = isQuestion[index];
@@ -495,9 +495,9 @@ class _FinishedChoiceChallengeState extends State<FinishedChoiceChallenge> {
                                       },
                                       child: Container(
                                         height:
-                                            (isAndroid || isIPhone) ? 40 : 80,
+                                            isMobile ? 40 : 80,
                                         width:
-                                            (isAndroid || isIPhone) ? 40 : 80,
+                                            isMobile ? 40 : 80,
                                         alignment: Alignment.center,
                                         decoration: BoxDecoration(
                                           color: cardColor,
@@ -508,7 +508,7 @@ class _FinishedChoiceChallengeState extends State<FinishedChoiceChallenge> {
                                           '${index + 1}',
                                           style: TextStyle(
                                             fontFamily: 'Arial',
-                                            fontSize: (isAndroid || isIPhone)
+                                            fontSize: isMobile
                                                 ? 16
                                                 : 20,
                                             color: Colors.white,
@@ -539,7 +539,7 @@ class _FinishedChoiceChallengeState extends State<FinishedChoiceChallenge> {
                                           '$correctTS',
                                           style: TextStyle(
                                             fontFamily: 'Arial',
-                                            fontSize: (isAndroid || isIPhone)
+                                            fontSize: isMobile
                                                 ? 14
                                                 : 20,
                                             color: Color(0xFF555555),
@@ -565,7 +565,7 @@ class _FinishedChoiceChallengeState extends State<FinishedChoiceChallenge> {
                                           '$incorrectTS',
                                           style: TextStyle(
                                             fontFamily: 'Arial',
-                                            fontSize: (isAndroid || isIPhone)
+                                            fontSize: isMobile
                                                 ? 14
                                                 : 20,
                                             color: Color(0xFF555555),
@@ -591,7 +591,7 @@ class _FinishedChoiceChallengeState extends State<FinishedChoiceChallenge> {
                                           'No Result',
                                           style: TextStyle(
                                             fontFamily: 'Arial',
-                                            fontSize: (isAndroid || isIPhone)
+                                            fontSize: isMobile
                                                 ? 14
                                                 : 20,
                                             color: Color(0xFF555555),
@@ -622,7 +622,7 @@ class _FinishedChoiceChallengeState extends State<FinishedChoiceChallenge> {
                           padding: const EdgeInsets.only(right: 4, top: 4),
                           child: Icon(
                             Icons.clear,
-                            size: (isAndroid || isIPhone) ? 22 : 45,
+                            size: isMobile ? 22 : 45,
                             color: Colors.red,
                           ),
                         )),

@@ -142,7 +142,7 @@ class _FinishedChallengeState extends State<FinishedChallenge> {
                                 history.challenge_name,
                                 style: TextStyle(
                                   fontFamily: 'Arial',
-                                  fontSize: (isAndroid || isIPhone)?16:24,
+                                  fontSize: isMobile?16:24,
                                   color: Color(0xFF555555),
                                   fontWeight: FontWeight.w500,
                                 ),
@@ -159,7 +159,7 @@ class _FinishedChallengeState extends State<FinishedChallenge> {
                               history.correct, // Consider making this dynamic if available
                               style: TextStyle(
                                 fontFamily: 'Arial',
-                                fontSize: (isAndroid || isIPhone)?16:24,
+                                fontSize: isMobile?16:24,
                                 color: Color(0xFF555555),
                                 fontWeight: FontWeight.w500,
                               ),
@@ -172,7 +172,7 @@ class _FinishedChallengeState extends State<FinishedChallenge> {
                               history.used_point, // Consider making this dynamic if available
                               style: TextStyle(
                                 fontFamily: 'Arial',
-                                fontSize: (isAndroid || isIPhone)?16:24,
+                                fontSize: isMobile?16:24,
                                 color: Color(0xFF555555),
                                 fontWeight: FontWeight.w500,
                               ),
@@ -185,7 +185,7 @@ class _FinishedChallengeState extends State<FinishedChallenge> {
                               history.challenge_start,
                               style: TextStyle(
                                 fontFamily: 'Arial',
-                                fontSize: (isAndroid || isIPhone)?16:24,
+                                fontSize: isMobile?16:24,
                                 color: Color(0xFF555555),
                                 fontWeight: FontWeight.w500,
                               ),
@@ -198,7 +198,7 @@ class _FinishedChallengeState extends State<FinishedChallenge> {
                               history.challenge_end,
                               style: TextStyle(
                                 fontFamily: 'Arial',
-                                fontSize: (isAndroid || isIPhone)?16:24,
+                                fontSize: isMobile?16:24,
                                 color: Color(0xFF555555),
                                 fontWeight: FontWeight.w500,
                               ),
@@ -211,7 +211,7 @@ class _FinishedChallengeState extends State<FinishedChallenge> {
                               history.challenge_duration, // Consider making this dynamic if available
                               style: TextStyle(
                                 fontFamily: 'Arial',
-                                fontSize: (isAndroid || isIPhone)?16:24,
+                                fontSize: isMobile?16:24,
                                 color: Color(0xFF555555),
                                 fontWeight: FontWeight.w500,
                               ),
@@ -236,7 +236,7 @@ class _FinishedChallengeState extends State<FinishedChallenge> {
         label,
         style: TextStyle(
           fontFamily: 'Arial',
-          fontSize: (isAndroid || isIPhone)?16:24,
+          fontSize: isMobile?16:24,
           color: Color(0xFF555555),
           fontWeight: FontWeight.w700,
         ),

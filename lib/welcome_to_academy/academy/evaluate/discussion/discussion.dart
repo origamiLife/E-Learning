@@ -2,6 +2,8 @@ import 'package:academy/welcome_to_academy/export.dart';
 import '../../academy.dart';
 import 'package:intl/intl.dart';
 import 'package:http/http.dart' as http;
+import 'package:html_unescape/html_unescape.dart';
+import 'package:html/parser.dart' show parse;
 
 class Discussion extends StatefulWidget {
   Discussion({
@@ -104,21 +106,42 @@ class _DiscussionState extends State<Discussion> {
     return FutureBuilder<List<DiscussionData>>(
       future: fetchDiscussion(),
       builder: (context, snapshot) {
-        if (snapshot.hasError) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              CircularProgressIndicator(
+                color: Color(0xFFFF9900),
+              ),
+              SizedBox(
+                width: 12,
+              ),
+              Text(
+                '$loadingTS...',
+                style: TextStyle(
+                  fontFamily: 'Arial',
+                  fontSize: 16,
+                  fontWeight: FontWeight.w700,
+                  color: Color(0xFF555555),
+                ),
+              ),
+            ],
+          );
+        } else if (snapshot.hasError) {
           return Center(child: Text('Error: ${snapshot.error}'));
         } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
           return Center(
               child: Text(
-            NotFoundDataTS,
-            style: TextStyle(
-              fontFamily: 'Arial',
-              fontSize: 16.0,
-              color: const Color(0xFF555555),
-              fontWeight: FontWeight.w700,
-            ),
-            overflow: TextOverflow.ellipsis,
-            maxLines: 1,
-          ));
+                NotFoundDataTS,
+                style: TextStyle(
+                  fontFamily: 'Arial',
+                  fontSize: 16.0,
+                  color: const Color(0xFF555555),
+                  fontWeight: FontWeight.w700,
+                ),
+                overflow: TextOverflow.ellipsis,
+                maxLines: 1,
+              ));
         } else {
           return _getContentWidget(snapshot.data!);
         }
@@ -126,11 +149,18 @@ class _DiscussionState extends State<Discussion> {
     );
   }
 
+  String _disccusion(String htmlString) {
+    final unescape = HtmlUnescape();
+    String decoded = unescape.convert(htmlString); // แปลงเป็น <p>Title 1</p>
+    final document = parse(decoded);               // แปลง HTML เป็น document
+    return document.body?.text.trim() ?? '';       // ดึงเฉพาะข้อความใน tag
+  }
+
   Widget _getContentWidget(List<DiscussionData> discussion) {
     return Container(
       color: Colors.grey.shade50,
       child: Padding(
-        padding: const EdgeInsets.all(16),
+        padding: const EdgeInsets.only(left: 8,right: 8),
         child: SingleChildScrollView(
           child: Column(
             children: List.generate(discussion.length, (index) {
@@ -174,10 +204,11 @@ class _DiscussionState extends State<Discussion> {
                           child: Row(
                             children: [
                               Expanded(
-                                flex: 1,
+                                flex: isMobile ? 2 : 1,
                                 child: Image.network(
                                   disc.disccusion_emp_image,
                                   width: double.infinity,
+                                  height: (isMobile)?100:180,
                                   fit: BoxFit.contain,
                                   errorBuilder: (context, error, stackTrace) {
                                     return Icon(Icons.info, size: 40);
@@ -188,7 +219,7 @@ class _DiscussionState extends State<Discussion> {
                                 width: 8,
                               ),
                               Expanded(
-                                flex: 2,
+                                flex: isMobile ? 3 : 5,
                                 child: Column(
                                   mainAxisAlignment: MainAxisAlignment.start,
                                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -206,6 +237,7 @@ class _DiscussionState extends State<Discussion> {
                                     ),
                                     SizedBox(height: 8),
                                     Row(
+                                      crossAxisAlignment: CrossAxisAlignment.start,
                                       children: [
                                         Icon(
                                           Icons.people_alt_outlined,
@@ -232,6 +264,7 @@ class _DiscussionState extends State<Discussion> {
                                     ),
                                     SizedBox(height: 8),
                                     Row(
+                                      crossAxisAlignment: CrossAxisAlignment.start,
                                       children: [
                                         Icon(
                                           Icons.calendar_month,
@@ -243,7 +276,7 @@ class _DiscussionState extends State<Discussion> {
                                         ),
                                         Flexible(
                                           child: Text(
-                                            disc.disccusion_date,
+                                        _disccusion(disc.disccusion_date),
                                             style: TextStyle(
                                               fontFamily: 'Arial',
                                               fontSize: 14.0,
@@ -258,7 +291,8 @@ class _DiscussionState extends State<Discussion> {
                                     ),
                                     SizedBox(height: 8),
                                     Text(
-                                      disc.discussion_description,
+                                      parse(disc.discussion_description).body?.text ?? '',
+                                      // disc.discussion_description,
                                       style: TextStyle(
                                         fontFamily: 'Arial',
                                         fontSize: 14.0,
@@ -346,46 +380,48 @@ class _DiscussionState extends State<Discussion> {
                   padding: const EdgeInsets.all(16),
                   child: Column(
                     children: [
-                      _buildTextField(_commentControllerA, '$ExplainTS...', (value) {
-                        setState(() {
-                          _commentA = value;
-                        });
-                      }),
+                      _buildTextField(_commentControllerA, '$ExplainTS...',
+                              (value) {
+                            setState(() {
+                              _commentA = value;
+                            });
+                          }),
                       SizedBox(height: 8),
-                  Container(
-                    width: double.infinity,
-                    decoration: BoxDecoration(
-                      color: Colors.orange.shade300,
-                      borderRadius: BorderRadius.circular(10),
-                    ),
-                    child: TextButton(
-                      onPressed: () {
-                        if (_commentA.isNotEmpty) {
-                          DiscussionSave(
-                            discussionId,
-                            "save",
-                            "",
-                            _commentA,
-                          );
-                          _commentControllerA.clear();
-                          setState(() {
-                            _commentA = "";
-                          });
-                        }
-                      },
-                      style: TextButton.styleFrom(
-                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-                      ),
-                      child: Text(
-                        "$postTS",
-                        style: const TextStyle(
-                          fontFamily: 'Arial',
-                          fontSize: 20,
-                          color: Colors.white,
-                          fontWeight: FontWeight.w700,
-                        ),
-                      ),
-                    )),
+                      Container(
+                          width: double.infinity,
+                          decoration: BoxDecoration(
+                            color: Colors.orange.shade300,
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                          child: TextButton(
+                            onPressed: () {
+                              if (_commentA.isNotEmpty) {
+                                DiscussionSave(
+                                  discussionId,
+                                  "save",
+                                  "",
+                                  _commentA,
+                                );
+                                _commentControllerA.clear();
+                                setState(() {
+                                  _commentA = "";
+                                });
+                              }
+                            },
+                            style: TextButton.styleFrom(
+                              padding: const EdgeInsets.symmetric(
+                                  horizontal: 8, vertical: 2),
+                            ),
+                            child: Text(
+                              "$postTS",
+                              style: const TextStyle(
+                                fontFamily: 'Arial',
+                                fontSize: 20,
+                                color: Colors.white,
+                                fontWeight: FontWeight.w700,
+                              ),
+                            ),
+                          )),
                     ],
                   ),
                 ),
@@ -465,13 +501,15 @@ class _DiscussionState extends State<Discussion> {
         maxLines: null,
         controller: controller,
         keyboardType: TextInputType.text,
-        style: GoogleFonts.openSans(fontSize: 14, color: const Color(0xFF555555)),
+        style: TextStyle(
+            fontFamily: 'Arial', fontSize: 14, color: const Color(0xFF555555)),
         decoration: InputDecoration(
           isDense: true,
           filled: true,
           fillColor: Colors.white,
           hintText: hintText,
-          hintStyle: GoogleFonts.openSans(fontSize: 14, color: Colors.black38),
+          hintStyle: TextStyle(
+              fontFamily: 'Arial', fontSize: 14, color: Colors.black38),
           border: OutlineInputBorder(
             borderRadius: BorderRadius.circular(15),
             borderSide: BorderSide.none,
@@ -804,11 +842,11 @@ class _DiscussionState extends State<Discussion> {
   }
 
   Future<void> DiscussionSave(
-    String discussion_id,
-    String method,
-    String reply_id,
-    String reply_comment,
-  ) async {
+      String discussion_id,
+      String method,
+      String reply_id,
+      String reply_comment,
+      ) async {
     try {
       final response = await http.post(
         Uri.parse('$host/api/origami/academy/discussionSave.php'),
@@ -827,14 +865,12 @@ class _DiscussionState extends State<Discussion> {
       if (response.statusCode == 200) {
         final jsonResponse = jsonDecode(response.body);
         if (jsonResponse['status'] == true) {
-          if(method == 'save'){
+          if (method == 'save') {
             _commentControllerA.clear();
             setState(() {
               _commentA = "";
             });
-          }else if(method == 'edit'){
-
-          }
+          } else if (method == 'edit') {}
 
           print("message: true");
         } else {
