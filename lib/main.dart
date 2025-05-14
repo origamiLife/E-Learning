@@ -19,7 +19,7 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized(); // รอการ initialize
   // ป้องกันการจับภาพหน้าจอ (สำหรับ Android)
   // await secureScreen();
-
+  print('ABC');
   // เตรียมข้อมูลสำหรับ Locale ภาษาไทย
   await initializeDateFormatting('th', null);
 
@@ -41,7 +41,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Origami Academy',
+      title: 'E-Leaning',
       theme: ThemeData(
         useMaterial3: false,
         colorScheme: ColorScheme.fromSeed(
@@ -94,11 +94,12 @@ class _LoginPageState extends State<LoginPage> {
   bool isPass = true;
   bool _forgot = false;
   bool _begin = false;
+  int countPage = 0;
 
   @override
   void initState() {
     super.initState();
-    print(widget.num);
+    countPage = widget.num;
     print(widget.popPage);
     print(widget.company_id);
     _fetchComponent();
@@ -141,7 +142,7 @@ class _LoginPageState extends State<LoginPage> {
   Future<void> loadCredentials() async {
     var box = await Hive.openBox('userBox');
 
-    if (widget.num == 1) {
+    if (countPage == 1) {
       await box.clear();
     }
 
@@ -153,7 +154,13 @@ class _LoginPageState extends State<LoginPage> {
       _passwordController.text = password ?? '';
     });
 
-    if (username!.isNotEmpty && password!.isNotEmpty && widget.num == 0) {
+    if(username == '' && password == ''){
+      countPage = 1;
+    }else{
+      countPage = 0;
+    }
+
+    if (username!.isNotEmpty && password!.isNotEmpty && countPage == 0) {
       _login();
     }
 
@@ -334,11 +341,12 @@ class _LoginPageState extends State<LoginPage> {
             children: [
               Container(
                 decoration: BoxDecoration(
-                  image: DecorationImage(
-                    image:
-                        NetworkImage(backgroudComponent),
-                    fit: BoxFit.cover, // ปรับให้รูปเต็มหน้าจอ
-                  ),
+                  image: backgroudComponent.isNotEmpty
+                      ? DecorationImage(
+                    image: NetworkImage(backgroudComponent),
+                    fit: BoxFit.cover,
+                  )
+                      : null, // หรือใช้ภาพจาก assets แทน
                 ),
               ),
               LayoutBuilder(builder: (context, constraints) {
@@ -719,7 +727,8 @@ class _LoginPageState extends State<LoginPage> {
                             builder: (context) => AcademyHomePage(
                               employee: employee[index],
                               Authorization: authorization,
-                              page: 'course',
+                              learnin_page: 'course',
+                              logo: logoComponent,
                               company_id: index,
                             ),
                           ),
@@ -787,7 +796,7 @@ class _LoginPageState extends State<LoginPage> {
               employeeJson.map((json) => Employee.fromJson(json)).toList();
           _isLoading = true;
         });
-        if (widget.num == 1) {
+        if (countPage == 1) {
           _showFullScreenImage(employee);
         } else {
           await Future.delayed(const Duration(seconds: 1));
@@ -797,7 +806,8 @@ class _LoginPageState extends State<LoginPage> {
               builder: (context) => AcademyHomePage(
                 employee: employee[widget.company_id??0],
                 Authorization: authorization,
-                page: 'course',
+                learnin_page: 'course',
+                logo: logoComponent,
                 company_id: widget.company_id??0,
               ),
             ),

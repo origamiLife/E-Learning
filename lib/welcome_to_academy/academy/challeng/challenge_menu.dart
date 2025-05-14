@@ -7,10 +7,11 @@ class ChallengeStartTime extends StatefulWidget {
   const ChallengeStartTime({
     super.key,
     required this.employee,
-    required this.Authorization,
+    required this.Authorization, required this.logo,
   });
   final Employee employee;
   final String Authorization;
+  final String logo;
 
   @override
   _ChallengeStartTimeState createState() => _ChallengeStartTimeState();
@@ -18,13 +19,9 @@ class ChallengeStartTime extends StatefulWidget {
 
 class _ChallengeStartTimeState extends State<ChallengeStartTime>
     with WidgetsBindingObserver {
-  late Future<List<GetChallenge>> futureChallenges;
   List<GetChallenge> getChallenges = [];
-  List<GetChallenge> allChallenges = [];
-  List<GetChallenge> filteredChallenges = [];
   final TextEditingController _searchController = TextEditingController();
-
-  bool _isMenu = false;
+  Map<String, String> statusOptions = {};
   String formattedDate = '';
   @override
   void initState() {
@@ -32,33 +29,16 @@ class _ChallengeStartTimeState extends State<ChallengeStartTime>
     DateTime now = DateTime.now();
     formattedDate = DateFormat('yyyy-MM-dd').format(now);
     WidgetsBinding.instance.addObserver(this);
-    futureChallenges = fetchGetChallenge();
-    futureChallenges.then((challenges) {
-      setState(() {
-        allChallenges = challenges;
-        filteredChallenges = challenges;
-      });
-    });
-
-    // Listener สำหรับการกรอง
-    _searchController.addListener(() {
-      filterChallenges();
-    });
+    loadLevelsStatus();
   }
 
-  void filterChallenges() {
-    final query = _searchController.text.toLowerCase();
-
-    setState(() {
-      filteredChallenges = allChallenges.where((challenge) {
-        final name = challenge.challenge_name.toLowerCase();
-        final start = challenge.challenge_start.toLowerCase();
-        final end = challenge.challenge_end.toLowerCase();
-        return name.contains(query) ||
-            start.contains(query) ||
-            end.contains(query);
-      }).toList();
-    });
+  Future<void> loadLevelsStatus() async {
+    final statusdata = await fetchStatusData();
+    if (statusdata != null) {
+      setState(() {
+        statusOptions = statusdata.level_data;
+      });
+    }
   }
 
   // ✅ ปิด Controller ใน dispose()
@@ -70,27 +50,18 @@ class _ChallengeStartTimeState extends State<ChallengeStartTime>
   }
 
   @override
-  void didChangeAppLifecycleState(AppLifecycleState state) {
-    if (state == AppLifecycleState.resumed) {
-      setState(() {
-        futureChallenges = fetchGetChallenge();
-      });
-    }
-  }
-
-  @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
       body: Column(
         children: [
           Padding(
-            padding: const EdgeInsets.only(right: 8,top: 4,bottom: 8),
+            padding: const EdgeInsets.only(right: 8, top: 4, bottom: 8),
             child: Row(
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
-                Expanded(flex:3,child: _buildSearchField()),
-                Expanded(flex:1,child: _DropdownStatus('Please select')),
+                Expanded(flex: 3, child: _buildSearchField()),
+                Expanded(flex: 1, child: _DropdownStatus('Status')),
               ],
             ),
           ),
@@ -98,7 +69,7 @@ class _ChallengeStartTimeState extends State<ChallengeStartTime>
             child: Padding(
               padding: const EdgeInsets.only(left: 8, right: 8),
               child: FutureBuilder<List<GetChallenge>>(
-                future: futureChallenges,
+                future: fetchGetChallenge(),
                 builder: (context, snapshot) {
                   if (snapshot.connectionState == ConnectionState.waiting) {
                     return Center(
@@ -139,9 +110,82 @@ class _ChallengeStartTimeState extends State<ChallengeStartTime>
                     // ✅ ใช้ snapshot.data โดยตรง
                     List<GetChallenge> challengeList = snapshot.data!;
                     return SingleChildScrollView(
-                      child: isMobile
-                          ? _challengeListSlim(challengeList)
-                          : _challengeListBig(challengeList),
+                      child: Column(
+                        children: [
+                          isMobile
+                              ? _challengeListSlim(challengeList)
+                              : _challengeListBig(challengeList),
+                          (current_page == total_pages)
+                              ? Container()
+                              : Column(
+                                  children: [
+                                    Divider(),
+                                    Row(
+                                      children: [
+                                        InkWell(
+                                          onTap: () {
+                                            if (current_page > 1) {
+                                              setState(() {
+                                                pages = (current_page - 1)
+                                                    .toString();
+                                              });
+                                            }
+                                          },
+                                          child: Padding(
+                                            padding: const EdgeInsets.only(
+                                                left: 8,
+                                                right: 8,
+                                                top: 8,
+                                                bottom: 12),
+                                            child: Text(
+                                              'ก่อนหน้า',
+                                              style: TextStyle(
+                                                fontFamily: 'Arial',
+                                                fontSize: 16.0,
+                                                color: (current_page <= 1)
+                                                    ? Colors.grey
+                                                    : Color(0xFF555555),
+                                                fontWeight: FontWeight.w700,
+                                              ),
+                                            ),
+                                          ),
+                                        ),
+                                        Spacer(),
+                                        InkWell(
+                                          onTap: () {
+                                            if (current_page >= total_pages) {
+                                              setState(() {
+                                                pages = (current_page + 1)
+                                                    .toString();
+                                              });
+                                            }
+                                          },
+                                          child: Padding(
+                                            padding: const EdgeInsets.only(
+                                                left: 8,
+                                                right: 8,
+                                                top: 8,
+                                                bottom: 12),
+                                            child: Text(
+                                              'ถัดไป',
+                                              style: TextStyle(
+                                                fontFamily: 'Arial',
+                                                fontSize: 16.0,
+                                                color: (current_page <=
+                                                        total_pages)
+                                                    ? Colors.grey
+                                                    : Color(0xFF555555),
+                                                fontWeight: FontWeight.w700,
+                                              ),
+                                            ),
+                                          ),
+                                        ),
+                                      ],
+                                    )
+                                  ],
+                                ),
+                        ],
+                      ),
                     );
                   }
                 },
@@ -182,7 +226,7 @@ class _ChallengeStartTimeState extends State<ChallengeStartTime>
               filled: true,
               fillColor: Colors.white,
               contentPadding:
-              const EdgeInsets.symmetric(horizontal: 24, vertical: 14),
+                  const EdgeInsets.symmetric(horizontal: 24, vertical: 14),
               hintText: '$SearchTS...',
               hintStyle: const TextStyle(
                   fontFamily: 'Arial', fontSize: 14, color: Color(0xFF555555)),
@@ -282,8 +326,10 @@ class _ChallengeStartTimeState extends State<ChallengeStartTime>
             padding: const EdgeInsets.all(12),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisAlignment: MainAxisAlignment.start,
               children: [
                 Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     const SizedBox(width: 8),
                     Expanded(
@@ -301,12 +347,16 @@ class _ChallengeStartTimeState extends State<ChallengeStartTime>
                         child: ClipRRect(
                           borderRadius: BorderRadius.circular(10),
                           child: Image.network(
-                            challenge.challenge_logo,
+                            challenge.challenge_cover,
                             height: 100,
                             width: 100,
                             fit: BoxFit.cover,
                             errorBuilder: (context, error, stackTrace) {
-                              return Icon(Icons.error, size: 80, color: Colors.red);
+                              return Image.network(
+                                  challenge.challenge_cover_error,
+                                  height: 100,
+                                  width: 100,
+                                  fit: BoxFit.cover);
                             },
                           ),
                         ),
@@ -322,45 +372,48 @@ class _ChallengeStartTimeState extends State<ChallengeStartTime>
                             challenge.challenge_name,
                             style: const TextStyle(
                               fontFamily: 'Arial',
-                              fontSize: 14,
+                              fontSize: 16,
                               fontWeight: FontWeight.w700,
                               color: Color(0xFF555555),
                             ),
                             overflow: TextOverflow.ellipsis,
                             maxLines: 2,
                           ),
-                          const SizedBox(height: 4),
+                          const SizedBox(height: 8),
                           Text(
                             '$startTS: ${challenge.challenge_start}',
                             style: const TextStyle(
                               fontFamily: 'Arial',
-                              fontSize: 12,
+                              fontSize: 14,
                               color: Color(0xFF555555),
+                              fontWeight: FontWeight.w500,
                             ),
                             overflow: TextOverflow.ellipsis,
                           ),
-                          const SizedBox(height: 4),
+                          const SizedBox(height: 8),
                           Text(
                             '$endTS: ${challenge.challenge_end}',
                             style: const TextStyle(
                               fontFamily: 'Arial',
-                              fontSize: 12,
+                              fontSize: 14,
                               color: Color(0xFF555555),
+                              fontWeight: FontWeight.w500,
                             ),
                             overflow: TextOverflow.ellipsis,
                           ),
-                          const SizedBox(height: 4),
+                          const SizedBox(height: 8),
                           Text(
                             (challenge.challenge_status == 'success')
                                 ? successTS
                                 : (challenge.challenge_status == 'time_out')
                                     ? timeoutTS
-                                    : (challenge.challenge_status == 'not_start')
+                                    : (challenge.challenge_status ==
+                                            'not_start')
                                         ? notStartTS
                                         : doingTS,
                             style: TextStyle(
                               fontFamily: 'Arial',
-                              fontSize: 12,
+                              fontSize: 14,
                               fontWeight: FontWeight.w600,
                               color: (challenge.challenge_status == 'doing' ||
                                       challenge.challenge_status == 'not_start')
@@ -375,7 +428,6 @@ class _ChallengeStartTimeState extends State<ChallengeStartTime>
                   ],
                 ),
                 const SizedBox(height: 4),
-                const Divider(),
               ],
             ),
           ),
@@ -431,12 +483,15 @@ class _ChallengeStartTimeState extends State<ChallengeStartTime>
                         child: ClipRRect(
                           borderRadius: BorderRadius.circular(10),
                           child: Image.network(
-                            challenge.challenge_logo,
+                            challenge.challenge_cover,
                             width: double.infinity,
                             height: 180,
                             fit: BoxFit.cover,
                             errorBuilder: (context, error, stackTrace) =>
-                                Icon(Icons.error, size: 50),
+                                Image.network(challenge.challenge_cover_error,
+                                    width: double.infinity,
+                                    height: 180,
+                                    fit: BoxFit.cover),
                           ),
                         ),
                       ),
@@ -487,7 +542,8 @@ class _ChallengeStartTimeState extends State<ChallengeStartTime>
                                 ? '$successTS'
                                 : (challenge.challenge_status == 'time_out')
                                     ? '$timeoutTS'
-                                    : (challenge.challenge_status == 'not_start')
+                                    : (challenge.challenge_status ==
+                                            'not_start')
                                         ? '$notStartTS'
                                         : '$doingTS',
                             style: TextStyle(
@@ -517,52 +573,50 @@ class _ChallengeStartTimeState extends State<ChallengeStartTime>
     );
   }
 
-  void _showChallengeDialog(
-      BuildContext context, GetChallenge challenge, GetChallenge challeng2) {
-    QuickAlert.show(
-      context: context,
-      type: QuickAlertType.confirm,
-      // customAsset: 'assets/images/learning/img.png',
-      width: MediaQuery.of(context).size.width > 600 ? 590 : 400,
-      title: '$AreYouReadyTS',
-      confirmBtnText: '$startTS',
-      confirmBtnColor: Colors.blue,
-      customAsset: 'assets/images/learning/student.png',
-      confirmBtnTextStyle: const TextStyle(
-        fontSize: 18,
-        color: Colors.white,
-        fontWeight: FontWeight.w700,
-      ),
-      cancelBtnText: '$CancelTS',
-      cancelBtnTextStyle: const TextStyle(
-        fontSize: 18,
-        color: Colors.grey,
-        fontWeight: FontWeight.w700,
-      ),
-      widget: Column(
-        children: [
-          const SizedBox(height: 8),
-          _textWidget('$challengeTS:', challenge.challenge_name),
-          _textWidget('$DescriptionTS:', challenge.challenge_description),
-          _textWidget('$RuleTS:', challenge.challenge_rule),
-          _textWidget('$DurationTS ($MinTS):', challenge.challenge_duration),
-          _textWidget('$PartTS:', challenge.challenge_question_part),
-          _textWidget('$NumberQuestionsTS:',
-              '${challenge.specific_question} $questionTS'),
-        ],
-      ),
-      onCancelBtnTap: () => Navigator.pop(context),
-      onConfirmBtnTap: () => btnGetchalleng(challenge),
-    );
-  }
+  // void _showChallengeDialog(
+  //     BuildContext context, GetChallenge challenge, GetChallenge challeng2) {
+  //   QuickAlert.show(
+  //     context: context,
+  //     type: QuickAlertType.confirm,
+  //     // customAsset: 'assets/images/learning/img.png',
+  //     width: MediaQuery.of(context).size.width > 600 ? 590 : 400,
+  //     title: '$AreYouReadyTS',
+  //     confirmBtnText: '$startTS',
+  //     confirmBtnColor: Colors.blue,
+  //     customAsset: 'assets/images/learning/student.png',
+  //     confirmBtnTextStyle: const TextStyle(
+  //       fontSize: 18,
+  //       color: Colors.white,
+  //       fontWeight: FontWeight.w700,
+  //     ),
+  //     cancelBtnText: '$CancelTS',
+  //     cancelBtnTextStyle: const TextStyle(
+  //       fontSize: 18,
+  //       color: Colors.grey,
+  //       fontWeight: FontWeight.w700,
+  //     ),
+  //     widget: Column(
+  //       children: [
+  //         const SizedBox(height: 8),
+  //         _textWidget('$challengeTS:', challenge.challenge_name),
+  //         _textWidget('$DescriptionTS:', challenge.challenge_description),
+  //         _textWidget('$RuleTS:', challenge.challenge_rule),
+  //         _textWidget('$DurationTS ($MinTS):', challenge.challenge_duration),
+  //         _textWidget('$PartTS:', challenge.challenge_question_part),
+  //         _textWidget('$NumberQuestionsTS:',
+  //             '${challenge.specific_question} $questionTS'),
+  //       ],
+  //     ),
+  //     onCancelBtnTap: () => Navigator.pop(context),
+  //     onConfirmBtnTap: () => btnGetchalleng(challenge),
+  //   );
+  // }
 
   void btnGetchalleng(GetChallenge challenge) {
     String? challengeStartStr = challenge.challenge_start;
     String? challengeEndStr = challenge.challenge_end;
 
-    if (challengeStartStr != null &&
-        challengeStartStr.isNotEmpty &&
-        challengeEndStr != null &&
+    if (challengeStartStr.isNotEmpty &&
         challengeEndStr.isNotEmpty) {
       DateTime dateStartChallenge =
           DateFormat('yyyy-MM-dd').parse(challengeStartStr);
@@ -587,13 +641,25 @@ class _ChallengeStartTimeState extends State<ChallengeStartTime>
                   employee: widget.employee,
                   Authorization: widget.Authorization,
                   initialMinutes:
-                      double.tryParse(challenge.challenge_duration) ?? 0,
-                  getchallenge: challenge,
+                      double.tryParse(challenge.challenge_minute) ?? 0,
+                  getchallenge: challenge, logo: widget.logo,
                 ),
               ),
             );
           } else {
-            showCustomDialog(context, challenge);
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => ChallengePage(
+                  employee: widget.employee,
+                  Authorization: widget.Authorization,
+                  initialMinutes:
+                      double.tryParse(challenge.challenge_minute) ?? 0,
+                  getchallenge: challenge, logo: widget.logo,
+                ),
+              ),
+            );
+            // showCustomDialog(context, challenge);
             // QuickAlert.show(
             //   context: context,
             //   type: QuickAlertType.confirm,
@@ -682,226 +748,203 @@ class _ChallengeStartTimeState extends State<ChallengeStartTime>
     }
   }
 
-  void showCustomDialog(BuildContext context, GetChallenge challenge) {
-    showDialog(
-      context: context,
-      barrierDismissible: false, // Prevent dismissing by tapping outside
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: Column(
-            children: [
-              Text(
-                '$AreYouReadyTS', // Title of the dialog
-                style: TextStyle(
-                    fontFamily: 'Arial',
-                    fontSize: 20,
-                    fontWeight: FontWeight.bold),
-              ),
-              // SizedBox(height: ),
-              Padding(
-                padding: const EdgeInsets.all(16.0),
-                child: SizedBox(
-                  width: isMobile ? 400 : 580,
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      // Image (similar to customAsset)
-                      Image.asset(
-                        'assets/images/learning/student.png',
-                        height: 180,
-                        width: double.infinity,
-                        fit: BoxFit.cover,
-                      ),
-                      SizedBox(height: 16),
-                      _textWidget2('$challengeTS:', challenge.challenge_name),
-                      _textWidget2(
-                          '$DescriptionTS:', challenge.challenge_description),
-                      _textWidget2('$RuleTS:', challenge.challenge_rule),
-                      _textWidget2('$DurationTS ($MinTS):',
-                          challenge.challenge_duration),
-                      _textWidget2(
-                          '$PartTS:', challenge.challenge_question_part),
-                      _textWidget2('$NumberQuestionsTS:',
-                          '${challenge.specific_question} $questionTS'),
-                    ],
-                  ),
-                ),
-              ),
-            ],
-          ),
-          actions: [
-            // Cancel Button
-            TextButton(
-              onPressed: () {
-                Navigator.pop(context); // Close the dialog
-              },
-              child: Text(
-                '$CancelTS',
-                style: TextStyle(
-                  fontSize: 14,
-                  color: Colors.grey,
-                  fontWeight: FontWeight.w700,
-                ),
+  // void showCustomDialog(BuildContext context, GetChallenge challenge) {
+  //   showDialog(
+  //     context: context,
+  //     barrierDismissible: false, // Prevent dismissing by tapping outside
+  //     builder: (BuildContext context) {
+  //       return AlertDialog(
+  //         title: Column(
+  //           children: [
+  //             Text(
+  //               '$AreYouReadyTS', // Title of the dialog
+  //               style: TextStyle(
+  //                   fontFamily: 'Arial',
+  //                   fontSize: 20,
+  //                   fontWeight: FontWeight.bold),
+  //             ),
+  //             // SizedBox(height: ),
+  //             Padding(
+  //               padding: const EdgeInsets.all(16.0),
+  //               child: SizedBox(
+  //                 width: isMobile ? 400 : 580,
+  //                 child: Column(
+  //                   crossAxisAlignment: CrossAxisAlignment.start,
+  //                   children: [
+  //                     // Image (similar to customAsset)
+  //                     Image.asset(
+  //                       'assets/images/learning/student.png',
+  //                       height: 180,
+  //                       width: double.infinity,
+  //                       fit: BoxFit.cover,
+  //                     ),
+  //                     SizedBox(height: 16),
+  //                     _textWidget2('$challengeTS:', challenge.challenge_name),
+  //                     _textWidget2(
+  //                         '$DescriptionTS:', challenge.challenge_description),
+  //                     _textWidget2('$RuleTS:', challenge.challenge_rule),
+  //                     _textWidget2('$DurationTS ($MinTS):',
+  //                         challenge.challenge_duration),
+  //                     _textWidget2(
+  //                         '$PartTS:', challenge.challenge_question_part),
+  //                     _textWidget2('$NumberQuestionsTS:',
+  //                         '${challenge.specific_question} $questionTS'),
+  //                   ],
+  //                 ),
+  //               ),
+  //             ),
+  //           ],
+  //         ),
+  //         actions: [
+  //           // Cancel Button
+  //           TextButton(
+  //             onPressed: () {
+  //               Navigator.pop(context); // Close the dialog
+  //             },
+  //             child: Text(
+  //               '$CancelTS',
+  //               style: TextStyle(
+  //                 fontSize: 14,
+  //                 color: Colors.grey,
+  //                 fontWeight: FontWeight.w700,
+  //               ),
+  //             ),
+  //           ),
+  //           // Confirm Button
+  //           TextButton(
+  //             onPressed: () {
+  //               // Navigator.pop(context); // Close the dialog
+  //               // Navigate to the next screen
+  //               Navigator.push(
+  //                 context,
+  //                 MaterialPageRoute(
+  //                   builder: (context) => ChallengePage(
+  //                     employee: widget.employee,
+  //                     Authorization: widget.Authorization,
+  //                     initialMinutes:
+  //                         double.tryParse(challenge.challenge_duration) ?? 0,
+  //                     getchallenge: challenge,
+  //                   ),
+  //                 ),
+  //               );
+  //             },
+  //             child: Text(
+  //               '$startTS',
+  //               style: TextStyle(
+  //                 fontSize: 16,
+  //                 color: Colors.orange,
+  //                 // fontWeight: FontWeight.w700,
+  //               ),
+  //             ),
+  //           ),
+  //         ],
+  //       );
+  //     },
+  //   );
+  // }
+
+  Widget _DropdownStatus(String value) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Container(
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(10),
+              color: Colors.white,
+              border: Border.all(
+                color: Colors.grey.shade300,
+                width: 1.0,
               ),
             ),
-            // Confirm Button
-            TextButton(
-              onPressed: () {
-                // Navigator.pop(context); // Close the dialog
-                // Navigate to the next screen
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => ChallengePage(
-                      employee: widget.employee,
-                      Authorization: widget.Authorization,
-                      initialMinutes:
-                          double.tryParse(challenge.challenge_duration) ?? 0,
-                      getchallenge: challenge,
+            child: DropdownButton2<String>(
+              isExpanded: true,
+              hint: Text(
+                value,
+                style: TextStyle(
+                  fontFamily: 'Arial',
+                  color: Colors.grey,
+                  fontSize: 14,
+                ),
+              ),
+              style: TextStyle(
+                fontFamily: 'Arial',
+                color: Colors.grey,
+                fontSize: 14,
+              ),
+              value: challenge_status,
+              items: statusOptions.entries.map((entry) {
+                return DropdownMenuItem<String>(
+                  value: entry.key,
+                  child: Text(
+                    entry.value,
+                    style: TextStyle(
+                      fontFamily: 'Arial',
+                      fontSize: 14,
                     ),
                   ),
                 );
+              }).toList(),
+              onChanged: (value) {
+                setState(() {
+                  challenge_status = value;
+                  print('$challenge_status');
+                  fetchGetChallenge();
+                });
               },
-              child: Text(
-                '$startTS',
-                style: TextStyle(
-                  fontSize: 16,
-                  color: Colors.orange,
-                  // fontWeight: FontWeight.w700,
-                ),
+              underline: SizedBox.shrink(),
+              iconStyleData: IconStyleData(
+                icon: Icon(Icons.arrow_drop_down,
+                    color: Color(0xFF555555), size: 30),
+                iconSize: 30,
               ),
-            ),
-          ],
-        );
-      },
-    );
-  }
-
-// Custom widget to display the text
-  Widget _textWidget2(String title, String value) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 4.0),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            title,
-            style: TextStyle(
-              fontFamily: 'Arial',
-              fontSize: 14,
-              fontWeight: FontWeight.bold,
-              color: Color(0xFF555555),
-            ),
-          ),
-          SizedBox(width: 10),
-          Expanded(
-              child: Text(
-            value,
-            style: TextStyle(
-              fontFamily: 'Arial',
-              fontSize: 12,
-              // fontWeight: FontWeight.w500,
-              color: Color(0xFF555555),
-            ),
-          )),
-        ],
-      ),
-    );
-  }
-
-  Widget _DropdownStatus(String value) {
-    return Container(
-      height: 40,
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(10),
-        color: Colors.white,
-        border: Border.all(
-          color: Colors.grey.shade300,
-          width: 1.0,
-        ),
-      ),
-      child: DropdownButton2<ModelDropdownAcademy>(
-        isExpanded: true,
-        hint: Text(
-          value,
-          style: TextStyle(
-            fontFamily: 'Arial',
-            color: Colors.grey,
-            fontSize: 14,
-          ),
-        ),
-        style: TextStyle(
-          fontFamily: 'Arial',
-          color: Colors.grey,
-          fontSize: 14,
-        ),
-        items: _modelStatus
-            .map((ModelDropdownAcademy status) =>
-            DropdownMenuItem<ModelDropdownAcademy>(
-              value: status,
-              child: Text(
-                status.name,
-                style: TextStyle(
-                  fontFamily: 'Arial',
-                  fontSize: 14,
-                ),
+              buttonStyleData: ButtonStyleData(
+                padding: const EdgeInsets.symmetric(vertical: 2),
               ),
-            ))
-            .toList(),
-        value: selectedStatus,
-        onChanged: (value) {
-          setState(() {
-            selectedStatus = value;
-          });
-        },
-        underline: SizedBox.shrink(),
-        iconStyleData: IconStyleData(
-          icon: Icon(Icons.arrow_drop_down,
-              color: Color(0xFF555555), size: 30),
-          iconSize: 30,
-        ),
-        buttonStyleData: ButtonStyleData(
-          padding: const EdgeInsets.symmetric(vertical: 2),
-        ),
-        dropdownStyleData: DropdownStyleData(
-          maxHeight: 200,
-        ),
-        menuItemStyleData: MenuItemStyleData(
-          height: 33,
-        ),
-      ),
+              dropdownStyleData: DropdownStyleData(
+                maxHeight: 200,
+              ),
+              menuItemStyleData: MenuItemStyleData(
+                height: 33,
+              ),
+            )),
+        SizedBox(height: 8),
+      ],
     );
   }
 
-  ModelDropdownAcademy? selectedStatus;
-  List<ModelDropdownAcademy> _modelStatus = [
-    ModelDropdownAcademy(id: '001', name: 'All'),
-    ModelDropdownAcademy(id: '001', name: 'Success'),
-    ModelDropdownAcademy(id: '001', name: 'Doing'),
-    ModelDropdownAcademy(id: '001', name: 'Timed Out'),
-    ModelDropdownAcademy(id: '001', name: 'Not Start'),
-  ];
-
+  String search = '';
+  String pages = '';
+  int total_items = 0;
+  int total_pages = 0;
+  int current_page = 0;
+  String? challenge_status;
   Future<List<GetChallenge>> fetchGetChallenge() async {
-    final uri = Uri.parse("$host/api/origami/challenge/get-challenge.php");
+    print('$challenge_status : $search : $pages');
+    final uri =
+        Uri.parse("$host/api/origami/e-learning/challenge/my-challenge.php");
     final response = await http.post(
       uri,
-      headers: {'Authorization': 'Bearer ${widget.Authorization}'},
+      headers: {'Authorization': 'Bearer $authorization'},
       body: {
-        'comp_id': widget.employee.comp_id,
+        'auth_password': authorization,
         'emp_id': widget.employee.emp_id,
+        'comp_id': widget.employee.comp_id,
+        'challenge_status': challenge_status ?? '',
+        'search': search,
+        'page': pages,
       },
     );
-
     if (response.statusCode == 200) {
       final Map<String, dynamic> jsonResponse = json.decode(response.body);
       // ตรวจสอบว่ามีคีย์ 'academy_data' และไม่เป็น null
-      if (jsonResponse['code'] == 200) {
+      if (jsonResponse['status'] == 200) {
         final List<dynamic> challengeJson = jsonResponse['challenge_data'];
+        total_items = jsonResponse['total_items'];
+        total_pages = jsonResponse['total_pages']; // หน้าทั้งหมด
+        current_page = jsonResponse['current_page']; // หน้าปัจจุบัน
         return getChallenges =
             challengeJson.map((json) => GetChallenge.fromJson(json)).toList();
       } else {
-        // หากไม่มีข้อมูลใน 'academy_data' ให้คืนค่าเป็นลิสต์ว่าง
         print('No challenge data available.');
         return [];
       }
@@ -909,75 +952,72 @@ class _ChallengeStartTimeState extends State<ChallengeStartTime>
       throw Exception('Failed to load academies');
     }
   }
+
+  Future<LevelData?> fetchStatusData() async {
+    final uri = Uri.parse("$host/api/origami/e-learning/challenge/status.php");
+    try {
+      final response = await http.post(
+        uri,
+        headers: {'Authorization': 'Bearer $authorization'},
+        body: {'auth_password': authorization},
+      );
+      if (response.statusCode == 200) {
+        return LevelData.fromJson(json.decode(response.body));
+      }
+      return null;
+    } catch (e) {
+      print('Error fetching question data: $e');
+      throw Exception('Error fetching question data: $e');
+    }
+  }
 }
 
 class GetChallenge {
   final String challenge_id;
-  final String challenge_status;
+  final String request_id;
   final String challenge_name;
-  final String challenge_description;
   final String challenge_start;
   final String challenge_end;
-  final String challenge_duration;
-  final String specific_question;
-  final String challenge_point_value;
-  final String timer_start;
-  final String timer_finish;
-  final String challenge_rank;
-  final String challenge_logo;
-  final String request_id;
-  final String status;
-  final String start_date;
-  final String end_date;
-  final String challenge_rule;
-  final String challenge_question_part;
-  final String correct_answer;
+  final String challenge_question;
+  final String challenge_correct;
+  final String challenge_point;
+  final String challenge_time_used;
+  final String challenge_cover;
+  final String challenge_cover_error;
+  final String challenge_status;
+  final String challenge_minute;
 
   GetChallenge({
     required this.challenge_id,
-    required this.challenge_status,
+    required this.request_id,
     required this.challenge_name,
-    required this.challenge_description,
     required this.challenge_start,
     required this.challenge_end,
-    required this.challenge_duration,
-    required this.specific_question,
-    required this.challenge_point_value,
-    required this.timer_start,
-    required this.timer_finish,
-    required this.challenge_rank,
-    required this.challenge_logo,
-    required this.request_id,
-    required this.status,
-    required this.start_date,
-    required this.end_date,
-    required this.challenge_rule,
-    required this.challenge_question_part,
-    required this.correct_answer,
+    required this.challenge_question,
+    required this.challenge_correct,
+    required this.challenge_point,
+    required this.challenge_time_used,
+    required this.challenge_cover,
+    required this.challenge_cover_error,
+    required this.challenge_status,
+    required this.challenge_minute,
   });
 
   factory GetChallenge.fromJson(Map<String, dynamic> json) {
     return GetChallenge(
       challenge_id: json['challenge_id'] ?? '',
-      challenge_status: json['challenge_status'] ?? '',
+      request_id: json['request_id'] ?? '',
       challenge_name: json['challenge_name'] ?? '',
-      challenge_description: json['challenge_description'] ?? '',
       challenge_start: json['challenge_start'] ?? '',
       challenge_end: json['challenge_end'] ?? '',
-      challenge_duration: json['challenge_duration'] ?? '',
-      specific_question: json['specific_question'] ?? '',
-      challenge_point_value: json['challenge_point_value'] ?? '',
-      timer_start: json['timer_start'] ?? '',
-      timer_finish: json['timer_finish'] ?? '',
-      challenge_rank: json['challenge_rank'] ?? '',
-      challenge_logo: json['challenge_logo'] ?? '',
-      request_id: json['request_id'] ?? '',
-      status: json['status'] ?? '',
-      start_date: json['start_date'] ?? '',
-      end_date: json['end_date'] ?? '',
-      challenge_rule: json['challenge_rule'] ?? '',
-      challenge_question_part: json['challenge_question_part'] ?? '',
-      correct_answer: json['correct_answer'] ?? '',
+      challenge_question: json['challenge_question'] ?? '',
+      challenge_correct: json['challenge_correct'] ?? '',
+      challenge_point: json['challenge_point'] ?? '',
+      challenge_time_used: json['challenge_time_used'] ?? '',
+      challenge_cover: json['challenge_cover'] ?? '',
+      challenge_cover_error: json['challenge_cover_error'] ?? '',
+      challenge_status: json['challenge_status'] ?? '',
+      challenge_minute: json['challenge_minute'] ?? '',
     );
   }
 }

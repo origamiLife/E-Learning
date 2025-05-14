@@ -14,7 +14,7 @@ class SummaryScores extends StatefulWidget {
     required this.initialMinutes,
     required this.challenge,
     required this.questionList,
-    required this.isQuestion,
+    required this.isQuestion, required this.logo,
   });
   final Employee employee;
   final String Authorization;
@@ -22,6 +22,7 @@ class SummaryScores extends StatefulWidget {
   final GetChallenge challenge;
   final List<String> questionList;
   final List<CheckAllChallenge> isQuestion;
+  final String logo;
 
   @override
   _SummaryScoresState createState() => _SummaryScoresState();
@@ -83,7 +84,7 @@ class _SummaryScoresState extends State<SummaryScores> {
                 builder: (context) => AcademyHomePage(
                     employee: widget.employee,
                     Authorization: widget.Authorization,
-                    page: 'challenge'),
+                    learnin_page: 'challenge', logo: widget.logo,),
               ),
             );
           },

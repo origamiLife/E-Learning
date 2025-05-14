@@ -12,12 +12,14 @@ class AcademyHomePage extends StatefulWidget {
       {Key? key,
       required this.employee,
       required this.Authorization,
-      required this.page,
+      required this.learnin_page,
+      required this.logo,
       this.company_id})
       : super(key: key);
   final Employee employee;
   final String Authorization;
-  final String page;
+  final String learnin_page;
+  final String logo;
   final int? company_id;
 
   @override
@@ -25,19 +27,33 @@ class AcademyHomePage extends StatefulWidget {
 }
 
 class _AcademyHomePageState extends State<AcademyHomePage> {
-  final TextEditingController _searchController = TextEditingController();
-  String page = "course";
+  TextEditingController _searchController = TextEditingController();
+  TextEditingController _searchCategoryController = TextEditingController();
+  TextEditingController _createEnrollController = TextEditingController();
+  late PaginationModel pagination;
+  String learnin_page = "course";
   String search = '';
-  // bool _isClick = false;
+  String searchCategory = '';
+  String? filter_date;
+  String? filter_type;
+  String? filter_level;
+  String? filter_category;
+  String pages = '';
+  bool isfilter = false;
+  Map<String, String> levelOptions = {};
+  Map<String, String> typeOptions = {};
+  List<CategoryData> categories = [];
+  CategoryData? selectedCategories;
+  List<int> selectIndex = [];
 
   @override
   void initState() {
     super.initState();
-    page = widget.page;
+    learnin_page = widget.learnin_page;
     print('isAndroid : $isAndroid');
     print('isIPhone : $isIPhone');
     print('object : $isMobile');
-    if (page == 'challenge') {
+    if (learnin_page == 'challenge') {
       _selectedIndex = 1;
     }
     // Listener สำหรับการกรอง
@@ -48,6 +64,34 @@ class _AcademyHomePageState extends State<AcademyHomePage> {
         search = _searchController.text;
       });
     });
+    loadLevels();
+    loadCategories();
+  }
+
+  Future<void> loadLevels() async {
+    final leveldata = await fetchLevelData();
+    final typedata = await fetchTypeData();
+    if (leveldata != null) {
+      setState(() {
+        levelOptions = leveldata.level_data;
+      });
+    }
+    if (typedata != null) {
+      setState(() {
+        typeOptions = typedata.level_data;
+      });
+    }
+  }
+
+  Future<void> loadCategories() async {
+    try {
+      final result = await fetchCategoryData();
+      setState(() {
+        categories = result;
+      });
+    } catch (e) {
+      print('Error loading categories: $e');
+    }
   }
 
   @override
@@ -72,22 +116,7 @@ class _AcademyHomePageState extends State<AcademyHomePage> {
       selectedRadio = value!;
       prefs.setInt('selectedRadio', selectedRadio);
       allTranslate();
-      // Navigator.pushReplacement(
-      //   context,
-      //   MaterialPageRoute(
-      //     builder: (context) => LoginPage(
-      //       num: 0,
-      //       popPage: 0,
-      //     ),
-      //   ),
-      // );
     });
-  }
-
-  Future<void> _launchUrl(Uri url) async {
-    if (!await launchUrl(url)) {
-      throw Exception('Could not launch ${url}');
-    }
   }
 
   int _selectedIndex = 0;
@@ -95,15 +124,15 @@ class _AcademyHomePageState extends State<AcademyHomePage> {
     _selectedIndex = index;
     setState(() {
       if (index == 0) {
-        page = "course";
+        learnin_page = "course";
       } else if (index == 1) {
-        page = "challenge";
+        learnin_page = "challenge";
       } else if (index == 2) {
-        page = "catalog";
+        learnin_page = "catalog";
       } else if (index == 3) {
-        page = "favorite";
+        learnin_page = "favorite";
       } else {
-        page = "course";
+        learnin_page = "course";
       }
     });
   }
@@ -111,37 +140,37 @@ class _AcademyHomePageState extends State<AcademyHomePage> {
   List<TabItem> items = [
     TabItem(
       icon: FontAwesomeIcons.university,
-      title: '$MyLearningTS',
+      title: MyLearningTS,
     ),
     TabItem(
       icon: FontAwesomeIcons.trophy,
-      title: '$MyChallengeTS',
+      title: MyChallengeTS,
     ),
     TabItem(
       icon: FontAwesomeIcons.thList,
-      title: '$CatalogTS',
+      title: CatalogTS,
     ),
     TabItem(
       icon: FontAwesomeIcons.heart,
-      title: '$FavoriteTS',
+      title: FavoriteTS,
     ),
   ];
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      // backgroundColor: Colors.white,
+      backgroundColor: Colors.white,
       body: SafeArea(
         child: Column(
           children: [
             _buildNavigationBar(),
-            // _buildAdBanner(),
-            SizedBox(height: 8),
-            (page == 'challenge')
+            const SizedBox(height: 8),
+            (learnin_page == 'challenge')
                 ? Expanded(
                     child: ChallengeStartTime(
                       employee: widget.employee,
                       Authorization: widget.Authorization,
+                      logo: widget.logo,
                     ),
                   )
                 : Expanded(child: _buildPopularEvents()),
@@ -167,59 +196,6 @@ class _AcademyHomePageState extends State<AcademyHomePage> {
     );
   }
 
-  Widget _buildMobileAppBanner() {
-    return Container(
-      color: Colors.white, // Or a suitable background color
-      padding: const EdgeInsets.all(8.0),
-      child: Row(
-        children: [
-          IconButton(
-            onPressed: () {
-              setState(() {
-                // _showBanner = false;
-              });
-            },
-            icon: const Icon(Icons.close),
-          ),
-          Image.asset(
-            "assets/images/learning/img_2.png",
-            height: 40,
-          ),
-          const SizedBox(width: 8),
-          const Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                "Origami Academy",
-                style: TextStyle(
-                  fontFamily: 'Arial',
-                ),
-              ),
-              Text(
-                "Open on the Origami Life website",
-                style: TextStyle(
-                  fontFamily: 'Arial',
-                  fontSize: 12,
-                  fontWeight: FontWeight.w500,
-                ),
-              ),
-            ],
-          ),
-          const Spacer(),
-          TextButton(
-            onPressed: () {
-              final Uri _url = Uri.parse("https://www.origami.life/edsd");
-              setState(() {
-                _launchUrl(_url);
-              });
-            },
-            child: Text(openTS),
-          ),
-        ],
-      ),
-    );
-  }
-
   Widget _buildNavigationBar() {
     return AppBar(
       backgroundColor: Colors.white, // Example background color
@@ -229,13 +205,26 @@ class _AcademyHomePageState extends State<AcademyHomePage> {
         Expanded(
           flex: 2,
           child: Padding(
-            padding: const EdgeInsets.all(8.0),
+            padding: const EdgeInsets.all(8),
             child: Row(
               children: [
-                Icon(Icons.menu_book, color: Color(0xFFFF9900), size: 30),
+                Image.network(
+                  widget.logo,
+                  width: 35,
+                  height: 35,
+                  fit: BoxFit.contain,
+                  errorBuilder: (context, error, stackTrace) {
+                    return Image.asset(
+                      widget.employee.comp_logo,
+                      width: 35,
+                      height: 35,
+                      fit: BoxFit.contain,
+                    );
+                  },
+                ),
                 SizedBox(width: 14),
                 Text(
-                  'Academy',
+                  'E-Learning',
                   style: TextStyle(
                     fontFamily: 'Arial',
                     fontSize: isMobile ? 24 : 28,
@@ -249,66 +238,6 @@ class _AcademyHomePageState extends State<AcademyHomePage> {
             ),
           ),
         ),
-        // Expanded(
-        //   flex: 2,
-        //   child: DropdownButton(
-        //     items: [
-        //       DropdownMenuItem(
-        //           value: 'course',
-        //           child: Text(
-        //             '$MyLearningTS',
-        //             overflow: TextOverflow.ellipsis,
-        //             maxLines: 1,
-        //           )),
-        //       DropdownMenuItem(
-        //           value: 'challenge',
-        //           child: Text(
-        //             '$MyChallengeTS',
-        //             overflow: TextOverflow.ellipsis,
-        //             maxLines: 1,
-        //           )),
-        //       DropdownMenuItem(
-        //           value: 'catalog',
-        //           child: Text(
-        //             '$CatalogTS',
-        //             overflow: TextOverflow.ellipsis,
-        //             maxLines: 1,
-        //           )),
-        //       DropdownMenuItem(
-        //           value: 'favorite',
-        //           child: Text(
-        //             '$FavoriteTS',
-        //             overflow: TextOverflow.ellipsis,
-        //             maxLines: 1,
-        //           )),
-        //       // Add other menu items
-        //     ],
-        //     onChanged: (value) {
-        //       setState(() {
-        //         selectedValue = value;
-        //         page = value!;
-        //       });
-        //     },
-        //     value: selectedValue,
-        //     hint: Text(
-        //       page == 'challenge' ? '$MyChallengeTS' : '$MyLearningTS',
-        //       style: TextStyle(
-        //         fontFamily: 'Arial',
-        //         fontSize: 16,
-        //         color: Colors.orange,
-        //         fontWeight: FontWeight.w500,
-        //       ),
-        //       overflow: TextOverflow.ellipsis,
-        //       maxLines: 1,
-        //     ),
-        //     style: TextStyle(
-        //       fontFamily: 'Arial',
-        //       fontSize: 16,
-        //       color: Colors.orange,
-        //       fontWeight: FontWeight.w500,
-        //     ),
-        //   ),
-        // ),
         Expanded(
           flex: 1,
           child: Row(
@@ -342,40 +271,12 @@ class _AcademyHomePageState extends State<AcademyHomePage> {
         Expanded(
           flex: 1,
           child: TextButton(
-            onPressed: () {
-              Navigator.pushAndRemoveUntil(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => const LoginPage(
-                    num: 1,
-                    popPage: 0,
-                    company_id: 0,
-                  ),
-                ),
-                (route) => false,
-              );
-            },
+            onPressed: () => fetchLogout(),
             child: Text('$IntOutTS', style: TextStyle(fontFamily: 'Arial')),
           ),
         ),
         // SizedBox(width: 16),
       ],
-    );
-  }
-
-  Widget _buildHeroImageSlider() {
-    final heroImages = [];
-    return CarouselSlider(
-      options: CarouselOptions(height: 400.0), // Adjust height as needed
-      items: heroImages.map((image) {
-        return Builder(
-          builder: (BuildContext context) {
-            return Expanded(
-                child: Image.network(image['desktop_image_url'],
-                    fit: BoxFit.cover));
-          },
-        );
-      }).toList(),
     );
   }
 
@@ -386,57 +287,57 @@ class _AcademyHomePageState extends State<AcademyHomePage> {
           padding: const EdgeInsets.only(top: 4),
           child: Column(
             children: [
-              _buildSearchField(),
-              Padding(
-                padding: const EdgeInsets.only(left: 8, right: 8, top: 8),
-                child: Column(
-                  children: [
-                    _DropdownLevel('All Select Level'),
-                    _DropdownCategory('All Category'),
-                    _DropdownType('All Type'),
-                  ],
-                ),
+              Row(
+                children: [
+                  Expanded(child: _buildSearchField()),
+                  Padding(
+                    padding: const EdgeInsets.only(left: 8.0, right: 8),
+                    child: InkWell(
+                        onTap: () {
+                          setState(() {
+                            (isfilter == false)
+                                ? isfilter = true
+                                : isfilter = false;
+                          });
+                        },
+                        child: Icon(
+                          Icons.filter_list,
+                          color: Colors.grey,
+                          size: 22,
+                        )),
+                  ),
+                ],
               ),
+              SizedBox(height: 8),
+              const Padding(
+                padding: EdgeInsets.only(left: 4, right: 4),
+              ),
+              if (isfilter == true)
+                Padding(
+                  padding: const EdgeInsets.only(left: 8, right: 8),
+                  child: Column(
+                    children: [
+                      _DropdownLevel('All Select Level'),
+                      _DropdownCategory('All Category'),
+                      _DropdownType('All Type'),
+                    ],
+                  ),
+                ),
             ],
           ),
         ),
         Expanded(
           child: Padding(
             padding: const EdgeInsets.only(left: 8, right: 8),
-            child: FutureBuilder<List<AcademyRespond>>(
+            child: FutureBuilder<List<AcademyModel>>(
               future: fetchAcademies(),
               builder: (context, snapshot) {
-                if (snapshot.connectionState == ConnectionState.waiting) {
-                  return Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      CircularProgressIndicator(
-                        color: Color(0xFFFF9900),
-                      ),
-                      SizedBox(
-                        width: 12,
-                      ),
-                      Text(
-                        '$loadingTS...',
-                        style: TextStyle(
-                          fontFamily: 'Arial',
-                          fontSize: 16,
-                          fontWeight: FontWeight.w700,
-                          color: Color(0xFF555555),
-                        ),
-                      ),
-                    ],
-                  );
-                } else if (snapshot.hasError) {
-                  return Center(
-                      child: Text(
-                    'Error: ${snapshot.error}',
-                    style: TextStyle(
-                      fontFamily: 'Arial',
-                      color: const Color(0xFF555555),
-                    ),
-                  ));
-                } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+                // if (snapshot.connectionState == ConnectionState.waiting) {
+                //   return Container();
+                // } else
+                if (snapshot.hasError) {
+                  return Center(child: Text('Error: ${snapshot.error}'));
+                } else if (!snapshot.hasData) {
                   return Center(
                       child: Text(
                     NotFoundDataTS,
@@ -460,19 +361,83 @@ class _AcademyHomePageState extends State<AcademyHomePage> {
     );
   }
 
-  Widget _Learning(List<AcademyRespond> filteredAcademy) {
-    return filteredAcademy.isNotEmpty
+  Widget _Learning(List<AcademyModel> myLearning) {
+    return myLearning.isNotEmpty
         ? SingleChildScrollView(
-            child: _buildAcademyListView(filteredAcademy),
+            child: Column(
+              children: [
+                _buildAcademyListView(myLearning),
+                if (pagination.page != pagination.total_pages)
+                  Column(
+                    children: [
+                      Divider(),
+                      Row(
+                        children: [
+                          InkWell(
+                            onTap: () {
+                              if (pagination.page > 1) {
+                                setState(() {
+                                  pages = (pagination.page - 1).toString();
+                                });
+                              }
+                            },
+                            child: Padding(
+                              padding: const EdgeInsets.only(
+                                  left: 8, right: 8, top: 8, bottom: 12),
+                              child: Text(
+                                'ก่อนหน้า',
+                                style: TextStyle(
+                                  fontFamily: 'Arial',
+                                  fontSize: 16.0,
+                                  color: (pagination.page <= 1)
+                                      ? Colors.grey
+                                      : Color(0xFF555555),
+                                  fontWeight: FontWeight.w700,
+                                ),
+                              ),
+                            ),
+                          ),
+                          Spacer(),
+                          InkWell(
+                            onTap: () {
+                              if (pagination.page >= pagination.total_pages) {
+                                setState(() {
+                                  pages = (pagination.page + 1).toString();
+                                });
+                              }
+                            },
+                            child: Padding(
+                              padding: const EdgeInsets.only(
+                                  left: 8, right: 8, top: 8, bottom: 12),
+                              child: Text(
+                                'ถัดไป',
+                                style: TextStyle(
+                                  fontFamily: 'Arial',
+                                  fontSize: 16.0,
+                                  color: (pagination.page <=
+                                          pagination.total_pages)
+                                      ? Colors.grey
+                                      : Color(0xFF555555),
+                                  fontWeight: FontWeight.w700,
+                                ),
+                              ),
+                            ),
+                          ),
+                        ],
+                      )
+                    ],
+                  ),
+              ],
+            ),
           )
         : _buildNotFoundText();
   }
 
-  Widget _buildAcademyListView(List<AcademyRespond> filteredAcademy) {
+  Widget _buildAcademyListView(List<AcademyModel> myLearning) {
     if (isMobile) {
-      return _buildAcademyList(filteredAcademy);
+      return _buildAcademyList(myLearning);
     } else {
-      return _buildAcademyList2(filteredAcademy);
+      return _buildAcademyList2(myLearning);
     }
   }
 
@@ -555,36 +520,20 @@ class _AcademyHomePageState extends State<AcademyHomePage> {
   }
 
   //android,iphone
-  Widget _buildAcademyList(List<AcademyRespond> filteredAcademy) {
+  Widget _buildAcademyList(List<AcademyModel> myLearning) {
     final widthArea = WidgetsBinding.instance.window.physicalSize.width /
         WidgetsBinding.instance.window.devicePixelRatio;
     return ListView.separated(
         padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 4),
         shrinkWrap: true,
         physics: const NeverScrollableScrollPhysics(),
-        itemCount: filteredAcademy.length,
+        itemCount: myLearning.length,
         separatorBuilder: (_, __) => Container(padding: EdgeInsets.all(4)),
         itemBuilder: (context, index) {
-          final academyItem = filteredAcademy[index];
+          final academylist = myLearning[index];
           return InkWell(
             onTap: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => EvaluateModule(
-                    employee: widget.employee,
-                    academy: academyItem,
-                    Authorization: widget.Authorization,
-                    callback: () {
-                      setState(() {
-                        academyId = academyItem.academy_id;
-                        academyType = academyItem.academy_type;
-                        favorite();
-                      });
-                    },
-                  ),
-                ),
-              );
+              fetchNextPlan(academylist);
             },
             child: Container(
               decoration: BoxDecoration(
@@ -623,12 +572,12 @@ class _AcademyHomePageState extends State<AcademyHomePage> {
                             child: ClipRRect(
                               borderRadius: BorderRadius.circular(2),
                               child: Image.network(
-                                academyItem.academy_image,
+                                academylist.academy_cover,
                                 width: double.infinity,
                                 fit: BoxFit.cover,
                                 errorBuilder: (context, error, stackTrace) {
                                   return Image.asset(
-                                    'assets/images/default_image.png',
+                                    academylist.academy_cover_error,
                                     width: double.infinity,
                                     fit: BoxFit.cover,
                                   );
@@ -644,7 +593,9 @@ class _AcademyHomePageState extends State<AcademyHomePage> {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text(
-                                academyItem.academy_subject,
+                                (academylist.academy_name == '')
+                                    ? 'Topic not found'
+                                    : academylist.academy_name,
                                 style: TextStyle(
                                   fontFamily: 'Arial',
                                   color: const Color(0xFF555555),
@@ -655,92 +606,44 @@ class _AcademyHomePageState extends State<AcademyHomePage> {
                               ),
                               SizedBox(height: 4),
                               Column(
-                                children: academyItem.academy_coach_data.isEmpty
+                                children: academylist.academy_coach.isEmpty
                                     ? [Text("")]
                                     : List.generate(1, (index) {
                                         return _buildCoachList(
-                                            academyItem.academy_coach_data,
-                                            index);
+                                            academylist.academy_coach, index);
                                       }),
                               ),
                               SizedBox(height: 4),
                               Row(
                                 children: [
-                                  Expanded(
-                                    child: Text(
-                                      academyItem.academy_date == "Time Out"
-                                          ? '$timeoutTS'
-                                          : '$startTS : \n${academyItem.academy_date}',
-                                      style: TextStyle(
-                                        fontFamily: 'Arial',
-                                        color: academyItem.academy_date ==
-                                                "Time Out"
-                                            ? Colors.red
-                                            : const Color(0xFF555555),
-                                        fontWeight: FontWeight.w500,
-                                      ),
-                                      overflow: TextOverflow.ellipsis,
-                                      maxLines: 3,
-                                    ),
-                                  ),
-                                  Expanded(
-                                    child: InkWell(
-                                      onTap: () {
-                                        setState(() {
-                                          academyId = academyItem.academy_id;
-                                          academyType =
-                                              academyItem.academy_type;
-                                          favorite();
-                                        });
-                                      },
-                                      child: Container(
-                                        width: widthArea * 0.12,
-                                        decoration: BoxDecoration(
-                                          color: Colors.white,
-                                          borderRadius:
-                                              BorderRadius.circular(10),
-                                          border: Border.all(
-                                            color: (academyItem.favorite == '1')
-                                                ? Colors.red
-                                                : Colors.orange, // สีขอบ
-                                            width: 2.0, // ความหนาของขอบ
-                                          ),
-                                          // border: Border(
-                                          //   bottom: BorderSide(color: Colors.orange, width: 2),
-                                          // )
+                                  if (academylist.academy_flag == 'learn')
+                                    Expanded(
+                                      child: Text(
+                                        academylist.academy_text,
+                                        style: TextStyle(
+                                          fontFamily: 'Arial',
+                                          color: const Color(0xFF555555),
+                                          fontWeight: FontWeight.w500,
                                         ),
-                                        padding: EdgeInsets.only(
-                                            top: 8,
-                                            bottom: 8,
-                                            right: 6,
-                                            left: 6),
-                                        child: Row(
-                                          mainAxisAlignment:
-                                              MainAxisAlignment.center,
-                                          children: [
-                                            Text(
-                                              'Favorite',
-                                              style: TextStyle(
-                                                fontFamily: 'Arial',
-                                                fontSize: 14,
-                                                color: (academyItem.favorite ==
-                                                        '1')
-                                                    ? Colors.red
-                                                    : Colors.orange,
-                                              ),
-                                            ),
-                                            SizedBox(width: 4),
-                                            Icon(Icons.favorite,
-                                                color: (academyItem.favorite ==
-                                                        '1')
-                                                    ? Colors.red
-                                                    : Colors.orange,
-                                                size: 20),
-                                          ],
-                                        ),
+                                        overflow: TextOverflow.ellipsis,
+                                        maxLines: 2,
                                       ),
-                                    ),
-                                  ),
+                                    )
+                                  else
+                                    Expanded(
+                                        child: _enrollWidget(
+                                      academylist,
+                                      widthArea,
+                                    )),
+                                  Container(
+                                      padding: const EdgeInsets.only(
+                                          left: 4, right: 4)),
+                                  Expanded(
+                                      child: _favoriteWidget(
+                                    academylist,
+                                    widthArea,
+                                    index,
+                                  )),
                                 ],
                               ),
                             ],
@@ -757,37 +660,184 @@ class _AcademyHomePageState extends State<AcademyHomePage> {
         });
   }
 
+  // bool isFavorite = false;
+  Widget _favoriteWidget(
+      AcademyModel academylist, double widthArea, int index) {
+    // bool isSelected = selectIndex.contains(index);
+    // (academylist.academy_favorite == 'Y') ? isSelected : !isSelected;
+    return InkWell(
+      onTap: () {
+        setState(() {
+          // (isSelected) ? selectIndex.remove(index) : selectIndex.add(index);
+
+          sendFavorite(academylist.academy_id, academylist.academy_type);
+          // print('isSelected: ${isSelected}');
+        });
+      },
+      child: Container(
+        width: widthArea * 0.12,
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(10),
+          border: Border.all(
+            color: (academylist.academy_favorite == 'Y')
+                ? Colors.red
+                : Colors.grey, // สีขอบ
+            width: 2.0, // ความหนาของขอบ
+          ),
+        ),
+        padding: EdgeInsets.only(top: 8, bottom: 8, right: 6, left: 6),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Text(
+              'Favorite',
+              style: TextStyle(
+                fontFamily: 'Arial',
+                fontSize: 14,
+                color: (academylist.academy_favorite == 'Y')
+                    ? Colors.red
+                    : Colors.grey,
+              ),
+            ),
+            SizedBox(width: 4),
+            Icon(Icons.favorite,
+                color: (academylist.academy_favorite == 'Y')
+                    ? Colors.red
+                    : Colors.grey,
+                size: 20),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _enrollWidget(AcademyModel academylist, double widthArea) {
+    return InkWell(
+      onTap: () {
+        enroll_academy_id = academylist.academy_id;
+        enroll_academy_type = academylist.academy_type;
+        enroll_academy_pages = '';
+
+        ////////////////////////// isCheck ////////////////////////////////
+        print('enroll_academy_type:$enroll_academy_type\n'
+            'enroll_academy_id:$enroll_academy_id\n'
+            'academy_flag: ${academylist.academy_flag}');
+        if (enroll_academy_type != '' &&
+            enroll_academy_id != '' &&
+            academylist.academy_flag == 'enroll') {
+          if (academylist.academy_text == 'Enroll') {
+            // fetchCreateEnroll(enroll_academy_id, enroll_academy_type);
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                duration: Duration(seconds: 3),
+                content: Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Container(
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          color: Colors.white,
+                        ),
+                        child: Icon(Icons.check_circle, color: Colors.green)),
+                    Flexible(
+                      child: Padding(
+                        padding: EdgeInsets.only(left: 14),
+                        child: Text(
+                          'Your enrollment has been successfully recorded and is pending administrator approval before proceeding',
+                          style: TextStyle(
+                            fontFamily: 'Arial',
+                            color: Colors.white,
+                            fontSize: 14,
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            );
+          } else if (academylist.academy_text == 'Pending') {
+            // fetchDeleteEnroll(enroll_academy_id);
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                duration: Duration(seconds: 3),
+                content: Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Container(
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          color: Colors.white,
+                        ),
+                        child: Icon(Icons.delete, color: Colors.red)),
+                    Flexible(
+                      child: Padding(
+                        padding: EdgeInsets.only(left: 14),
+                        child: Text(
+                          'Your enrollment has been successfully recorded and is pending administrator approval before proceeding',
+                          style: TextStyle(
+                            fontFamily: 'Arial',
+                            color: Colors.white,
+                            fontSize: 14,
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            );
+          }
+        }
+      },
+      child: Container(
+        width: widthArea * 0.12,
+        decoration: BoxDecoration(
+          color: Colors.green,
+          borderRadius: BorderRadius.circular(10),
+          border: Border.all(
+            color: Colors.green, // สีขอบ
+            width: 2, // ความหนาของขอบ
+          ),
+        ),
+        padding: EdgeInsets.only(top: 8, bottom: 8, right: 6, left: 6),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(null, color: Colors.orange, size: 20),
+            Text(
+              academylist.academy_text,
+              style: TextStyle(
+                fontFamily: 'Arial',
+                fontSize: 14,
+                color: Colors.white,
+              ),
+            ),
+            Icon(null, color: Colors.orange, size: 20),
+          ],
+        ),
+      ),
+    );
+  }
+
   //tablet, ipad
-  Widget _buildAcademyList2(List<AcademyRespond> filteredAcademy) {
+  Widget _buildAcademyList2(List<AcademyModel> myLearning) {
     final widthArea = WidgetsBinding.instance.window.physicalSize.width /
         WidgetsBinding.instance.window.devicePixelRatio;
     return ListView.separated(
         padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 4),
         shrinkWrap: true,
         physics: const NeverScrollableScrollPhysics(),
-        itemCount: filteredAcademy.length,
+        itemCount: myLearning.length,
         separatorBuilder: (_, __) => Container(padding: EdgeInsets.all(4)),
         itemBuilder: (context, index) {
-          final academyItem = filteredAcademy[index];
+          final academylist = myLearning[index];
           return GestureDetector(
             onTap: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => EvaluateModule(
-                    employee: widget.employee,
-                    academy: academyItem,
-                    Authorization: widget.Authorization,
-                    callback: () {
-                      setState(() {
-                        academyId = academyItem.academy_id;
-                        academyType = academyItem.academy_type;
-                        favorite();
-                      });
-                    },
-                  ),
-                ),
-              );
+              fetchNextPlan(academylist);
             },
             child: Container(
               decoration: BoxDecoration(
@@ -824,16 +874,16 @@ class _AcademyHomePageState extends State<AcademyHomePage> {
                           child: ClipRRect(
                             borderRadius: BorderRadius.circular(2),
                             child: Image.network(
-                              academyItem.academy_image,
+                              academylist.academy_cover,
                               height: 180,
                               width: double.infinity,
                               fit: BoxFit.cover,
                               errorBuilder: (context, error, stackTrace) {
                                 return Image.asset(
-                                  'assets/images/default_image.png', // Default image in case of an error.
+                                  academylist.academy_cover_error,
                                   width: double.infinity,
                                   height: 180,
-                                  fit: BoxFit.contain,
+                                  fit: BoxFit.cover,
                                 );
                               },
                             ),
@@ -848,7 +898,9 @@ class _AcademyHomePageState extends State<AcademyHomePage> {
                           children: [
                             const SizedBox(height: 8),
                             Text(
-                              academyItem.academy_subject,
+                              (academylist.academy_name == '')
+                                  ? 'Topic not found'
+                                  : academylist.academy_name,
                               style: const TextStyle(
                                 fontFamily: 'Arial',
                                 color: Color(0xFF555555),
@@ -861,25 +913,20 @@ class _AcademyHomePageState extends State<AcademyHomePage> {
                             Padding(
                               padding: const EdgeInsets.only(top: 8, bottom: 8),
                               child: Column(
-                                children: academyItem.academy_coach_data.isEmpty
+                                children: academylist.academy_coach.isEmpty
                                     ? [Text("")]
                                     : List.generate(1, (index) {
                                         return _buildCoachList(
-                                            academyItem.academy_coach_data,
-                                            index);
+                                            academylist.academy_coach, index);
                                       }),
                               ),
                             ),
                             Text(
-                              academyItem.academy_date == "Time Out"
-                                  ? '$timeoutTS'
-                                  : '$startTS : ${academyItem.academy_date}',
+                              '${academylist.academy_text}',
                               style: TextStyle(
                                 fontFamily: 'Arial',
                                 fontSize: 18,
-                                color: academyItem.academy_date == "Time Out"
-                                    ? Colors.red
-                                    : const Color(0xFF555555),
+                                color: Colors.red,
                                 fontWeight: FontWeight.w500,
                               ),
                               overflow: TextOverflow.ellipsis,
@@ -888,11 +935,8 @@ class _AcademyHomePageState extends State<AcademyHomePage> {
                             const SizedBox(height: 16),
                             InkWell(
                               onTap: () {
-                                setState(() {
-                                  academyId = academyItem.academy_id;
-                                  academyType = academyItem.academy_type;
-                                  favorite();
-                                });
+                                sendFavorite(academylist.academy_id,
+                                    academylist.academy_type);
                               },
                               child: Container(
                                 width: widthArea * 0.12,
@@ -900,9 +944,9 @@ class _AcademyHomePageState extends State<AcademyHomePage> {
                                   color: Colors.white,
                                   borderRadius: BorderRadius.circular(10),
                                   border: Border.all(
-                                    color: (academyItem.favorite == '1')
+                                    color: (academylist.academy_favorite == 'Y')
                                         ? Colors.red
-                                        : Colors.orange, // สีขอบ
+                                        : Colors.grey, // สีขอบ
                                     width: 2.0, // ความหนาของขอบ
                                   ),
                                   // border: Border(
@@ -918,16 +962,18 @@ class _AcademyHomePageState extends State<AcademyHomePage> {
                                       style: TextStyle(
                                         fontFamily: 'Arial',
                                         fontSize: 16,
-                                        color: (academyItem.favorite == '1')
+                                        color: (academylist.academy_favorite ==
+                                                'Y')
                                             ? Colors.red
-                                            : Colors.orange,
+                                            : Colors.grey,
                                       ),
                                     ),
                                     SizedBox(width: 4),
                                     Icon(Icons.favorite,
-                                        color: (academyItem.favorite == '1')
+                                        color: (academylist.academy_favorite ==
+                                                'Y')
                                             ? Colors.red
-                                            : Colors.orange,
+                                            : Colors.grey,
                                         size: 22),
                                   ],
                                 ),
@@ -947,7 +993,7 @@ class _AcademyHomePageState extends State<AcademyHomePage> {
         });
   }
 
-  Widget _buildCoachList(List<AcademyCoachData> academyCoachData, int index) {
+  Widget _buildCoachList(List<AcademyCoachModel> academyCoachData, int index) {
     final coach = academyCoachData[index];
     return Padding(
       padding: const EdgeInsets.only(bottom: 8.0),
@@ -960,11 +1006,16 @@ class _AcademyHomePageState extends State<AcademyHomePage> {
             ClipRRect(
               borderRadius: BorderRadius.circular(50),
               child: Image.network(
-                coach.avatar ?? '',
+                coach.coach_image,
                 height: isMobile ? 32 : 36,
                 width: isMobile ? 32 : 36,
                 fit: BoxFit.contain,
-                errorBuilder: (context, error, stackTrace) => Icon(Icons.error),
+                errorBuilder: (context, error, stackTrace) => Image.network(
+                  coach.coach_image_error,
+                  height: isMobile ? 32 : 36,
+                  width: isMobile ? 32 : 36,
+                  fit: BoxFit.contain,
+                ),
               ),
             ),
             // Coach Name
@@ -972,7 +1023,7 @@ class _AcademyHomePageState extends State<AcademyHomePage> {
               child: Padding(
                 padding: const EdgeInsets.only(right: 16),
                 child: Text(
-                  coach.name ?? '',
+                  coach.coach_name,
                   style: TextStyle(
                     fontFamily: 'Arial',
                     fontSize: isMobile ? 14 : 18,
@@ -990,27 +1041,323 @@ class _AcademyHomePageState extends State<AcademyHomePage> {
     );
   }
 
-  Future<List<AcademyRespond>> fetchAcademies() async {
-    final uri = Uri.parse("$host/api/origami/academy/course.php");
+  Widget _DropdownCategory(String value) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Container(
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(10),
+            color: Colors.white,
+            border: Border.all(
+              color: Colors.grey.shade300,
+              width: 1.0,
+            ),
+          ),
+          child: DropdownButton2<CategoryData>(
+            isExpanded: true,
+            hint: Text(
+              value,
+              style: TextStyle(
+                fontFamily: 'Arial',
+                color: Colors.grey,
+                fontSize: 14,
+              ),
+            ),
+            style: TextStyle(
+              fontFamily: 'Arial',
+              color: Colors.grey,
+              fontSize: 14,
+            ),
+            items: categories
+                .map((item) => DropdownMenuItem<CategoryData>(
+                      value: item,
+                      child: Text(
+                        item.category_name,
+                        style: TextStyle(
+                          fontFamily: 'Arial',
+                          fontSize: 14,
+                        ),
+                      ),
+                    ))
+                .toList(),
+            value: selectedCategories,
+            onChanged: (value) {
+              setState(() {
+                selectedCategories = value;
+                filter_category = value?.category_id ?? '';
+              });
+            },
+            underline: SizedBox.shrink(),
+            iconStyleData: IconStyleData(
+              icon: InkWell(
+                onTap: () {
+                  setState(() {
+                    filter_category = null;
+                  });
+                },
+                child: Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Icon(Icons.close, color: Colors.red, size: 18),
+                ),
+              ),
+              iconSize: 30,
+            ),
+            buttonStyleData: ButtonStyleData(
+                padding: const EdgeInsets.symmetric(vertical: 2)),
+            dropdownStyleData: DropdownStyleData(maxHeight: 200),
+            menuItemStyleData: MenuItemStyleData(height: 33),
+            dropdownSearchData: DropdownSearchData(
+              searchController: _searchCategoryController,
+              searchInnerWidgetHeight: 50,
+              searchInnerWidget: Padding(
+                padding: const EdgeInsets.all(8),
+                child: TextFormField(
+                  controller: _searchCategoryController,
+                  keyboardType: TextInputType.text,
+                  style: TextStyle(
+                      fontFamily: 'Arial',
+                      color: Color(0xFF555555),
+                      fontSize: 14),
+                  decoration: InputDecoration(
+                    isDense: true,
+                    filled: true,
+                    fillColor: Colors.white,
+                    contentPadding: const EdgeInsets.symmetric(
+                      horizontal: 10,
+                      vertical: 8,
+                    ),
+                    hintText: 'search...',
+                    hintStyle: TextStyle(
+                        fontFamily: 'Arial',
+                        fontSize: 14,
+                        color: Color(0xFF555555)),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    enabledBorder: OutlineInputBorder(
+                      borderSide: BorderSide(
+                        color: Colors.grey.shade300,
+                        width: 1,
+                      ),
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    focusedBorder: OutlineInputBorder(
+                      borderSide: BorderSide(
+                        color: Colors.grey.shade300,
+                        width: 1,
+                      ),
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                  ),
+                ),
+              ),
+              searchMatchFn: (item, searchValue) {
+                return item.value!.category_name
+                    .toLowerCase()
+                    .contains(searchValue.toLowerCase());
+              },
+            ),
+            onMenuStateChange: (isOpen) {
+              if (!isOpen) {
+                _searchCategoryController
+                    .clear(); // Clear the search field when the menu closes
+              }
+            },
+          ),
+        ),
+        SizedBox(height: 8),
+      ],
+    );
+  }
+
+  Widget _DropdownType(String value) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Container(
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(10),
+              color: Colors.white,
+              border: Border.all(
+                color: Colors.grey.shade300,
+                width: 1.0,
+              ),
+            ),
+            child: DropdownButton2<String>(
+              isExpanded: true,
+              hint: Text(
+                value,
+                style: TextStyle(
+                  fontFamily: 'Arial',
+                  color: Colors.grey,
+                  fontSize: 14,
+                ),
+              ),
+              style: TextStyle(
+                fontFamily: 'Arial',
+                color: Colors.grey,
+                fontSize: 14,
+              ),
+              value: filter_type,
+              items: typeOptions.entries.map((entry) {
+                return DropdownMenuItem<String>(
+                  value: entry.key,
+                  child: Text(
+                    entry.value,
+                    style: TextStyle(
+                      fontFamily: 'Arial',
+                      fontSize: 14,
+                    ),
+                  ),
+                );
+              }).toList(),
+              onChanged: (value) {
+                setState(() {
+                  filter_type = value;
+                });
+              },
+              underline: SizedBox.shrink(),
+              iconStyleData: IconStyleData(
+                icon: InkWell(
+                  onTap: () {
+                    setState(() {
+                      filter_type = null;
+                    });
+                  },
+                  child: Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Icon(Icons.close, color: Colors.red, size: 18),
+                  ),
+                ),
+                iconSize: 30,
+              ),
+              buttonStyleData: ButtonStyleData(
+                padding: const EdgeInsets.symmetric(vertical: 2),
+              ),
+              dropdownStyleData: DropdownStyleData(
+                maxHeight: 200,
+              ),
+              menuItemStyleData: MenuItemStyleData(
+                height: 33,
+              ),
+            )),
+        SizedBox(height: 8),
+      ],
+    );
+  }
+
+  Widget _DropdownLevel(String value) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Container(
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(10),
+              color: Colors.white,
+              border: Border.all(
+                color: Colors.grey.shade300,
+                width: 1.0,
+              ),
+            ),
+            child: DropdownButton2<String>(
+              isExpanded: true,
+              hint: Text(
+                value,
+                style: TextStyle(
+                  fontFamily: 'Arial',
+                  color: Colors.grey,
+                  fontSize: 14,
+                ),
+              ),
+              style: TextStyle(
+                fontFamily: 'Arial',
+                color: Colors.grey,
+                fontSize: 14,
+              ),
+              value: filter_level,
+              items: levelOptions.entries.map((entry) {
+                return DropdownMenuItem<String>(
+                  value: entry.key,
+                  child: Text(
+                    entry.value,
+                    style: TextStyle(
+                      fontFamily: 'Arial',
+                      fontSize: 14,
+                    ),
+                  ),
+                );
+              }).toList(),
+              onChanged: (value) {
+                setState(() {
+                  filter_level = value;
+                });
+              },
+              underline: SizedBox.shrink(),
+              iconStyleData: IconStyleData(
+                icon: InkWell(
+                  onTap: () {
+                    setState(() {
+                      filter_level = null;
+                    });
+                  },
+                  child: Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Icon(Icons.close, color: Colors.red, size: 18),
+                  ),
+                ),
+                iconSize: 30,
+              ),
+              buttonStyleData: ButtonStyleData(
+                padding: const EdgeInsets.symmetric(vertical: 2),
+              ),
+              dropdownStyleData: DropdownStyleData(
+                maxHeight: 200,
+              ),
+              menuItemStyleData: MenuItemStyleData(
+                height: 33,
+              ),
+            )),
+        SizedBox(height: 8),
+      ],
+    );
+  }
+
+  String urlS = '';
+  bool isStartLearning = false;
+  Future<List<AcademyModel>> fetchAcademies() async {
+    print('$filter_date:\n$filter_type:\n$filter_level:\n'
+        '$filter_category:\n$search:\n$pages');
+    if (_selectedIndex == 0) {
+      urlS = "$host/api/origami/e-learning/academy/my-learning.php";
+    } else if (_selectedIndex == 2) {
+      urlS = "$host/api/origami/e-learning/academy/catalog.php";
+    } else if (_selectedIndex == 3) {
+      urlS = "$host/api/origami/e-learning/academy/my-favorite.php";
+    }
+    final uri = Uri.parse(urlS);
     try {
       final response = await http.post(
         uri,
         headers: {'Authorization': 'Bearer ${widget.Authorization}'},
         body: {
-          'comp_id': widget.employee.comp_id,
+          'auth_password': authorization,
           'emp_id': widget.employee.emp_id,
-          'Authorization': widget.Authorization,
-          'pages': page,
-          'search': search,
+          'comp_id': widget.employee.comp_id,
+          'filter_date': filter_date ?? '',
+          'filter_type': filter_type ?? '',
+          'filter_level': filter_level ?? '',
+          'filter_category': filter_category ?? '',
+          'search': (search != '') ? '1' : search,
+          'pages': pages,
         },
       );
       if (response.statusCode == 200) {
         final Map<String, dynamic> jsonResponse = json.decode(response.body);
-        // เข้าถึงข้อมูลในคีย์ 'instructors'
         final List<dynamic> academiesJson = jsonResponse['academy_data'];
-        // แปลงข้อมูลจาก JSON เป็น List<Instructor>
+        pagination = PaginationModel.fromJson(jsonResponse['pagination']);
         return academiesJson
-            .map((json) => AcademyRespond.fromJson(json))
+            .map((json) => AcademyModel.fromJson(json))
             .toList();
       } else {
         throw Exception(
@@ -1022,23 +1369,90 @@ class _AcademyHomePageState extends State<AcademyHomePage> {
     }
   }
 
-  String academyId = "";
-  String academyType = "";
-  Future<void> favorite() async {
+  Future<LevelData?> fetchLevelData() async {
+    final uri = Uri.parse("$host/api/origami/e-learning/academy/level.php");
     try {
       final response = await http.post(
-        Uri.parse('$host/api/origami/academy/favorite.php'),
+        uri,
+        headers: {'Authorization': 'Bearer $authorization'},
+        body: {'auth_password': authorization},
+      );
+      if (response.statusCode == 200) {
+        return LevelData.fromJson(json.decode(response.body));
+      }
+      return null;
+    } catch (e) {
+      print('Error fetching question data: $e');
+      throw Exception('Error fetching question data: $e');
+    }
+  }
+
+  Future<LevelData?> fetchTypeData() async {
+    final uri = Uri.parse("$host/api/origami/e-learning/academy/type.php");
+    try {
+      final response = await http.post(
+        uri,
+        headers: {'Authorization': 'Bearer $authorization'},
+        body: {'auth_password': authorization},
+      );
+      if (response.statusCode == 200) {
+        return LevelData.fromJson(json.decode(response.body));
+      }
+      return null;
+    } catch (e) {
+      print('Error fetching question data: $e');
+      throw Exception('Error fetching question data: $e');
+    }
+  }
+
+  String pageCategory = '';
+  Future<List<CategoryData>> fetchCategoryData() async {
+    try {
+      final response = await http.post(
+        Uri.parse('$host/api/origami/e-learning/academy/category.php'),
+        body: {
+          'auth_password': authorization,
+          'comp_id': widget.employee.comp_id,
+          'search': (searchCategory != '') ? '1' : searchCategory,
+          'pages': pageCategory,
+        },
+      );
+
+      if (response.statusCode == 200) {
+        final jsonResponse = jsonDecode(response.body);
+        if (jsonResponse['status'] == 200) {
+          final List<dynamic> data = jsonResponse['category_data'];
+          return data.map((e) => CategoryData.fromJson(e)).toList();
+        } else {
+          throw Exception('API error: ${jsonResponse['message']}');
+        }
+      } else {
+        throw Exception('Server error: ${response.reasonPhrase}');
+      }
+    } catch (e) {
+      throw Exception('Fetch error: $e');
+    }
+  }
+
+  Future<void> sendFavorite(String academy_id, String academy_type) async {
+    try {
+      final response = await http.post(
+        Uri.parse('$host/api/origami/e-learning/academy/favorite.php'),
         body: {
           'comp_id': widget.employee.comp_id,
           'emp_id': widget.employee.emp_id,
-          'Authorization': widget.Authorization,
-          'academy_id': academyId,
-          'academy_type': academyType,
+          'auth_password': authorization,
+          'academy_id': academy_id,
+          'academy_type': academy_type,
         },
       );
       if (response.statusCode == 200) {
         final jsonResponse = jsonDecode(response.body);
-        if (jsonResponse['status'] == true) {
+        if (jsonResponse['status'] == 200) {
+          setState(() {
+            _selectedIndex = 3;
+            _selectedIndex = 0;
+          });
           print("print message: ${jsonResponse['status']}");
         } else {
           throw Exception(
@@ -1053,248 +1467,271 @@ class _AcademyHomePageState extends State<AcademyHomePage> {
     }
   }
 
-  Widget _DropdownCategory(String value) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Container(
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(10),
-            color: Colors.white,
-            border: Border.all(
-              color: Colors.grey.shade300,
-              width: 1.0,
-            ),
-          ),
-          child: DropdownButton2<ModelDropdownAcademy>(
-            isExpanded: true,
-            hint: Text(
-              value,
-              style: TextStyle(
-                fontFamily: 'Arial',
-                color: Colors.grey,
-                fontSize: 14,
+  Future<void> fetchLogout() async {
+    try {
+      final response = await http.post(
+        Uri.parse('$host/api/origami/signout.php'),
+        body: {
+          'comp_id': widget.employee.comp_id,
+          'emp_id': widget.employee.emp_id,
+          'auth_password': authorization,
+        },
+      );
+      if (response.statusCode == 200) {
+        final jsonResponse = jsonDecode(response.body);
+        if (jsonResponse['status'] == 200) {
+          Navigator.pushAndRemoveUntil(
+            context,
+            MaterialPageRoute(
+              builder: (context) => const LoginPage(
+                num: 1,
+                popPage: 0,
+                company_id: 0,
               ),
             ),
-            style: TextStyle(
-              fontFamily: 'Arial',
-              color: Colors.grey,
-              fontSize: 14,
-            ),
-            items: _modelCategory
-                .map((ModelDropdownAcademy category) =>
-                    DropdownMenuItem<ModelDropdownAcademy>(
-                      value: category,
-                      child: Text(
-                        category.name,
-                        style: TextStyle(
-                          fontFamily: 'Arial',
-                          fontSize: 14,
-                        ),
-                      ),
-                    ))
-                .toList(),
-            value: selectedCategory,
-            onChanged: (value) {
-              setState(() {
-                selectedCategory = value;
-              });
-            },
-            underline: SizedBox.shrink(),
-            iconStyleData: IconStyleData(
-              icon: Icon(Icons.arrow_drop_down,
-                  color: Color(0xFF555555), size: 30),
-              iconSize: 30,
-            ),
-            buttonStyleData: ButtonStyleData(
-              padding: const EdgeInsets.symmetric(vertical: 2),
-            ),
-            dropdownStyleData: DropdownStyleData(
-              maxHeight: 200,
-            ),
-            menuItemStyleData: MenuItemStyleData(
-              height: 33,
-            ),
-          ),
-        ),
-        SizedBox(height: 8),
-      ],
-    );
+            (route) => false,
+          );
+          print("logout message: ${jsonResponse['status']}");
+        } else {
+          throw Exception(
+              'Failed to load personal data: ${jsonResponse['message']}');
+        }
+      } else {
+        throw Exception(
+            'Failed to load personal data: ${response.reasonPhrase}');
+      }
+    } catch (e) {
+      throw Exception('Failed to load personal data: $e');
+    }
   }
 
-  Widget _DropdownType(String value) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        // Text(
-        //   value,
-        //   style: TextStyle(
-        //     fontFamily: 'Arial',
-        //     fontSize: 14,
-        //     color: Color(0xFF555555),
-        //     fontWeight: FontWeight.w500,
-        //   ),
-        // ),
-        // SizedBox(height: 8),
-        Container(
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(10),
-            color: Colors.white,
-            border: Border.all(
-              color: Colors.grey.shade300,
-              width: 1.0,
-            ),
-          ),
-          child: DropdownButton2<ModelDropdownAcademy>(
-            isExpanded: true,
-            hint: Text(
-              value,
-              style: TextStyle(
-                fontFamily: 'Arial',
-                color: Colors.grey,
-                fontSize: 14,
+  Future<void> fetchNextPlan(AcademyModel academylist) async {
+    try {
+      final response = await http.post(
+        Uri.parse('$host/api/origami/e-learning/academy/study/plan.php'),
+        body: {
+          'auth_password': authorization,
+          'emp_id': widget.employee.emp_id,
+          'comp_id': widget.employee.comp_id,
+          'academy_id': academylist.academy_id,
+          'academy_type': academylist.academy_type,
+        },
+      );
+      if (response.statusCode == 200) {
+        final jsonResponse = jsonDecode(response.body);
+        if (jsonResponse['status'] == 200) {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => EvaluateModule(
+                employee: widget.employee,
+                Authorization: widget.Authorization,
+                academy: academylist,
+                callback: () {
+                  sendFavorite(
+                      academylist.academy_id, academylist.academy_type);
+                },
               ),
             ),
-            style: TextStyle(
-              fontFamily: 'Arial',
-              color: Colors.grey,
-              fontSize: 14,
-            ),
-            items: _modelType
-                .map((ModelDropdownAcademy type) =>
-                    DropdownMenuItem<ModelDropdownAcademy>(
-                      value: type,
-                      child: Text(
-                        type.name,
-                        style: TextStyle(
-                          fontFamily: 'Arial',
-                          fontSize: 14,
-                        ),
-                      ),
-                    ))
-                .toList(),
-            value: selectedType,
-            onChanged: (value) {
-              setState(() {
-                selectedType = value;
-              });
-            },
-            underline: SizedBox.shrink(),
-            iconStyleData: IconStyleData(
-              icon: Icon(Icons.arrow_drop_down,
-                  color: Color(0xFF555555), size: 30),
-              iconSize: 30,
-            ),
-            buttonStyleData: ButtonStyleData(
-              padding: const EdgeInsets.symmetric(vertical: 2),
-            ),
-            dropdownStyleData: DropdownStyleData(
-              maxHeight: 200,
-            ),
-            menuItemStyleData: MenuItemStyleData(
-              height: 33,
-            ),
-          ),
-        ),
-        SizedBox(height: 8),
-      ],
-    );
+          );
+        } else {
+          throw Exception(
+              'Failed to load personal data: ${jsonResponse['message']}');
+        }
+      } else {
+        throw Exception(
+            'Failed to load personal data: ${response.reasonPhrase}');
+      }
+    } catch (e) {
+      throw Exception('Failed to load personal data: $e');
+    }
   }
 
-  Widget _DropdownLevel(String value) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        // Text(
-        //   value,
-        //   style: TextStyle(
-        //     fontFamily: 'Arial',
-        //     fontSize: 14,
-        //     color: Color(0xFF555555),
-        //     fontWeight: FontWeight.w500,
-        //   ),
-        // ),
-        // SizedBox(height: 8),
-        Container(
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(10),
-            color: Colors.white,
-            border: Border.all(
-              color: Colors.grey.shade300,
-              width: 1.0,
-            ),
-          ),
-          child: DropdownButton2<ModelDropdownAcademy>(
-            isExpanded: true,
-            hint: Text(
-              value,
-              style: TextStyle(
-                fontFamily: 'Arial',
-                color: Colors.grey,
-                fontSize: 14,
+  String enroll_academy_id = '';
+  String enroll_academy_type = '';
+  String enroll_academy_pages = '';
+  Future<List<GetEnrollModel>> fetchGetEnroll() async {
+    final uri =
+        Uri.parse("$host/api/origami/e-learning/academy/enroll/get.enroll.php");
+    try {
+      final response = await http.post(
+        uri,
+        headers: {'Authorization': 'Bearer ${widget.Authorization}'},
+        body: {
+          'auth_password': authorization,
+          'emp_id': widget.employee.emp_id,
+          'comp_id': widget.employee.comp_id,
+          'academy_id': enroll_academy_id,
+          'academy_type': enroll_academy_type,
+          'page': enroll_academy_pages,
+        },
+      );
+      if (response.statusCode == 200) {
+        final Map<String, dynamic> jsonResponse = json.decode(response.body);
+        final List<dynamic> dataJson = jsonResponse['enroll_data'];
+        return dataJson.map((json) => GetEnrollModel.fromJson(json)).toList();
+      } else {
+        throw Exception(
+            'Failed to load question data, status code: ${response.statusCode}');
+      }
+    } catch (e) {
+      print('Error fetching question data: $e');
+      throw Exception('Error fetching question data: $e');
+    }
+  }
+
+  String enrollDescription = '';
+  Future<void> fetchCreateEnroll(String academy_id, String academy_type) async {
+    try {
+      final response = await http.post(
+        Uri.parse(
+            '$host/api/origami/e-learning/academy/enroll/create.enroll.php'),
+        body: {
+          'comp_id': widget.employee.comp_id,
+          'emp_id': widget.employee.emp_id,
+          'auth_password': authorization,
+          'academy_id': academy_id,
+          'academy_type': academy_type,
+          'description': enrollDescription,
+        },
+      );
+      if (response.statusCode == 200) {
+        final jsonResponse = jsonDecode(response.body);
+        if (jsonResponse['status'] == 200) {
+          // Navigator.pop(context);
+          enrollDescription = '';
+          _createEnrollController.clear();
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              duration: Duration(seconds: 3),
+              content: Row(
+                children: [
+                  Container(
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        color: Colors.white,
+                      ),
+                      child: Icon(Icons.check_circle,
+                          color: Colors.green, size: 20)),
+                  Padding(
+                    padding: EdgeInsets.only(left: 14),
+                    child: Text(
+                      jsonResponse['message'],
+                      style: TextStyle(
+                        fontFamily: 'Arial',
+                        color: Colors.white,
+                        fontSize: 16,
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                  ),
+                ],
               ),
             ),
-            style: TextStyle(
-              fontFamily: 'Arial',
-              color: Colors.grey,
-              fontSize: 14,
-            ),
-            items: _modelLevel
-                .map((ModelDropdownAcademy level) =>
-                    DropdownMenuItem<ModelDropdownAcademy>(
-                      value: level,
-                      child: Text(
-                        level.name,
-                        style: TextStyle(
-                          fontFamily: 'Arial',
-                          fontSize: 14,
-                        ),
-                      ),
-                    ))
-                .toList(),
-            value: selectedLevel,
-            onChanged: (value) {
-              setState(() {
-                selectedLevel = value;
-              });
-            },
-            underline: SizedBox.shrink(),
-            iconStyleData: IconStyleData(
-              icon: Icon(Icons.arrow_drop_down,
-                  color: Color(0xFF555555), size: 30),
-              iconSize: 30,
-            ),
-            buttonStyleData: ButtonStyleData(
-              padding: const EdgeInsets.symmetric(vertical: 2),
-            ),
-            dropdownStyleData: DropdownStyleData(
-              maxHeight: 200,
-            ),
-            menuItemStyleData: MenuItemStyleData(
-              height: 33,
-            ),
-          ),
-        ),
-        SizedBox(height: 8),
-      ],
-    );
+          );
+        } else {
+          throw Exception(
+              'Failed to load personal data: ${jsonResponse['message']}');
+        }
+      } else {
+        throw Exception(
+            'Failed to load personal data: ${response.reasonPhrase}');
+      }
+    } catch (e) {
+      throw Exception('Failed to load personal data: $e');
+    }
   }
 
-  ModelDropdownAcademy? selectedCategory;
-  ModelDropdownAcademy? selectedType;
-  ModelDropdownAcademy? selectedLevel;
-  List<ModelDropdownAcademy> _modelCategory = [
-    ModelDropdownAcademy(id: '001', name: 'Searching...'),
-  ];
+  // Future<void> fetchUpdateEnroll(String enroll_id, String description,
+  //     AcademyModel academylist, double widthArea, isUpdateEnroll) async {
+  //   try {
+  //     final response = await http.post(
+  //       Uri.parse(
+  //           '$host/api/origami/e-learning/academy/enroll/update.enroll.php'),
+  //       body: {
+  //         'comp_id': widget.employee.comp_id,
+  //         'emp_id': widget.employee.emp_id,
+  //         'auth_password': authorization,
+  //         'enroll_id': enroll_id,
+  //         'description': description,
+  //       },
+  //     );
+  //     if (response.statusCode == 200) {
+  //       final jsonResponse = jsonDecode(response.body);
+  //       if (jsonResponse['status'] == 200) {
+  //         enrollDescription = '';
+  //         _createEnrollController.clear();
+  //         isUpdateEnroll = false;
+  //         Navigator.pop(context);
+  //         _getEnrollShowModal(academylist, widthArea, isUpdateEnroll);
+  //         print("logout message: ${jsonResponse['status']}");
+  //       } else {
+  //         throw Exception(
+  //             'Failed to load personal data: ${jsonResponse['message']}');
+  //       }
+  //     } else {
+  //       throw Exception(
+  //           'Failed to load personal data: ${response.reasonPhrase}');
+  //     }
+  //   } catch (e) {
+  //     throw Exception('Failed to load personal data: $e');
+  //   }
+  // }
 
-  List<ModelDropdownAcademy> _modelType = [
-    ModelDropdownAcademy(id: '001', name: 'All Type'),
-    ModelDropdownAcademy(id: '002', name: 'Course'),
-    ModelDropdownAcademy(id: '003', name: 'Learning Map'),
-    ModelDropdownAcademy(id: '004', name: 'OA Courese'),
-  ];
-
-  List<ModelDropdownAcademy> _modelLevel = [
-    ModelDropdownAcademy(id: '001', name: 'Searching...'),
-  ];
+  Future<void> fetchDeleteEnroll(String enroll_id) async {
+    try {
+      final response = await http.post(
+        Uri.parse(
+            '$host/api/origami/e-learning/academy/enroll/delete.enroll.php'),
+        body: {
+          'comp_id': widget.employee.comp_id,
+          'emp_id': widget.employee.emp_id,
+          'auth_password': authorization,
+          'enroll_id': enroll_id,
+        },
+      );
+      if (response.statusCode == 200) {
+        final jsonResponse = jsonDecode(response.body);
+        if (jsonResponse['status'] == 200) {
+          enrollDescription = '';
+          _createEnrollController.clear();
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              duration: Duration(seconds: 3),
+              content: Row(
+                children: [
+                  Container(
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        color: Colors.white,
+                      ),
+                      child: Icon(Icons.delete, color: Colors.red, size: 20)),
+                  Padding(
+                    padding: EdgeInsets.only(left: 14),
+                    child: Text(
+                      jsonResponse['message'],
+                      style: TextStyle(
+                        fontFamily: 'Arial',
+                        color: Colors.white,
+                        fontSize: 16,
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          );
+        } else {
+          throw Exception(
+              'Failed to load personal data: ${jsonResponse['message']}');
+        }
+      } else {
+        throw Exception(
+            'Failed to load personal data: ${response.reasonPhrase}');
+      }
+    } catch (e) {
+      throw Exception('Failed to load personal data: $e');
+    }
+  }
 }

@@ -9,7 +9,7 @@ class Certification extends StatefulWidget {
     required this.Authorization,
   });
   final Employee employee;
-  final AcademyRespond academy;
+  final AcademyModel academy;
   final String Authorization;
   @override
   _CertificationState createState() => _CertificationState();
@@ -40,7 +40,7 @@ class _CertificationState extends State<Certification> {
 
   @override
   Widget build(BuildContext context) {
-    return FutureBuilder<List<CertificationData>>(
+    return FutureBuilder<List<CertificationModel>>(
       future: fetchCertification(),
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
@@ -87,7 +87,7 @@ class _CertificationState extends State<Certification> {
                 maxLines: 1,
               ));
         } else {
-          return (snapshot.data!.first.certificationList.isEmpty)
+          return (snapshot.data!.isEmpty)
               ? Center(
               child: Text(
                 NotFoundDataTS,
@@ -106,16 +106,15 @@ class _CertificationState extends State<Certification> {
     );
   }
 
-  Widget _getContentWidget(List<CertificationData> listCertification) {
+  Widget _getContentWidget(List<CertificationModel> Certifications) {
     return Container(
       color: Colors.grey.shade50,
       child: Padding(
         padding: const EdgeInsets.only(left: 8,right: 8),
         child: SingleChildScrollView(
           child: Column(
-            children: List.generate(listCertification.length, (index) {
-              final certification = listCertification[index];
-              courseId = certification.courseId;
+            children: List.generate(Certifications.length, (index) {
+              final certification = Certifications[index];
               return Column(
                 children: [
                   InkWell(
@@ -139,7 +138,7 @@ class _CertificationState extends State<Certification> {
                           children: [
                             Expanded(
                               child: Text(
-                                certification.courseName,
+                                certification.course_name,
                                 style: TextStyle(
                                   fontFamily: 'Arial',
                                   fontSize: 18.0,
@@ -168,7 +167,7 @@ class _CertificationState extends State<Certification> {
                         children: [
                           Expanded(
                             child: Text(
-                              certification.courseName,
+                              certification.course_name,
                               style: TextStyle(
                                 fontFamily: 'Arial',
                                 fontSize: 16,
@@ -199,38 +198,38 @@ class _CertificationState extends State<Certification> {
     );
   }
 
-  Widget _buildCertificationCard(CertificationData certification) {
-    return Card(
-      color: Colors.white,
-      child: Container(
-        padding: EdgeInsets.symmetric(vertical: 10, horizontal: 6),
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(10),
-        ),
-        child: Row(
-          children: [
-            Expanded(
-              child: Text(
-                certification.courseName,
-                style: _getTextStyle(18.0, FontWeight.w700, Color(0xFF555555)),
-              ),
-            ),
-            Icon(
-              Icons.keyboard_arrow_down,
-              color: Color(0xFF555555),
-              size: 30,
-            ),
-          ],
-        ),
-      ),
-    );
-  }
+  // Widget _buildCertificationCard(CertificationData certification) {
+  //   return Card(
+  //     color: Colors.white,
+  //     child: Container(
+  //       padding: EdgeInsets.symmetric(vertical: 10, horizontal: 6),
+  //       decoration: BoxDecoration(
+  //         color: Colors.white,
+  //         borderRadius: BorderRadius.circular(10),
+  //       ),
+  //       child: Row(
+  //         children: [
+  //           Expanded(
+  //             child: Text(
+  //               certification.courseName,
+  //               style: _getTextStyle(18.0, FontWeight.w700, Color(0xFF555555)),
+  //             ),
+  //           ),
+  //           Icon(
+  //             Icons.keyboard_arrow_down,
+  //             color: Color(0xFF555555),
+  //             size: 30,
+  //           ),
+  //         ],
+  //       ),
+  //     ),
+  //   );
+  // }
 
-  Widget _buildCertificationList(CertificationData certification) {
+  Widget _buildCertificationList(CertificationModel certification) {
     return Column(
-      children: List.generate(certification.certificationList.length, (index) {
-        final certificate = certification.certificationList[index];
+      children: List.generate(certification.certificate_data.length, (index) {
+        final certificate = certification.certificate_data[index];
         return Card(
           color: Color(0xFFF5F5F5),
           child: Container(
@@ -264,7 +263,7 @@ class _CertificationState extends State<Certification> {
     );
   }
 
-  Widget _buildCertificateImage(CertificationList certificate) {
+  Widget _buildCertificateImage(CertificateData certificate) {
     return Column(
       mainAxisAlignment: MainAxisAlignment.start,
       children: [
@@ -272,7 +271,7 @@ class _CertificationState extends State<Certification> {
           alignment: Alignment.center,
           children: [
             Image.network(
-              _getCertificateImage(certificate.certificationName),
+              certificate.certification_background,
               width: double.infinity,
               fit: BoxFit.fill,
               errorBuilder: (context, error, stackTrace) {
@@ -283,7 +282,7 @@ class _CertificationState extends State<Certification> {
             ),
             Center(
               child: Text(
-                certificate.certificationName,
+                certificate.certification_name,
                 style: _getTextStyle(14.0, FontWeight.w600, Color(0xFF555555)),
                 overflow: TextOverflow.ellipsis,
                 maxLines: 2,
@@ -297,70 +296,74 @@ class _CertificationState extends State<Certification> {
     );
   }
 
-  Widget _buildCertificateDetails(CertificationList certificate) {
+  Widget _buildCertificateDetails(CertificateData certificate) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         SingleChildScrollView(
           scrollDirection: Axis.horizontal,
           child: Text(
-            certificate.certificationName,
+            certificate.certification_name,
             style: _getTextStyle(18.0, FontWeight.w700, Color(0xFF555555)),
             maxLines: 1,
           ),
         ),
         SizedBox(height: 4),
         Text(
-          certificate.certificationDescription,
+          certificate.certification_description,
           style: _getTextStyle(14.0, FontWeight.w600, Color(0xFF555555)),
         ),
         SizedBox(height: 8),
-        _buildCertificationConditions(certificate),
+        if(certificate.content_pass != '')
+        _buildCertificationConditions(certificate.content_pass),
+        if(certificate.video_quality != '')
+          _buildCertificationConditions(certificate.video_quality),
+        if(certificate.challenge_pass != '')
+          _buildCertificationConditions(certificate.challenge_pass),
+        if(certificate.event_pass != '')
+          _buildCertificationConditions(certificate.event_pass),
       ],
     );
   }
 
-  Widget _buildCertificationConditions(CertificationList certificate) {
-    return Column(
-      children: certificate.certificationCondition.map((condition) {
-        return Padding(
-          padding: const EdgeInsets.only(bottom: 8),
-          child: Row(
-            children: [
-              // SizedBox(width: 8),
-              Icon(Icons.lens_sharp, color: Colors.green, size: 8),
-              SizedBox(width: 4),
-              Flexible(
-                child: SingleChildScrollView(
-                  scrollDirection: Axis.horizontal,
-                  child: Text(
-                    condition.condition,
-                    style:
-                    _getTextStyle(14.0, FontWeight.w400, Color(0xFF555555)),
-                    // overflow: TextOverflow.ellipsis,
-                    maxLines: 1,
-                  ),
-                ),
+  Widget _buildCertificationConditions(String persen) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 8),
+      child: Row(
+        children: [
+          // SizedBox(width: 8),
+          Icon(Icons.lens_sharp, color: Colors.green, size: 8),
+          SizedBox(width: 4),
+          Flexible(
+            child: SingleChildScrollView(
+              scrollDirection: Axis.horizontal,
+              child: Text(
+                persen,
+                style:
+                _getTextStyle(14.0, FontWeight.w400, Color(0xFF555555)),
+                // overflow: TextOverflow.ellipsis,
+                maxLines: 1,
               ),
-            ],
+            ),
           ),
-        );
-      }).toList(),
+        ],
+      ),
     );
   }
 
-  Widget _buildDownloadButton(CertificationList certificate) {
+  Widget _buildDownloadButton(CertificateData certificate) {
     return InkWell(
       onTap: () {
-        if (certificate.canDownload == "Y") {
-          certificationId = certificate.certificationId;
-          Download();
+        if (certificate.certification_no != "") {
+          course_id = certificate.course_id;
+          certification_id = certificate.certification_id;
+          ViewCertification();
         }
       },
       child: Container(
         padding: EdgeInsets.all(8),
         decoration: BoxDecoration(
-          color: certificate.canDownload == "Y"
+          color: certificate.certification_no != ""
               ? Colors.amber.shade200
               : Colors.grey.shade200,
           borderRadius: BorderRadius.circular(10),
@@ -393,15 +396,15 @@ class _CertificationState extends State<Certification> {
     }
   }
 
-  Future<List<CertificationData>> fetchCertification() async {
-    final uri = Uri.parse("$host/api/origami/academy/certification.php");
+  Future<List<CertificationModel>> fetchCertification() async {
+    final uri = Uri.parse("$host/api/origami/e-learning/academy/study/get.certificate.php");
     final response = await http.post(
       uri,
-      headers: {'Authorization': 'Bearer ${widget.Authorization}'},
+      headers: {'Authorization': 'Bearer $authorization'},
       body: {
-        'comp_id': widget.employee.comp_id,
+        'auth_password': authorization,
         'emp_id': widget.employee.emp_id,
-        'Authorization': widget.Authorization,
+        'comp_id': widget.employee.comp_id,
         'academy_id': widget.academy.academy_id,
         'academy_type': widget.academy.academy_type,
       },
@@ -410,33 +413,31 @@ class _CertificationState extends State<Certification> {
     if (response.statusCode == 200) {
       final Map<String, dynamic> jsonResponse = json.decode(response.body);
       final List<dynamic> dataJson = jsonResponse['certification_data'];
-      return dataJson.map((json) => CertificationData.fromJson(json)).toList();
+      return dataJson.map((json) => CertificationModel.fromJson(json)).toList();
     } else {
       throw Exception('Failed to load academies');
     }
   }
 
-  String courseId = "";
-  String certificationId = "";
+  String course_id = "";
+  String certification_id = "";
   String certification_file = "";
 
-  Future<void> Download() async {
+  Future<void> ViewCertification() async {
     try {
       final response = await http.post(
-        Uri.parse('$host/api/origami/academy/certificationDownload.php'),
+        Uri.parse('$host/api/origami/e-learning/academy/study/view.certificate.php'),
         body: {
-          'comp_id': widget.employee.comp_id,
+          'auth_password': authorization,
           'emp_id': widget.employee.emp_id,
-          'Authorization': widget.Authorization,
-          'academy_id': widget.academy.academy_id,
-          'academy_type': widget.academy.academy_type,
-          'course_id': courseId,
-          'certification_id': certificationId,
+          'comp_id': widget.employee.comp_id,
+          'course_id': course_id,
+          'certification_id': certification_id,
         },
       );
       if (response.statusCode == 200) {
         final jsonResponse = jsonDecode(response.body);
-        if (jsonResponse['status'] == true) {
+        if (jsonResponse['status'] == 200) {
           print("$jsonResponse");
           certification_file = jsonResponse['certification_file'];
           print("message: $certification_file");
@@ -458,74 +459,84 @@ class _CertificationState extends State<Certification> {
   }
 }
 
-class CertificationData {
-  final String courseId;
-  final String courseName;
-  final List<CertificationList> certificationList;
+class CertificationModel {
+  final String course_name;
+  final List<CertificateData> certificate_data;
 
-  CertificationData({
-    required this.courseId,
-    required this.courseName,
-    required this.certificationList,
+  CertificationModel({
+    required this.course_name,
+    required this.certificate_data,
   });
 
-  factory CertificationData.fromJson(Map<String, dynamic> json) {
-    return CertificationData(
-      courseId: json['course_id'] ?? '',
-      courseName: json['course_name'] ?? '',
-      certificationList: (json['cerification_list'] as List?)
-          ?.map((item) => CertificationList.fromJson(item))
+  factory CertificationModel.fromJson(Map<String, dynamic> json) {
+    return CertificationModel(
+      course_name: json['course_name'] ?? '',
+      certificate_data: (json['certificate_data'] as List?)
+          ?.map((item) => CertificateData.fromJson(item))
           .toList() ??
           [],
     );
   }
 }
 
-class CertificationList {
-  final String certificationId;
-  final String certificationName;
-  final String certificationDescription;
-  final List<CertificationCondition> certificationCondition;
-  final String canDownload;
+class CertificateData {
+  final String certification_id;
+  final String course_id;
+  final String certification_level;
+  final String certification_name;
+  final String certification_description;
+  final String certification_background;
+  final String content_pass;
+  final String content_pass_val;
+  final String video_quality;
+  final String video_quality_val;
+  final String challenge_pass;
+  final String challenge_pass_val;
+  final String event_pass;
+  final String event_pass_val;
+  final String certification_date;
+  final String certification_no;
+  final String certification_dowload;
 
-  CertificationList({
-    required this.certificationId,
-    required this.certificationName,
-    required this.certificationDescription,
-    required this.certificationCondition,
-    required this.canDownload,
+  CertificateData({
+    required this.certification_id,
+    required this.course_id,
+    required this.certification_level,
+    required this.certification_name,
+    required this.certification_description,
+    required this.certification_background,
+    required this.content_pass,
+    required this.content_pass_val,
+    required this.video_quality,
+    required this.video_quality_val,
+    required this.challenge_pass,
+    required this.challenge_pass_val,
+    required this.event_pass,
+    required this.event_pass_val,
+    required this.certification_date,
+    required this.certification_no,
+    required this.certification_dowload,
   });
 
-  factory CertificationList.fromJson(Map<String, dynamic> json) {
-    return CertificationList(
-      certificationId: json['certification_id'] ?? '',
-      certificationName: json['certification_name'] ?? '',
-      certificationDescription: json['certification_description'] ?? '',
-      certificationCondition: (json['certification_condition'] as List?)
-          ?.map((item) => CertificationCondition.fromJson(item))
-          .toList() ??
-          [],
-      canDownload: json['can_download'] ?? '',
-    );
-  }
-}
-
-class CertificationCondition {
-  final String condition;
-  final String percent;
-  final String icon;
-
-  CertificationCondition({
-    required this.condition,
-    required this.percent,
-    required this.icon,
-  });
-
-  factory CertificationCondition.fromJson(Map<String, dynamic> json) {
-    return CertificationCondition(
-      condition: json['condition'] ?? '',
-      percent: json['percent'] ?? '',
-      icon: json['icon'] ?? '',
+  factory CertificateData.fromJson(Map<String, dynamic> json) {
+    return CertificateData(
+      certification_id: json['certification_id'] ?? '',
+      course_id: json['course_id'] ?? '',
+      certification_level: json['certification_level'] ?? '',
+      certification_name: json['certification_name'] ?? '',
+      certification_description: json['certification_description'] ?? '',
+      certification_background: json['certification_background'] ?? '',
+      content_pass: json['content_pass'] ?? '',
+      content_pass_val: json['content_pass_val'] ?? '',
+      video_quality: json['video_quality'] ?? '',
+      video_quality_val: json['video_quality_val'] ?? '',
+      challenge_pass: json['challenge_pass'] ?? '',
+      challenge_pass_val: json['challenge_pass_val'] ?? '',
+      event_pass: json['event_pass'] ?? '',
+      event_pass_val: json['event_pass_val'] ?? '',
+      certification_date: json['certification_date'] ?? '',
+      certification_no: json['certification_no'] ?? '',
+      certification_dowload: json['certification_dowload'] ?? '',
     );
   }
 }

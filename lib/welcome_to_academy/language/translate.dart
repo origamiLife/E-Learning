@@ -2,7 +2,6 @@ import 'package:academy/main.dart';
 import 'ENG.dart';
 import 'TH.dart';
 
-Future<String>? futureLoadData;
 Future<String> loadData() async {
   await Future.delayed(const Duration(seconds: 1)); // Simulate a network call
   return 'Data Loaded';

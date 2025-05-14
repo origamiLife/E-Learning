@@ -9,7 +9,7 @@ class Description extends StatefulWidget {
     required this.Authorization,
   });
   final Employee employee;
-  final AcademyRespond academy;
+  final AcademyModel academy;
   final String Authorization;
 
   @override
@@ -17,37 +17,9 @@ class Description extends StatefulWidget {
 }
 
 class _DescriptionState extends State<Description> {
-  Future<List<DescriptionData>> fetchDescription() async {
-    final uri = Uri.parse("$host/api/origami/academy/description.php");
-    final response = await http.post(
-      uri,
-      headers: {'Authorization': 'Bearer ${widget.Authorization}'},
-      body: {
-        'comp_id': widget.employee.comp_id,
-        'emp_id': widget.employee.emp_id,
-        'Authorization': widget.Authorization,
-        'academy_id': widget.academy.academy_id,
-        'academy_type': widget.academy.academy_type,
-      },
-    );
-
-    if (response.statusCode == 200) {
-      final Map<String, dynamic> jsonResponse = json.decode(response.body);
-      // เข้าถึงข้อมูลในคีย์ 'academy_data'
-      final List<dynamic> academiesJson = jsonResponse['description_data'];
-      // แปลงข้อมูลจาก JSON เป็น List<AcademyRespond>
-      return academiesJson
-          .map((json) => DescriptionData.fromJson(json))
-          .toList();
-    } else {
-      throw Exception('Failed to load academies');
-    }
-  }
-
   @override
   void initState() {
     super.initState();
-    fetchDescription();
   }
 
   @override
@@ -56,7 +28,7 @@ class _DescriptionState extends State<Description> {
   }
 
   Widget loading() {
-    return FutureBuilder<List<DescriptionData>>(
+    return FutureBuilder<List<DescriptionModel>>(
       future: fetchDescription(),
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
@@ -103,7 +75,7 @@ class _DescriptionState extends State<Description> {
   }
 
   bool isSwitch = false;
-  Widget _getContentWidget(List<DescriptionData> description) {
+  Widget _getContentWidget(List<DescriptionModel> descriptions) {
     return Container(
       color: Colors.grey.shade50,
       child: Padding(
@@ -111,182 +83,135 @@ class _DescriptionState extends State<Description> {
         child: SingleChildScrollView(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Column(
-                children: List.generate(description.length, (index) {
-                  String video_count = description[index].video_count;
-                  return Column(
-                    children: [
-                      InkWell(
-                        borderRadius: BorderRadius.circular(10),
-                        onTap: () {
-                          setState(() {
-                            (isSwitch == false)
-                                ? isSwitch = true
-                                : isSwitch = false;
-                          });
-                        },
-                        child: (isSwitch == true)
-                            ? Column(
-                              children: [
-                                Container(
-                                    padding: EdgeInsets.all(8),
-                                    // color: Colors.transparent,
-                                    decoration: BoxDecoration(
-                                      color: Colors.transparent,
-                                      borderRadius: BorderRadius.circular(20),
-                                    ),
-                                    child: Row(
-                                      children: [
-                                        Expanded(
-                                            child: Text(
-                                          description[index].course_subject,
-                                          style: TextStyle(
-                                            fontFamily: 'Arial',
-                                            fontSize: 16,
-                                            color: Color(0xFF555555),
-                                            fontWeight: FontWeight.w500,
-                                          ),
-                                        )),
-                                        SizedBox(width: 4),
-                                        Icon(
-                                          Icons.keyboard_arrow_down,
-                                          color: Color(0xFF555555),
-                                          // size: 30,
-                                        )
-                                      ],
-                                    ),
-                                  ),
-                                SizedBox(height: 4),
-                                Divider()
-                              ],
-                            )
-                            : Container(
-                                padding: EdgeInsets.all(8),
-                                // color: Colors.transparent,
-                                decoration: BoxDecoration(
-                                  color: Colors.transparent,
-                                  borderRadius: BorderRadius.circular(20),
+            children: List.generate(descriptions.length, (index) {
+              final description = descriptions[index];
+              return Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.only(left: 8, top: 16, bottom: 8),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          "Description",
+                          style: TextStyle(
+                            fontFamily: 'Arial',
+                            fontSize: 18,
+                            color: Color(0xFF555555),
+                            fontWeight: FontWeight.w700,
+                          ),
+                          overflow: TextOverflow.ellipsis,
+                          maxLines: 1,
+                        ),
+                        SizedBox(height: 8),
+                        Text.rich(
+                          TextSpan(
+                            children: [
+                              TextSpan(
+                                text: '   ', // หรือ '\t' เยื้องบรรทัดแรก
+                              ),
+                              TextSpan(
+                                text: description.course_description,
+                                style: TextStyle(
+                                  fontFamily: 'Arial',
+                                  fontSize: 14,
+                                  color: Color(0xFF555555),
+                                  fontWeight: FontWeight.w500,
                                 ),
-                                child: Row(
-                                  children: [
-                                    Expanded(
-                                      child: Text(
-                                        description[index].course_subject,
-                                        style: TextStyle(
-                                          fontFamily: 'Arial',
-                                          fontSize: 16,
-                                          color: Color(0xFF555555),
-                                          fontWeight: FontWeight.w500,
+                              ),
+                            ],
+                          ),
+                          textAlign: TextAlign.justify,
+                        ),
+                      ],
+                    ),
+                  ),
+                  Card(
+                    color: Color(0xFFF5F5F5),
+                    child: Container(
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(10),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.grey.withOpacity(0.5),
+                            spreadRadius: 0,
+                            blurRadius: 0,
+                            offset: Offset(0, 3), // x, y
+                          ),
+                        ],
+                      ),
+                      child: Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: Column(
+                          children: [
+                            Container(
+                              alignment: Alignment.centerLeft,
+                              // color: Colors.transparent,
+                              decoration: BoxDecoration(
+                                color: Colors.transparent,
+                                borderRadius: BorderRadius.circular(20),
+                              ),
+                              child: Text(
+                                "$WYLTS",
+                                style: TextStyle(
+                                  fontFamily: 'Arial',
+                                  fontSize: 14,
+                                  color: Color(0xFF555555),
+                                  fontWeight: FontWeight.w700,
+                                ),
+                                overflow: TextOverflow.ellipsis,
+                                maxLines: 1,
+                              ),
+                            ),
+                            SizedBox(height: 8),
+                            Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Column(
+                                  children: List.generate(
+                                      description.content_data.length,
+                                      (indexI) {
+                                    final content =
+                                        description.content_data[indexI];
+                                    return Container(
+                                      alignment: Alignment.centerLeft,
+                                      child: Padding(
+                                        padding: EdgeInsets.only(bottom: 4),
+                                        child: Text(
+                                          "${content.class_no}  ${content.content_name}",
+                                          style: TextStyle(
+                                            fontSize: 14,
+                                            fontFamily: 'Arial',
+                                            color: Color(0xFF555555),
+                                          ),
+                                          overflow: TextOverflow.ellipsis,
+                                          maxLines: 1,
                                         ),
                                       ),
-                                    ),
-                                    SizedBox(width: 4),
-                                    Icon(
-                                      Icons.keyboard_arrow_down,
-                                      color: Color(0xFF555555),
-                                      size: 30,
-                                    )
-                                  ],
+                                    );
+                                  }),
                                 ),
-                              ),
-                      ),
-                      if (isSwitch == false)
-                        Card(
-                          color: Color(0xFFF5F5F5),
-                          child: Container(
-                            decoration: BoxDecoration(
-                              color: Colors.white,
-                              borderRadius: BorderRadius.circular(10),
-                              boxShadow: [
-                                BoxShadow(
-                                  color: Colors.grey.withOpacity(0.5),
-                                  spreadRadius: 0,
-                                  blurRadius: 0,
-                                  offset: Offset(0, 3), // x, y
-                                ),
+                                SizedBox(height: 16),
+                                Inclu(description),
                               ],
                             ),
-                            child: Padding(
-                              padding: const EdgeInsets.all(8.0),
-                              child: Column(
-                                children: [
-                                  Container(
-                                    alignment: Alignment.centerLeft,
-                                    // color: Colors.transparent,
-                                    decoration: BoxDecoration(
-                                      color: Colors.transparent,
-                                      borderRadius: BorderRadius.circular(20),
-                                    ),
-                                    child: Text(
-                                      "$WYLTS",
-                                      style: TextStyle(
-                                        fontFamily: 'Arial',
-                                        color: Color(0xFF555555),
-                                        fontWeight: FontWeight.w700,
-                                      ),
-                                      overflow: TextOverflow.ellipsis,
-                                      maxLines: 1,
-                                    ),
-                                  ),
-                                  SizedBox(height: 8),
-                                  Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: [
-                                      Column(
-                                        children: List.generate(
-                                            description[index]
-                                                .topic_section
-                                                .length, (indexI) {
-                                          return Container(
-                                            alignment: Alignment.centerLeft,
-                                            child: Padding(
-                                              padding: const EdgeInsets.only(
-                                                  bottom: 4),
-                                              child: Text(
-                                                "   ${description[index].topic_section[indexI]}",
-                                                style: TextStyle(
-                                                  fontFamily: 'Arial',
-                                                  color: Color(0xFF555555),
-                                                ),
-                                                overflow: TextOverflow.ellipsis,
-                                                maxLines: 1,
-                                              ),
-                                            ),
-                                          );
-                                        }),
-                                      ),
-                                      SizedBox(
-                                        height: 16,
-                                      ),
-                                      Inclu(video_count, description, index),
-                                    ],
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ),
-                        )
-                    ],
-                  );
-                }),
-              ),
-            ],
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              );
+            }),
           ),
         ),
       ),
     );
   }
 
-  Widget Inclu(
-      String video_count, List<DescriptionData> description, int index) {
-    String video_count = description[index].video_count;
-    String document_count = description[index].document_count;
-    String youtube_count = description[index].youtube_count;
-    String challenge_count = description[index].challenge_count;
-    String link_count = description[index].link_count;
-    String event_count = description[index].event_count;
+  Widget Inclu(DescriptionModel description) {
     return Container(
       padding: EdgeInsets.all(8),
       decoration: BoxDecoration(
@@ -301,7 +226,7 @@ class _DescriptionState extends State<Description> {
             courseIncludesTS,
             style: TextStyle(
               fontFamily: 'Arial',
-              // fontSize: 16.0,
+              fontSize: 16.0,
               color: Color(0xFF555555),
               fontWeight: FontWeight.w700,
             ),
@@ -311,215 +236,237 @@ class _DescriptionState extends State<Description> {
           ),
           Column(
             children: [
-              video_count == "0"
-                  ? Container()
-                  : Padding(
-                      padding: EdgeInsets.only(bottom: 8.0),
-                      child: Row(
-                        children: [
-                          Icon(
-                            Icons.video_collection_outlined,
-                            color: Color(0xFF555555),
-                          ),
-                          SizedBox(
-                            width: 8,
-                          ),
-                          Text(
-                            "${description[index].video_count} $videoTS",
-                            style: TextStyle(
-                              fontFamily: 'Arial',
-                              color: Colors.grey,
-                              fontWeight: FontWeight.w500,
-                            ),
-                          ),
-                        ],
+              if (description.video_counter != "0")
+                Padding(
+                  padding: EdgeInsets.only(bottom: 8.0),
+                  child: Row(
+                    children: [
+                      Icon(
+                        Icons.video_collection_outlined,
+                        color: Color(0xFF555555),
                       ),
-                    ),
-              document_count == "0"
-                  ? Container()
-                  : Padding(
-                      padding: const EdgeInsets.only(bottom: 8.0),
-                      child: Row(
-                        children: [
-                          Icon(
-                            Icons.file_copy_outlined,
-                            color: Color(0xFF555555),
-                          ),
-                          SizedBox(
-                            width: 8,
-                          ),
-                          Text(
-                            "${document_count} File",
-                            style: TextStyle(
-                              fontFamily: 'Arial',
-                              color: Colors.grey,
-                              fontWeight: FontWeight.w700,
-                            ),
-                          ),
-                        ],
+                      SizedBox(
+                        width: 8,
                       ),
-                    ),
-              youtube_count == "0"
-                  ? Container()
-                  : Padding(
-                      padding: const EdgeInsets.only(bottom: 8.0),
-                      child: Row(
-                        children: [
-                          Icon(
-                            Icons.ondemand_video_outlined,
-                            color: Color(0xFF555555),
-                          ),
-                          SizedBox(
-                            width: 8,
-                          ),
-                          Text(
-                            "${youtube_count} Video",
-                            style: TextStyle(
-                              fontFamily: 'Arial',
-                              color: Colors.grey,
-                              fontWeight: FontWeight.w500,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-              challenge_count == "0"
-                  ? Container()
-                  : Padding(
-                      padding: const EdgeInsets.only(bottom: 8.0),
-                      child: Row(
-                        children: [
-                          Icon(
-                            Icons.emoji_events_outlined,
-                            color: Color(0xFF555555),
-                          ),
-                          SizedBox(
-                            width: 8,
-                          ),
-                          Text(
-                            "${challenge_count} Challenge",
-                            style: TextStyle(
-                              fontFamily: 'Arial',
-                              color: Colors.grey,
-                              fontWeight: FontWeight.w500,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-              link_count == "0"
-                  ? Container()
-                  : Padding(
-                      padding: const EdgeInsets.only(bottom: 8.0),
-                      child: Row(
-                        children: [
-                          Icon(
-                            Icons.link_outlined,
-                            color: Color(0xFF555555),
-                          ),
-                          SizedBox(
-                            width: 8,
-                          ),
-                          Text(
-                            "${link_count} Link",
-                            style: TextStyle(
-                              fontFamily: 'Arial',
-                              color: Colors.grey,
-                              fontWeight: FontWeight.w500,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-              event_count == "0"
-                  ? Container()
-                  : Padding(
-                      padding: const EdgeInsets.only(bottom: 8.0),
-                      child: Row(
-                        children: [
-                          Icon(
-                            Icons.event_note,
-                            color: Color(0xFF555555),
-                          ),
-                          SizedBox(
-                            width: 8,
-                          ),
-                          Flexible(
-                            child: Text(
-                              "${event_count} Event",
-                              style: TextStyle(
-                                fontFamily: 'Arial',
-                                color: Colors.grey,
-                                fontWeight: FontWeight.w500,
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-              Padding(
-                padding: const EdgeInsets.only(bottom: 8.0),
-                child: Row(
-                  children: [
-                    Icon(
-                      Icons.school_outlined,
-                      color: Color(0xFF555555),
-                    ),
-                    SizedBox(
-                      width: 8,
-                    ),
-                    Flexible(
-                      child: Text(
-                        "$certificateTS",
+                      Text(
+                        "${description.video_counter} $videoTS",
                         style: TextStyle(
                           fontFamily: 'Arial',
                           color: Colors.grey,
                           fontWeight: FontWeight.w500,
                         ),
                       ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
-              ),
+              if (description.document_counter != "0")
+                Padding(
+                  padding: const EdgeInsets.only(bottom: 8.0),
+                  child: Row(
+                    children: [
+                      Icon(
+                        Icons.file_copy_outlined,
+                        color: Color(0xFF555555),
+                      ),
+                      SizedBox(
+                        width: 8,
+                      ),
+                      Text(
+                        "${description.document_counter} File",
+                        style: TextStyle(
+                          fontFamily: 'Arial',
+                          color: Colors.grey,
+                          fontWeight: FontWeight.w700,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              if (description.youtube_counter != "0")
+                Padding(
+                  padding: const EdgeInsets.only(bottom: 8.0),
+                  child: Row(
+                    children: [
+                      Icon(
+                        Icons.ondemand_video_outlined,
+                        color: Color(0xFF555555),
+                      ),
+                      SizedBox(
+                        width: 8,
+                      ),
+                      Text(
+                        "${description.youtube_counter} Video",
+                        style: TextStyle(
+                          fontFamily: 'Arial',
+                          color: Colors.grey,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              if (description.challenge_counter != "0")
+                Padding(
+                  padding: const EdgeInsets.only(bottom: 8.0),
+                  child: Row(
+                    children: [
+                      Icon(
+                        Icons.emoji_events_outlined,
+                        color: Color(0xFF555555),
+                      ),
+                      SizedBox(
+                        width: 8,
+                      ),
+                      Text(
+                        "${description.challenge_counter} Challenge",
+                        style: TextStyle(
+                          fontFamily: 'Arial',
+                          color: Colors.grey,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              if (description.link_counter != "0")
+                Padding(
+                  padding: const EdgeInsets.only(bottom: 8.0),
+                  child: Row(
+                    children: [
+                      Icon(
+                        Icons.link_outlined,
+                        color: Color(0xFF555555),
+                      ),
+                      SizedBox(
+                        width: 8,
+                      ),
+                      Text(
+                        "${description.link_counter} Link",
+                        style: TextStyle(
+                          fontFamily: 'Arial',
+                          color: Colors.grey,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              if (description.course_certificate == "Y")
+                Padding(
+                  padding: const EdgeInsets.only(bottom: 8.0),
+                  child: Row(
+                    children: [
+                      Icon(
+                        Icons.school_outlined,
+                        color: Color(0xFF555555),
+                      ),
+                      SizedBox(
+                        width: 8,
+                      ),
+                      Flexible(
+                        child: Text(
+                          'Certificate of completion',
+                          style: TextStyle(
+                            fontFamily: 'Arial',
+                            color: Colors.grey,
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
             ],
           ),
         ],
       ),
     );
   }
+
+  Future<List<DescriptionModel>> fetchDescription() async {
+    final uri =
+        Uri.parse("$host/api/origami/e-learning/academy/study/description.php");
+    final response = await http.post(
+      uri,
+      headers: {'Authorization': 'Bearer ${widget.Authorization}'},
+      body: {
+        'auth_password': authorization,
+        'academy_id': widget.academy.academy_id,
+        'academy_type': widget.academy.academy_type,
+      },
+    );
+
+    if (response.statusCode == 200) {
+      final Map<String, dynamic> jsonResponse = json.decode(response.body);
+      // เข้าถึงข้อมูลในคีย์ 'academy_data'
+      final List<dynamic> academiesJson = jsonResponse['course_data'];
+      // แปลงข้อมูลจาก JSON เป็น List<AcademyModel>
+      return academiesJson
+          .map((json) => DescriptionModel.fromJson(json))
+          .toList();
+    } else {
+      throw Exception('Failed to load academies');
+    }
+  }
 }
 
-class DescriptionData {
-  final String course_subject;
-  final String video_count;
-  final String document_count;
-  final String youtube_count;
-  final String challenge_count;
-  final String link_count;
-  final String event_count;
-  final List<String> topic_section;
+class DescriptionModel {
+  final String course_name;
+  final String course_description;
+  final String video_counter;
+  final String challenge_counter;
+  final String document_counter;
+  final String youtube_counter;
+  final String link_counter;
+  final String course_certificate;
+  final List<ContentData> content_data;
 
-  DescriptionData({
-    required this.course_subject,
-    required this.video_count,
-    required this.document_count,
-    required this.youtube_count,
-    required this.challenge_count,
-    required this.link_count,
-    required this.event_count,
-    required this.topic_section,
+  DescriptionModel({
+    required this.course_name,
+    required this.course_description,
+    required this.video_counter,
+    required this.challenge_counter,
+    required this.document_counter,
+    required this.youtube_counter,
+    required this.link_counter,
+    required this.course_certificate,
+    required this.content_data,
   });
 
-  factory DescriptionData.fromJson(Map<String, dynamic> json) {
-    return DescriptionData(
-      course_subject: json['course_subject'] ?? '',
-      video_count: json['video_count'] ?? '',
-      document_count: json['document_count'] ?? '',
-      youtube_count: json['youtube_count'] ?? '',
-      challenge_count: json['challenge_count'] ?? '',
-      link_count: json['link_count'] ?? '',
-      event_count: json['event_count'] ?? '',
-      topic_section: List<String>.from(json['topic_section']),
+  factory DescriptionModel.fromJson(Map<String, dynamic> json) {
+    return DescriptionModel(
+      course_name: json['course_name'] ?? '',
+      course_description: json['course_description'] ?? '',
+      video_counter: json['video_counter'] ?? '',
+      challenge_counter: json['challenge_counter'] ?? '',
+      document_counter: json['document_counter'] ?? '',
+      youtube_counter: json['youtube_counter'] ?? '',
+      link_counter: json['link_counter'] ?? '',
+      course_certificate: json['course_certificate'] ?? '',
+      content_data: (json['content_data'] as List?)
+              ?.map((e) => ContentData.fromJson(e))
+              .toList() ??
+          [],
+    );
+  }
+}
+
+class ContentData {
+  final String content_name;
+  final String content_type;
+  final String class_no;
+
+  ContentData({
+    required this.content_name,
+    required this.content_type,
+    required this.class_no,
+  });
+
+  factory ContentData.fromJson(Map<String, dynamic> json) {
+    return ContentData(
+      content_name: json['content_name'] ?? '',
+      content_type: json['content_type'] ?? '',
+      class_no: json['class_no'] ?? '',
     );
   }
 }

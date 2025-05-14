@@ -14,7 +14,7 @@ class Curriculum extends StatefulWidget {
     required this.callback,
   });
   final Employee employee;
-  final AcademyRespond academy;
+  final AcademyModel academy;
   final String Authorization;
   final VoidCallback callback;
   @override

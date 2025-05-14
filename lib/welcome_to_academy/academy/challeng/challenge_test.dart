@@ -15,12 +15,13 @@ class ChallengePage extends StatefulWidget {
     required this.employee,
     required this.Authorization,
     required this.initialMinutes,
-    required this.getchallenge,
+    required this.getchallenge, required this.logo,
   });
   final Employee employee;
   final String Authorization;
   final double initialMinutes;
   final GetChallenge getchallenge;
+  final String logo;
   @override
   _ChallengePageState createState() => _ChallengePageState();
 }
@@ -75,7 +76,7 @@ class _ChallengePageState extends State<ChallengePage> {
                 initialMinutes: widget.initialMinutes,
                 challenge: widget.getchallenge,
                 questionList: questionList,
-                isQuestion: checkAllChallenge,
+                isQuestion: checkAllChallenge, logo: widget.logo,
               ),
             ),
           );
@@ -204,7 +205,7 @@ class _ChallengePageState extends State<ChallengePage> {
                       initialMinutes: widget.initialMinutes,
                       challenge: widget.getchallenge,
                       questionList: questionList,
-                      isQuestion: checkAllChallenge,
+                      isQuestion: checkAllChallenge, logo: widget.logo,
                     ),
                   ),
                 );
@@ -259,7 +260,7 @@ class _ChallengePageState extends State<ChallengePage> {
                 initialMinutes: widget.initialMinutes,
                 challenge: widget.getchallenge,
                 questionList: questionList,
-                isQuestion: checkAllChallenge,
+                isQuestion: checkAllChallenge, logo: widget.logo,
               ),
             ),
           );
@@ -314,7 +315,7 @@ class _ChallengePageState extends State<ChallengePage> {
       DateTime startTime = format.parse(timerStart).toUtc(); // แปลงเป็น UTC
       DateTime now = DateTime.now().toUtc();
 
-      int durationMinutes = int.tryParse(challenge.challenge_duration) ?? 0;
+      int durationMinutes = int.tryParse(challenge.challenge_minute) ?? 0;
       DateTime endTime = startTime.add(Duration(minutes: durationMinutes));
 
       // คำนวณเวลาคงเหลือ
@@ -381,7 +382,7 @@ class _ChallengePageState extends State<ChallengePage> {
                   builder: (context) => AcademyHomePage(
                     employee: widget.employee,
                     Authorization: widget.Authorization,
-                    page: 'challenge',
+                    learnin_page: 'challenge', logo: widget.logo,
                   ),
                 ),
               );

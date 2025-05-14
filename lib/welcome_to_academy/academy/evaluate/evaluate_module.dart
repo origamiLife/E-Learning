@@ -20,7 +20,7 @@ class EvaluateModule extends StatefulWidget {
     required this.Authorization,
   });
   final Employee employee;
-  final AcademyRespond academy;
+  final AcademyModel academy;
   final VoidCallback? callback;
   final int? selectedPage;
   final String Authorization;
@@ -42,44 +42,44 @@ class _EvaluateModuleState extends State<EvaluateModule>
   String _commentA = "";
   String _commentB = "";
 
-  Future<Map<String, dynamic>> getAllAcademyData() async {
-    try {
-      final uri = Uri.parse("$host/api/origami/academy/academy.php");
-      final response = await http.post(
-        uri,
-        headers: {'Authorization': 'Bearer ${widget.Authorization}'},
-        body: {
-          'comp_id': widget.employee.comp_id,
-          'emp_id': widget.employee.emp_id,
-          'Authorization': widget.Authorization,
-          'academy_id': widget.academy.academy_id,
-          'academy_type': widget.academy.academy_type,
-        },
-      );
-
-      if (response.statusCode == 200) {
-        // แปลงข้อมูล JSON เป็น Map
-        final Map<String, dynamic> jsonResponse = json.decode(response.body);
-
-        // ดึงข้อมูลจาก JSON
-        HeaderData headerData =
-            HeaderData.fromJson(jsonResponse['header_data']);
-        FastView fastView = FastView.fromJson(jsonResponse['fastview_data']);
-
-        // ส่งข้อมูลกลับเป็น Map
-        return {
-          'headerData': headerData,
-          'fastView': fastView,
-        };
-      } else {
-        print('Failed to load academy data');
-        throw Exception('Failed to load academies');
-      }
-    } catch (e) {
-      print('Error: $e');
-      throw Exception('Error: $e');
-    }
-  }
+  // Future<Map<String, dynamic>> getAllAcademyData() async {
+  //   try {
+  //     final uri = Uri.parse("$host/api/origami/academy/academy.php");
+  //     final response = await http.post(
+  //       uri,
+  //       headers: {'Authorization': 'Bearer ${widget.Authorization}'},
+  //       body: {
+  //         'comp_id': widget.employee.comp_id,
+  //         'emp_id': widget.employee.emp_id,
+  //         'Authorization': widget.Authorization,
+  //         'academy_id': widget.academy.academy_id,
+  //         'academy_type': widget.academy.academy_type,
+  //       },
+  //     );
+  //
+  //     if (response.statusCode == 200) {
+  //       // แปลงข้อมูล JSON เป็น Map
+  //       final Map<String, dynamic> jsonResponse = json.decode(response.body);
+  //
+  //       // ดึงข้อมูลจาก JSON
+  //       HeaderData headerData =
+  //           HeaderData.fromJson(jsonResponse['header_data']);
+  //       FastView fastView = FastView.fromJson(jsonResponse['fastview_data']);
+  //
+  //       // ส่งข้อมูลกลับเป็น Map
+  //       return {
+  //         'headerData': headerData,
+  //         'fastView': fastView,
+  //       };
+  //     } else {
+  //       print('Failed to load academy data');
+  //       throw Exception('Failed to load academies');
+  //     }
+  //   } catch (e) {
+  //     print('Error: $e');
+  //     throw Exception('Error: $e');
+  //   }
+  // }
 
   String URL = '';
   String imageUrl = '';
@@ -88,10 +88,9 @@ class _EvaluateModuleState extends State<EvaluateModule>
   void initState() {
     super.initState();
     _selectedIndex = widget.selectedPage ?? 0;
-    getAllAcademyData();
     _tabController = TabController(
         length: _tabs.length, vsync: this, initialIndex: _selectedIndex);
-    if (widget.academy.favorite == '1') {
+    if (widget.academy.academy_favorite == 'Y') {
       _isClick = true;
     } else {
       _isClick = false;
@@ -140,14 +139,12 @@ class _EvaluateModuleState extends State<EvaluateModule>
           },
         ),
       ),
-      body: FutureBuilder<Map<String, dynamic>>(
-        future: getAllAcademyData(),
+      body: FutureBuilder<HeaderData>(
+        future: fetchHeader(),
         builder: (context, snapshot) {
           if (snapshot.hasData) {
-            // เมื่อโหลดข้อมูลสำเร็จ
-            HeaderData headerData = snapshot.data!['headerData'];
-            FastView fastView = snapshot.data!['fastView'];
-            return _Head(headerData, fastView);
+            final headerData = snapshot.data!;
+            return _Head(headerData);
           } else {
             return Center(
                 child: Text(
@@ -167,14 +164,48 @@ class _EvaluateModuleState extends State<EvaluateModule>
     );
   }
 
-  Widget _Head(HeaderData headerData, FastView fastView) {
-    return Column(
-      children: <Widget>[
-        (isMobile)
-            ? _headerMobile(headerData, fastView)
-            : _headerMobileN(headerData, fastView),
-        Expanded(child: _bodyAcademy()),
-      ],
+  Widget _Head(HeaderData headerData) {
+    return Center(
+      child: FutureBuilder<FastView>(
+        future: fetchFastView(), // เรียกใช้ฟังก์ชัน API
+        builder: (context, snapshot) {
+          if (snapshot.hasError) {
+            return Center(child: Text('Error: ${snapshot.error}'));
+          } else if (!snapshot.hasData) {
+            return Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                CircularProgressIndicator(
+                  color: Color(0xFFFF9900),
+                ),
+                SizedBox(
+                  width: 12,
+                ),
+                Text(
+                  '$loadingTS...',
+                  style: TextStyle(
+                    fontFamily: 'Arial',
+                    fontSize: 16,
+                    fontWeight: FontWeight.w700,
+                    color: Color(0xFF555555),
+                  ),
+                ),
+              ],
+            );
+          } else {
+            final fastView = snapshot.data!;
+            return Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                (isMobile)
+                    ? _headerMobile(headerData, fastView)
+                    : _headerMobileN(headerData, fastView),
+                Expanded(child: _bodyAcademy()),
+              ],
+            );
+          }
+        },
+      ),
     );
   }
 
@@ -190,39 +221,66 @@ class _EvaluateModuleState extends State<EvaluateModule>
               children: [
                 Padding(
                   padding: const EdgeInsets.only(left: 16, right: 4, top: 8),
-                  child: Row(
+                  child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Expanded(
-                        child: Text(
-                          widget.academy.academy_subject,
-                          style: TextStyle(
-                            fontFamily: 'Arial',
-                            fontSize: 18,
-                            fontWeight: FontWeight.w700,
-                            color: Color(0xFF555555),
+                      Row(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Expanded(
+                            child: Text(
+                              headerData.topic_name,
+                              style: TextStyle(
+                                fontFamily: 'Arial',
+                                fontSize: 18,
+                                fontWeight: FontWeight.w700,
+                                color: Color(0xFF555555),
+                              ),
+                              overflow: TextOverflow.ellipsis,
+                              maxLines: 2,
+                            ),
                           ),
-                          overflow: TextOverflow.ellipsis,
-                          maxLines: 2,
-                        ),
+                          CircleAvatar(
+                            radius: 16,
+                            backgroundColor: _isClick
+                                ? Colors.red.shade100
+                                : Colors.grey.shade100,
+                            child: InkWell(
+                              onTap: () {
+                                setState(() {
+                                  widget.callback!();
+                                  _isClick = !_isClick;
+                                });
+                              },
+                              child: Icon(Icons.favorite,
+                                  color:
+                                      _isClick ? Colors.red : Colors.grey.shade500,
+                                  size: 22),
+                            ),
+                          ),
+                        ],
                       ),
-                      CircleAvatar(
-                        radius: 16,
-                        backgroundColor: _isClick
-                            ? Colors.red.shade100
-                            : Colors.grey.shade100,
-                        child: InkWell(
-                          onTap: () {
-                            setState(() {
-                              widget.callback!();
-                              _isClick = !_isClick;
-                            });
-                          },
-                          child: Icon(Icons.favorite,
-                              color:
-                                  _isClick ? Colors.red : Colors.grey.shade500,
-                              size: 22),
+                      Text.rich(
+                        TextSpan(
+                          children: [
+                            TextSpan(
+                              text: '   ', // หรือ '\t' เยื้องบรรทัดแรก
+                            ),
+                            TextSpan(
+                              text: headerData.topic_description,
+                            ),
+                          ],
                         ),
+                        textAlign: TextAlign.justify,
+                        style: TextStyle(
+                          fontFamily: 'Arial',
+                          fontSize: 14,
+                          color: Color(0xFF555555),
+                          fontWeight: FontWeight.w500,
+                        ),
+                        strutStyle: StrutStyle(fontSize: 16, height: 1.5),
+                        maxLines: 3,
+                        overflow: TextOverflow.ellipsis,
                       ),
                     ],
                   ),
@@ -256,6 +314,14 @@ class _EvaluateModuleState extends State<EvaluateModule>
                                     width: double.infinity,
                                     height: 120,
                                     fit: BoxFit.cover,
+                                    errorBuilder: (context, error, stackTrace) {
+                                      return Image.network(
+                                        widget.employee.comp_logo,
+                                        width: double.infinity,
+                                        height: 120,
+                                        fit: BoxFit.cover,
+                                      );
+                                    },
                                   ),
                                 ),
                               ),
@@ -276,96 +342,36 @@ class _EvaluateModuleState extends State<EvaluateModule>
                                           fontWeight: FontWeight.w500,
                                           color: Color(0xFF555555),
                                         ),
-                                        maxLines: 3,
-                                        overflow: TextOverflow.ellipsis,
                                       ),
                                       SizedBox(height: 6),
-                                      Row(
-                                        children: [
-                                          Text(
-                                            "$startTS: ",
-                                            style: TextStyle(
-                                              fontFamily: 'Arial',
-                                              fontSize: 12,
-                                              fontWeight: FontWeight.w500,
-                                              color: Color(0xFF555555),
+                                      Padding(
+                                        padding: const EdgeInsets.only(top: 8),
+                                        child: InkWell(
+                                          onTap: () {},
+                                          child: Container(
+                                            alignment: Alignment.center,
+                                            width: double.infinity,
+                                            padding: const EdgeInsets.only(
+                                                left: 24,
+                                                right: 24,
+                                                top: 10,
+                                                bottom: 10),
+                                            decoration: BoxDecoration(
+                                              color: Colors.orange,
+                                              borderRadius:
+                                                  BorderRadius.circular(10),
                                             ),
-                                          ),
-                                          Flexible(
                                             child: Text(
-                                              fastView.fastview_exp,
+                                              fastView.fastview_button_text,
                                               style: TextStyle(
                                                 fontFamily: 'Arial',
-                                                fontSize: 12,
-                                                fontWeight: FontWeight.w500,
-                                                color: Colors.orange,
+                                                fontSize: 14,
+                                                color: Colors.white,
+                                                fontWeight: FontWeight.w700,
                                               ),
                                             ),
                                           ),
-                                        ],
-                                      ),
-                                      SizedBox(height: 6),
-                                      Row(
-                                        children: [
-                                          Text(
-                                            "$statusTS: ",
-                                            style: TextStyle(
-                                              fontFamily: 'Arial',
-                                              fontSize: 12,
-                                              fontWeight: FontWeight.w500,
-                                              color: Color(0xFF555555),
-                                            ),
-                                          ),
-                                          Flexible(
-                                            child: Text(
-                                              fastView.fastview_button,
-                                              style: TextStyle(
-                                                fontFamily: 'Arial',
-                                                fontSize: 12,
-                                                fontWeight: FontWeight.w500,
-                                                color: Colors.orange,
-                                              ),
-                                            ),
-                                          ),
-                                        ],
-                                      ),
-                                      Row(
-                                        children: [
-                                          Expanded(
-                                            child: Padding(
-                                              padding:
-                                                  const EdgeInsets.only(top: 8),
-                                              child: InkWell(
-                                                onTap: () {},
-                                                child: Container(
-                                                  alignment: Alignment.center,
-                                                  width: double.infinity,
-                                                  padding:
-                                                      const EdgeInsets.only(
-                                                          left: 24,
-                                                          right: 24,
-                                                          top: 8,
-                                                          bottom: 8),
-                                                  decoration: BoxDecoration(
-                                                    color: Colors.orange,
-                                                    borderRadius:
-                                                        BorderRadius.circular(
-                                                            10),
-                                                  ),
-                                                  child: Text(
-                                                    "$EnrollTS",
-                                                    style: TextStyle(
-                                                      fontFamily: 'Arial',
-                                                      fontSize: 12,
-                                                      color: Colors.white,
-                                                    ),
-                                                  ),
-                                                ),
-                                              ),
-                                            ),
-                                          ),
-                                          // Expanded(child: SizedBox())
-                                        ],
+                                        ),
                                       ),
                                     ],
                                   ),
@@ -384,7 +390,7 @@ class _EvaluateModuleState extends State<EvaluateModule>
                   child: Row(
                     children: [
                       _infoRow(Icons.video_collection_outlined,
-                          '${headerData.video_number} Video'),
+                          '${headerData.video_count} Video'),
                       Text(
                         '|',
                         style: TextStyle(
@@ -393,7 +399,8 @@ class _EvaluateModuleState extends State<EvaluateModule>
                           color: Color(0xFF555555),
                         ),
                       ),
-                      _infoRow(Icons.access_time, '${headerData.video_time}'),
+                      _infoRow(
+                          Icons.access_time, '${headerData.video_duration}'),
                       Text(
                         '|',
                         style: TextStyle(
@@ -415,10 +422,11 @@ class _EvaluateModuleState extends State<EvaluateModule>
           indicatorColor: Colors.orange,
           labelColor: Colors.orange,
           labelStyle: const TextStyle(
-              fontFamily: 'Arial',
-              fontSize: 14,
-              color: Colors.grey,
-              fontWeight: FontWeight.w500),
+            fontFamily: 'Arial',
+            fontSize: 14,
+            color: Colors.grey,
+            fontWeight: FontWeight.w500,
+          ),
           unselectedLabelColor: Colors.grey,
           onTap: (index) {
             setState(() {
@@ -465,7 +473,8 @@ class _EvaluateModuleState extends State<EvaluateModule>
                             ],
                           ),
                           child: Padding(
-                            padding: const EdgeInsets.only(left: 16,top: 16,bottom: 8),
+                            padding: const EdgeInsets.only(
+                                left: 16, top: 16, bottom: 8),
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
@@ -473,7 +482,7 @@ class _EvaluateModuleState extends State<EvaluateModule>
                                 SizedBox(
                                   width: widthArea * 0.65,
                                   child: Text(
-                                    widget.academy.academy_subject,
+                                    widget.academy.academy_name,
                                     style: TextStyle(
                                       fontFamily: 'Arial',
                                       fontSize: 18,
@@ -494,7 +503,7 @@ class _EvaluateModuleState extends State<EvaluateModule>
                                           CrossAxisAlignment.start,
                                       children: [
                                         Text(
-                                          widget.academy.academy_category,
+                                          widget.academy.academy_name,
                                           style: TextStyle(
                                             fontFamily: 'Arial',
                                             fontSize: 16,
@@ -570,7 +579,7 @@ class _EvaluateModuleState extends State<EvaluateModule>
                           child: Row(
                             children: [
                               _infoRow(Icons.video_collection_outlined,
-                                  '${headerData.video_number} Video'),
+                                  '${headerData.video_count} Video'),
                               Text(
                                 '|',
                                 style: TextStyle(
@@ -580,7 +589,7 @@ class _EvaluateModuleState extends State<EvaluateModule>
                                 ),
                               ),
                               _infoRow(Icons.access_time,
-                                  '${headerData.video_time}'),
+                                  '${headerData.video_duration}'),
                               Text(
                                 '|',
                                 style: TextStyle(
@@ -611,10 +620,9 @@ class _EvaluateModuleState extends State<EvaluateModule>
                           color: Colors.white,
                           borderRadius: BorderRadius.circular(10),
                           border: Border.all(
-                            color: _isClick
-                                ? Colors.red
-                                : Colors.orange, // สีขอบ
-                            width: 2.0,        // ความหนาของขอบ
+                            color:
+                                _isClick ? Colors.red : Colors.orange, // สีขอบ
+                            width: 2.0, // ความหนาของขอบ
                           ),
                         ),
                         child: Padding(
@@ -647,55 +655,55 @@ class _EvaluateModuleState extends State<EvaluateModule>
                                     overflow: TextOverflow.ellipsis,
                                   ),
                                   SizedBox(height: (isMobile) ? 6 : 10),
-                                  Row(
-                                    children: [
-                                      Text(
-                                        "$startTS: ",
-                                        style: TextStyle(
-                                          fontFamily: 'Arial',
-                                          fontSize: (isMobile) ? 12 : 16,
-                                          fontWeight: FontWeight.w500,
-                                          color: Color(0xFF555555),
-                                        ),
-                                      ),
-                                      Flexible(
-                                        child: Text(
-                                          fastView.fastview_exp,
-                                          style: TextStyle(
-                                            fontFamily: 'Arial',
-                                            fontSize: (isMobile) ? 12 : 16,
-                                            fontWeight: FontWeight.w500,
-                                            color: Colors.orange,
-                                          ),
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                  SizedBox(height: 10),
-                                  Row(
-                                    children: [
-                                      Text(
-                                        "$statusTS: ",
-                                        style: TextStyle(
-                                          fontFamily: 'Arial',
-                                          fontSize: (isMobile) ? 12 : 16,
-                                          fontWeight: FontWeight.w500,
-                                          color: Color(0xFF555555),
-                                        ),
-                                      ),
-                                      Flexible(
-                                        child: Text(
-                                          fastView.fastview_button,
-                                          style: TextStyle(
-                                            fontFamily: 'Arial',
-                                            fontSize: (isMobile) ? 12 : 16,
-                                            fontWeight: FontWeight.w500,
-                                            color: Colors.orange,
-                                          ),
-                                        ),
-                                      ),
-                                    ],
-                                  ),
+                                  // Row(
+                                  //   children: [
+                                  //     Text(
+                                  //       "$startTS: ",
+                                  //       style: TextStyle(
+                                  //         fontFamily: 'Arial',
+                                  //         fontSize: (isMobile) ? 12 : 16,
+                                  //         fontWeight: FontWeight.w500,
+                                  //         color: Color(0xFF555555),
+                                  //       ),
+                                  //     ),
+                                  //     Flexible(
+                                  //       child: Text(
+                                  //         fastView.fastview_exp,
+                                  //         style: TextStyle(
+                                  //           fontFamily: 'Arial',
+                                  //           fontSize: (isMobile) ? 12 : 16,
+                                  //           fontWeight: FontWeight.w500,
+                                  //           color: Colors.orange,
+                                  //         ),
+                                  //       ),
+                                  //     ),
+                                  //   ],
+                                  // ),
+                                  // SizedBox(height: 10),
+                                  // Row(
+                                  //   children: [
+                                  //     Text(
+                                  //       "$statusTS: ",
+                                  //       style: TextStyle(
+                                  //         fontFamily: 'Arial',
+                                  //         fontSize: (isMobile) ? 12 : 16,
+                                  //         fontWeight: FontWeight.w500,
+                                  //         color: Color(0xFF555555),
+                                  //       ),
+                                  //     ),
+                                  //     Flexible(
+                                  //       child: Text(
+                                  //         fastView.fastview_button,
+                                  //         style: TextStyle(
+                                  //           fontFamily: 'Arial',
+                                  //           fontSize: (isMobile) ? 12 : 16,
+                                  //           fontWeight: FontWeight.w500,
+                                  //           color: Colors.orange,
+                                  //         ),
+                                  //       ),
+                                  //     ),
+                                  //   ],
+                                  // ),
                                   Row(
                                     children: [
                                       Expanded(
@@ -799,11 +807,11 @@ class _EvaluateModuleState extends State<EvaluateModule>
   int _selectedIndex = 0;
 
   final List<String> _tabs = [
-    '$DescriptionTS',
     '$CurriculumTS',
+    '$DescriptionTS',
     '$InstructorsTS',
     '$DiscussionTS',
-    // 'Announcements',
+    'Announcements',
     '$AttachFileTS',
     '$CertificationTS',
   ];
@@ -811,19 +819,19 @@ class _EvaluateModuleState extends State<EvaluateModule>
   Widget _bodyAcademy() {
     switch (_selectedIndex) {
       case 0:
-        return Description(
-          employee: widget.employee,
-          academy: widget.academy,
-          Authorization: widget.Authorization,
-        );
-      case 1:
         return Curriculum(
           employee: widget.employee,
           academy: widget.academy,
           Authorization: widget.Authorization,
           callback: () {
-            _selectedIndex = 1;
+            _selectedIndex = 0;
           },
+        );
+      case 1:
+        return Description(
+          employee: widget.employee,
+          academy: widget.academy,
+          Authorization: widget.Authorization,
         );
       case 2:
         return Instructors(
@@ -837,15 +845,18 @@ class _EvaluateModuleState extends State<EvaluateModule>
           academy: widget.academy,
           Authorization: widget.Authorization,
         );
-      // case 4:
-      //   return Announcements();
       case 4:
+        return Announcements(
+          employee: widget.employee,
+          academy: widget.academy,
+        );
+      case 5:
         return AttachFile(
           employee: widget.employee,
           academy: widget.academy,
           Authorization: widget.Authorization,
         );
-      case 5:
+      case 6:
         return Certification(
           employee: widget.employee,
           academy: widget.academy,
@@ -868,6 +879,48 @@ class _EvaluateModuleState extends State<EvaluateModule>
         );
     }
   }
+
+  Future<HeaderData> fetchHeader() async {
+    final uri =
+        Uri.parse("$host/api/origami/e-learning/academy/study/header.php");
+    final response = await http.post(
+      uri,
+      headers: {'Authorization': 'Bearer ${authorization}'},
+      body: {
+        'auth_password': authorization,
+        'academy_id': widget.academy.academy_id,
+        'academy_type': widget.academy.academy_type,
+      },
+    );
+    if (response.statusCode == 200) {
+      final Map<String, dynamic> jsonResponse = json.decode(response.body);
+      return HeaderData.fromJson(jsonResponse['header_data']);
+    } else {
+      throw Exception('Failed to load academies');
+    }
+  }
+
+  Future<FastView> fetchFastView() async {
+    final uri =
+        Uri.parse("$host/api/origami/e-learning/academy/study/fastview.php");
+    final response = await http.post(
+      uri,
+      headers: {'Authorization': 'Bearer $authorization'},
+      body: {
+        'auth_password': authorization,
+        'emp_id': widget.employee.emp_id,
+        'comp_id': widget.employee.comp_id,
+        'academy_id': widget.academy.academy_id,
+        'academy_type': widget.academy.academy_type,
+      },
+    );
+    if (response.statusCode == 200) {
+      final Map<String, dynamic> jsonResponse = json.decode(response.body);
+      return FastView.fromJson(jsonResponse['fastview_data']);
+    } else {
+      throw Exception('Failed to load academies');
+    }
+  }
 }
 
 class IDPlan {
@@ -886,79 +939,70 @@ class IDPlan {
 }
 
 class HeaderData {
-  final String academy_name;
-  final String academy_description;
+  final String topic_name;
+  final String topic_description;
   final String category_name;
-  final String video_time;
-  final String video_number;
-  final String student_number;
-  final String announce_number;
-  final String favorite_status;
-  final String academy_link;
+  final String video_count;
+  final String video_duration;
 
   HeaderData({
-    required this.academy_name,
-    required this.academy_description,
+    required this.topic_name,
+    required this.topic_description,
     required this.category_name,
-    required this.video_time,
-    required this.video_number,
-    required this.student_number,
-    required this.announce_number,
-    required this.favorite_status,
-    required this.academy_link,
+    required this.video_count,
+    required this.video_duration,
   });
 
   // สร้างฟังก์ชันเพื่อแปลง JSON ไปเป็น Object ของ Academy
   factory HeaderData.fromJson(Map<String, dynamic> json) {
     return HeaderData(
-      academy_name: json['academy_name'] ?? '',
-      academy_description: json['academy_description'] ?? '',
+      topic_name: json['topic_name'] ?? '',
+      topic_description: json['topic_description'] ?? '',
       category_name: json['category_name'] ?? '',
-      video_time: json['video_time'] ?? '',
-      video_number: json['video_number'] ?? '',
-      student_number: json['student_number'] ?? '',
-      announce_number: json['announce_number'] ?? '',
-      favorite_status: json['favorite_status']?.toString() ?? '',
-      academy_link: json['academy_link'] ?? '',
+      video_count: json['video_count'] ?? '',
+      video_duration: json['video_duration'] ?? '',
     );
   }
 }
 
 class FastView {
   final String fastview_cover;
+  final String fastview_text;
+  final String fastview_date;
+  final String fastview_button_text;
+  final String fastview_button_class;
   final String course_id;
-  final String course_option;
-  final String item_id;
+  final String topic_option;
+  final String topic_item;
   final String topic_no;
   final String topic_id;
-  final String fastview_button;
-  final String fastview_exp;
-  final String fastview_text;
 
   FastView({
     required this.fastview_cover,
+    required this.fastview_text,
+    required this.fastview_date,
+    required this.fastview_button_text,
+    required this.fastview_button_class,
     required this.course_id,
-    required this.course_option,
-    required this.item_id,
+    required this.topic_option,
+    required this.topic_item,
     required this.topic_no,
     required this.topic_id,
-    required this.fastview_button,
-    required this.fastview_exp,
-    required this.fastview_text,
   });
 
   // สร้างฟังก์ชันเพื่อแปลง JSON ไปเป็น Object ของ Academy
   factory FastView.fromJson(Map<String, dynamic> json) {
     return FastView(
       fastview_cover: json['fastview_cover'] ?? '',
+      fastview_text: json['fastview_text'] ?? '',
+      fastview_date: json['fastview_date'] ?? '',
+      fastview_button_text: json['fastview_button_text'] ?? '',
+      fastview_button_class: json['fastview_button_class'] ?? '',
       course_id: json['course_id'] ?? '',
-      course_option: json['course_option'] ?? '',
-      item_id: json['item_id'] ?? '',
+      topic_option: json['topic_option'] ?? '',
+      topic_item: json['topic_item'] ?? '',
       topic_no: json['topic_no'] ?? '',
       topic_id: json['topic_id'] ?? '',
-      fastview_button: json['fastview_button'] ?? '',
-      fastview_exp: json['fastview_exp'] ?? '',
-      fastview_text: json['fastview_text'] ?? '',
     );
   }
 }

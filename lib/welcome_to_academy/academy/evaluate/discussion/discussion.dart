@@ -13,7 +13,7 @@ class Discussion extends StatefulWidget {
     required this.Authorization,
   });
   final Employee employee;
-  final AcademyRespond academy;
+  final AcademyModel academy;
   final String Authorization;
   @override
   _DiscussionState createState() => _DiscussionState();
@@ -23,59 +23,6 @@ class _DiscussionState extends State<Discussion> {
   final TextEditingController _commentControllerA = TextEditingController();
   final TextEditingController _commentControllerB = TextEditingController();
 
-  Future<List<DiscussionData>> fetchDiscussion() async {
-    final uri = Uri.parse("$host/api/origami/academy/discussion.php");
-    final response = await http.post(
-      uri,
-      headers: {'Authorization': 'Bearer ${widget.Authorization}'},
-      body: {
-        'comp_id': widget.employee.comp_id,
-        'emp_id': widget.employee.emp_id,
-        'Authorization': widget.Authorization,
-        'academy_id': widget.academy.academy_id,
-        'academy_type': widget.academy.academy_type,
-      },
-    );
-
-    if (response.statusCode == 200) {
-      final Map<String, dynamic> jsonResponse = json.decode(response.body);
-      // เข้าถึงข้อมูลในคีย์ 'instructors'
-      final List<dynamic> discussionJson = jsonResponse['discussion_data'];
-      // แปลงข้อมูลจาก JSON เป็น List<Instructor>
-      return discussionJson
-          .map((json) => DiscussionData.fromJson(json))
-          .toList();
-    } else {
-      throw Exception('Failed to load instructors');
-    }
-  }
-
-  String discussionId = "";
-  Future<List<ReplyData>> fetchReply() async {
-    final uri = Uri.parse("$host/api/origami/academy/discussionReply.php");
-    final response = await http.post(
-      uri,
-      headers: {'Authorization': 'Bearer ${widget.Authorization}'},
-      body: {
-        'comp_id': widget.employee.comp_id,
-        'emp_id': widget.employee.emp_id,
-        'Authorization': widget.Authorization,
-        'academy_id': widget.academy.academy_id,
-        'academy_type': widget.academy.academy_type,
-        'discussion_id': discussionId,
-      },
-    );
-
-    if (response.statusCode == 200) {
-      final Map<String, dynamic> jsonResponse = json.decode(response.body);
-      // เข้าถึงข้อมูลในคีย์ 'instructors'
-      final List<dynamic> replyJson = jsonResponse['reply_data'];
-      // แปลงข้อมูลจาก JSON เป็น List<Instructor>
-      return replyJson.map((json) => ReplyData.fromJson(json)).toList();
-    } else {
-      throw Exception('Failed to load instructors');
-    }
-  }
 
   String _commentA = "";
   String _commentB = "";
@@ -839,6 +786,60 @@ class _DiscussionState extends State<Discussion> {
         );
       },
     );
+  }
+
+  Future<List<DiscussionData>> fetchDiscussion() async {
+    final uri = Uri.parse("$host/api/origami/academy/discussion.php");
+    final response = await http.post(
+      uri,
+      headers: {'Authorization': 'Bearer ${widget.Authorization}'},
+      body: {
+        'comp_id': widget.employee.comp_id,
+        'emp_id': widget.employee.emp_id,
+        'Authorization': authorization,
+        'academy_id': widget.academy.academy_id,
+        'academy_type': widget.academy.academy_type,
+      },
+    );
+
+    if (response.statusCode == 200) {
+      final Map<String, dynamic> jsonResponse = json.decode(response.body);
+      // เข้าถึงข้อมูลในคีย์ 'instructors'
+      final List<dynamic> discussionJson = jsonResponse['discussion_data'];
+      // แปลงข้อมูลจาก JSON เป็น List<Instructor>
+      return discussionJson
+          .map((json) => DiscussionData.fromJson(json))
+          .toList();
+    } else {
+      throw Exception('Failed to load instructors');
+    }
+  }
+
+  String discussionId = "";
+  Future<List<ReplyData>> fetchReply() async {
+    final uri = Uri.parse("$host/api/origami/academy/discussionReply.php");
+    final response = await http.post(
+      uri,
+      headers: {'Authorization': 'Bearer ${widget.Authorization}'},
+      body: {
+        'comp_id': widget.employee.comp_id,
+        'emp_id': widget.employee.emp_id,
+        'Authorization': widget.Authorization,
+        'academy_id': widget.academy.academy_id,
+        'academy_type': widget.academy.academy_type,
+        'discussion_id': discussionId,
+      },
+    );
+
+    if (response.statusCode == 200) {
+      final Map<String, dynamic> jsonResponse = json.decode(response.body);
+      // เข้าถึงข้อมูลในคีย์ 'instructors'
+      final List<dynamic> replyJson = jsonResponse['reply_data'];
+      // แปลงข้อมูลจาก JSON เป็น List<Instructor>
+      return replyJson.map((json) => ReplyData.fromJson(json)).toList();
+    } else {
+      throw Exception('Failed to load instructors');
+    }
   }
 
   Future<void> DiscussionSave(

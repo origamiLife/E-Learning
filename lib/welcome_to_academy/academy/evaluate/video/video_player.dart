@@ -17,7 +17,7 @@ class NetworkVideoPlayer extends StatefulWidget {
   });
   final String videoUrl;
   final Employee employee;
-  final AcademyRespond academy;
+  final AcademyModel academy;
   final String Authorization;
   final Topic topic;
   final String learning_seq;
@@ -224,7 +224,7 @@ class _NetworkVideoPlayerState extends State<NetworkVideoPlayer> {
                                                     academy: widget.academy,
                                                     Authorization:
                                                         widget.Authorization,
-                                                    selectedPage: 1,
+                                                    selectedPage: 0,
                                                   ))),
                                       child: const Icon(
                                           Icons.keyboard_arrow_down,
