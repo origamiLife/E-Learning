@@ -1,0 +1,2 @@
+/Users/kridsadamac/StudioProjects/academy/android/app/.cxx/Debug/2r451247/armeabi-v7a/CMakeFiles/edit_cache.dir
+/Users/kridsadamac/StudioProjects/academy/android/app/.cxx/Debug/2r451247/armeabi-v7a/CMakeFiles/rebuild_cache.dir
