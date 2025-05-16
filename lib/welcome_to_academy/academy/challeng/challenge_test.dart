@@ -374,18 +374,18 @@ class _ChallengePageState extends State<ChallengePage> {
           ),
           leading: IconButton(
             icon:
-            Icon(Icons.arrow_back_ios, color: Colors.white, size: 24),
+            Icon(null, color: Colors.white, size: 24),
             onPressed: () {
-              Navigator.pushReplacement(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => AcademyHomePage(
-                    employee: widget.employee,
-                    Authorization: widget.Authorization,
-                    learnin_page: 'challenge', logo: widget.logo,
-                  ),
-                ),
-              );
+              // Navigator.pushReplacement(
+              //   context,
+              //   MaterialPageRoute(
+              //     builder: (context) => AcademyHomePage(
+              //       employee: widget.employee,
+              //       Authorization: widget.Authorization,
+              //       learnin_page: 'challenge', logo: widget.logo,
+              //     ),
+              //   ),
+              // );
             },
           ),
           // leading: Icon(null),

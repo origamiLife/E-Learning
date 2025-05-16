@@ -260,18 +260,8 @@ class _EvaluateModuleState extends State<EvaluateModule>
                           ),
                         ],
                       ),
-                      Text.rich(
-                        TextSpan(
-                          children: [
-                            TextSpan(
-                              text: '   ', // หรือ '\t' เยื้องบรรทัดแรก
-                            ),
-                            TextSpan(
-                              text: headerData.topic_description,
-                            ),
-                          ],
-                        ),
-                        textAlign: TextAlign.justify,
+                      Text(
+                        headerData.topic_description,
                         style: TextStyle(
                           fontFamily: 'Arial',
                           fontSize: 14,
@@ -342,6 +332,7 @@ class _EvaluateModuleState extends State<EvaluateModule>
                                           fontWeight: FontWeight.w500,
                                           color: Color(0xFF555555),
                                         ),
+                                        strutStyle: StrutStyle(fontSize: 14, height: 1.5),
                                       ),
                                       SizedBox(height: 6),
                                       Padding(

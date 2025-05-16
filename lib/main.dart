@@ -154,14 +154,10 @@ class _LoginPageState extends State<LoginPage> {
       _passwordController.text = password ?? '';
     });
 
-    if(username == '' && password == ''){
-      countPage = 1;
-    }else{
-      countPage = 0;
-    }
-
-    if (username!.isNotEmpty && password!.isNotEmpty && countPage == 0) {
+    if (username?.isNotEmpty == true && password?.isNotEmpty == true) {
       _login();
+    } else {
+      countPage = 1;
     }
 
     print('Username: $username');
@@ -336,31 +332,33 @@ class _LoginPageState extends State<LoginPage> {
         },
         child: Scaffold(
           backgroundColor: Colors.transparent,
-          body: Stack(
-            alignment: Alignment.center,
-            children: [
-              Container(
-                decoration: BoxDecoration(
-                  image: backgroudComponent.isNotEmpty
-                      ? DecorationImage(
-                    image: NetworkImage(backgroudComponent),
-                    fit: BoxFit.cover,
-                  )
-                      : null, // หรือใช้ภาพจาก assets แทน
+          body: SafeArea(
+            child: Stack(
+              alignment: Alignment.center,
+              children: [
+                Container(
+                  decoration: BoxDecoration(
+                    image: backgroudComponent.isNotEmpty
+                        ? DecorationImage(
+                      image: NetworkImage(backgroudComponent),
+                      fit: BoxFit.cover,
+                    )
+                        : null, // หรือใช้ภาพจาก assets แทน
+                  ),
                 ),
-              ),
-              LayoutBuilder(builder: (context, constraints) {
-                return SingleChildScrollView(
-                  child: ConstrainedBox(
-                      constraints: BoxConstraints(
-                        minHeight: constraints.maxHeight,
-                      ),
-                      child: _forgot
-                          ? _forgotWidget(constraints)
-                          : _loginWidget(constraints)),
-                );
-              }),
-            ],
+                LayoutBuilder(builder: (context, constraints) {
+                  return SingleChildScrollView(
+                    child: ConstrainedBox(
+                        constraints: BoxConstraints(
+                          minHeight: constraints.maxHeight,
+                        ),
+                        child: _forgot
+                            ? _forgotWidget(constraints)
+                            : _loginWidget(constraints)),
+                  );
+                }),
+              ],
+            ),
           ),
         ),
       );
@@ -510,12 +508,17 @@ class _LoginPageState extends State<LoginPage> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              Image.network(
-                logoComponent, // ใส่โลโก้
-                fit: BoxFit.contain,
-                errorBuilder: (context, error, stackTrace) {
-                  return Container();
-                },
+              Container(
+                // color: Colors.white,
+                width: MediaQuery.of(context).size.width * 0.5,
+                child: Image.network(
+                  logoComponent, // ใส่โลโก้
+                  width: MediaQuery.of(context).size.width * 0.5,
+                  fit: BoxFit.contain,
+                  errorBuilder: (context, error, stackTrace) {
+                    return Container();
+                  },
+                ),
               ),
               Form(
                 key: _formKey,

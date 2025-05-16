@@ -105,24 +105,15 @@ class _DescriptionState extends State<Description> {
                           maxLines: 1,
                         ),
                         SizedBox(height: 8),
-                        Text.rich(
-                          TextSpan(
-                            children: [
-                              TextSpan(
-                                text: '   ', // หรือ '\t' เยื้องบรรทัดแรก
-                              ),
-                              TextSpan(
-                                text: description.course_description,
-                                style: TextStyle(
-                                  fontFamily: 'Arial',
-                                  fontSize: 14,
-                                  color: Color(0xFF555555),
-                                  fontWeight: FontWeight.w500,
-                                ),
-                              ),
-                            ],
+                        Text(
+                          description.course_description,
+                          style: TextStyle(
+                            fontFamily: 'Arial',
+                            fontSize: 14,
+                            color: Color(0xFF555555),
+                            fontWeight: FontWeight.w500,
                           ),
-                          textAlign: TextAlign.justify,
+                          strutStyle: StrutStyle(fontSize: 16, height: 1.5),
                         ),
                       ],
                     ),

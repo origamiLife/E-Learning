@@ -8,7 +8,7 @@ export 'package:academy/main.dart';
 export 'package:google_fonts/google_fonts.dart';
 export 'package:shared_preferences/shared_preferences.dart';
 export 'package:dropdown_button2/dropdown_button2.dart';
-export 'package:image_picker/image_picker.dart';
+// export 'package:image_picker/image_picker.dart';
 export 'package:intl/date_symbol_data_local.dart'; // โหลดข้อมูล locale สำหรับการแสดงวันที่
 export 'package:permission_handler/permission_handler.dart';
 export 'package:file_picker/file_picker.dart';
@@ -25,7 +25,6 @@ export 'package:syncfusion_flutter_calendar/calendar.dart';
 export 'package:percent_indicator/percent_indicator.dart';
 export 'package:flutter_switch/flutter_switch.dart';
 export 'package:multi_select_flutter/multi_select_flutter.dart';
-export 'package:open_file/open_file.dart';
 export 'package:flutter_speed_dial/flutter_speed_dial.dart';
 export 'package:flutter_custom_clippers/flutter_custom_clippers.dart';
 export 'package:hive_flutter/hive_flutter.dart';

@@ -1,5 +1,3 @@
-import 'package:academy/welcome_to_academy/test/chat_telegram.dart';
-import 'package:academy/welcome_to_academy/test/telegram.dart';
 import 'package:http/http.dart' as http;
 import 'package:html/parser.dart' show parse;
 import 'package:carousel_slider/carousel_slider.dart';
@@ -332,24 +330,41 @@ class _AcademyHomePageState extends State<AcademyHomePage> {
             child: FutureBuilder<List<AcademyModel>>(
               future: fetchAcademies(),
               builder: (context, snapshot) {
-                // if (snapshot.connectionState == ConnectionState.waiting) {
-                //   return Container();
-                // } else
-                if (snapshot.hasError) {
-                  return Center(child: Text('Error: ${snapshot.error}'));
-                } else if (!snapshot.hasData) {
+                if (snapshot.connectionState == ConnectionState.waiting) {
                   return Center(
-                      child: Text(
-                    NotFoundDataTS,
-                    style: TextStyle(
-                      fontFamily: 'Arial',
-                      fontSize: 16.0,
-                      color: const Color(0xFF555555),
-                      fontWeight: FontWeight.w700,
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        CircularProgressIndicator(
+                          color: Color(0xFFFF9900),
+                        ),
+                        SizedBox(width: 12),
+                        Text(
+                          '$loadingTS...',
+                          style: TextStyle(
+                            fontFamily: 'Arial',
+                            fontSize: 16,
+                            fontWeight: FontWeight.w700,
+                            color: Color(0xFF555555),
+                          ),
+                        ),
+                      ],
                     ),
-                    overflow: TextOverflow.ellipsis,
-                    maxLines: 1,
-                  ));
+                  );
+                } else if (snapshot.hasError) {
+                  return Center(child: Text('Error: ${snapshot.error}'));
+                } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+                  return Center(
+                    child: Text(
+                      NotFoundDataTS,
+                      style: TextStyle(
+                        fontFamily: 'Arial',
+                        fontSize: 16.0,
+                        color: Color(0xFF555555),
+                        fontWeight: FontWeight.w700,
+                      ),
+                    ),
+                  );
                 } else {
                   return _Learning(snapshot.data!);
                 }
@@ -367,7 +382,7 @@ class _AcademyHomePageState extends State<AcademyHomePage> {
             child: Column(
               children: [
                 _buildAcademyListView(myLearning),
-                if (pagination.page != pagination.total_pages)
+                // if (pagination.page != pagination.total_pages)
                   Column(
                     children: [
                       Divider(),
@@ -398,6 +413,16 @@ class _AcademyHomePageState extends State<AcademyHomePage> {
                             ),
                           ),
                           Spacer(),
+                          Text(
+                            '${pagination.page} / ${pagination.total_pages}',
+                            style: TextStyle(
+                              fontFamily: 'Arial',
+                              fontSize: 16.0,
+                              color: Colors.grey,
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
+                          Spacer(),
                           InkWell(
                             onTap: () {
                               if (pagination.page >= pagination.total_pages) {
@@ -414,10 +439,7 @@ class _AcademyHomePageState extends State<AcademyHomePage> {
                                 style: TextStyle(
                                   fontFamily: 'Arial',
                                   fontSize: 16.0,
-                                  color: (pagination.page <=
-                                          pagination.total_pages)
-                                      ? Colors.grey
-                                      : Color(0xFF555555),
+                                  color: Colors.grey,
                                   fontWeight: FontWeight.w700,
                                 ),
                               ),
@@ -663,53 +685,48 @@ class _AcademyHomePageState extends State<AcademyHomePage> {
   // bool isFavorite = false;
   Widget _favoriteWidget(
       AcademyModel academylist, double widthArea, int index) {
-    // bool isSelected = selectIndex.contains(index);
-    // (academylist.academy_favorite == 'Y') ? isSelected : !isSelected;
     return InkWell(
-      onTap: () {
-        setState(() {
-          // (isSelected) ? selectIndex.remove(index) : selectIndex.add(index);
-
-          sendFavorite(academylist.academy_id, academylist.academy_type);
-          // print('isSelected: ${isSelected}');
-        });
-      },
-      child: Container(
-        width: widthArea * 0.12,
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(10),
-          border: Border.all(
-            color: (academylist.academy_favorite == 'Y')
-                ? Colors.red
-                : Colors.grey, // สีขอบ
-            width: 2.0, // ความหนาของขอบ
-          ),
-        ),
-        padding: EdgeInsets.only(top: 8, bottom: 8, right: 6, left: 6),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Text(
-              'Favorite',
-              style: TextStyle(
-                fontFamily: 'Arial',
-                fontSize: 14,
-                color: (academylist.academy_favorite == 'Y')
-                    ? Colors.red
-                    : Colors.grey,
+            onTap: () async {
+              setState(() {
+                sendFavorite(academylist.academy_id, academylist.academy_type);
+              });
+            },
+            child: Container(
+              width: widthArea * 0.12,
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(10),
+                border: Border.all(
+                  color: (academylist.academy_favorite == 'Y')
+                      ? Colors.red
+                      : Colors.grey, // สีขอบ
+                  width: 2.0, // ความหนาของขอบ
+                ),
+              ),
+              padding: EdgeInsets.only(top: 8, bottom: 8, right: 6, left: 6),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text(
+                    'Favorite',
+                    style: TextStyle(
+                      fontFamily: 'Arial',
+                      fontSize: 14,
+                      color: (academylist.academy_favorite == 'Y')
+                          ? Colors.red
+                          : Colors.grey,
+                    ),
+                  ),
+                  SizedBox(width: 4),
+                  Icon(Icons.favorite,
+                      color: (academylist.academy_favorite == 'Y')
+                          ? Colors.red
+                          : Colors.grey,
+                      size: 20),
+                ],
               ),
             ),
-            SizedBox(width: 4),
-            Icon(Icons.favorite,
-                color: (academylist.academy_favorite == 'Y')
-                    ? Colors.red
-                    : Colors.grey,
-                size: 20),
-          ],
-        ),
-      ),
-    );
+          );
   }
 
   Widget _enrollWidget(AcademyModel academylist, double widthArea) {
@@ -1348,8 +1365,8 @@ class _AcademyHomePageState extends State<AcademyHomePage> {
           'filter_type': filter_type ?? '',
           'filter_level': filter_level ?? '',
           'filter_category': filter_category ?? '',
-          'search': (search != '') ? '1' : search,
-          'pages': pages,
+          'search': search,
+          'pages': (search != '') ? '1' : pages,
         },
       );
       if (response.statusCode == 200) {
@@ -1434,6 +1451,12 @@ class _AcademyHomePageState extends State<AcademyHomePage> {
     }
   }
 
+  // bool _begin = false;
+  // Future<void> _loadBegin() async {
+  //   await Future.delayed(Duration(seconds: 2));
+  //   _begin = true;
+  // }
+
   Future<void> sendFavorite(String academy_id, String academy_type) async {
     try {
       final response = await http.post(
@@ -1452,6 +1475,7 @@ class _AcademyHomePageState extends State<AcademyHomePage> {
           setState(() {
             _selectedIndex = 3;
             _selectedIndex = 0;
+            // final maxDuration = Duration(seconds: 2);
           });
           print("print message: ${jsonResponse['status']}");
         } else {

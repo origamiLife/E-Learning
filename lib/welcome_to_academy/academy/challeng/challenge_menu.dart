@@ -7,7 +7,8 @@ class ChallengeStartTime extends StatefulWidget {
   const ChallengeStartTime({
     super.key,
     required this.employee,
-    required this.Authorization, required this.logo,
+    required this.Authorization,
+    required this.logo,
   });
   final Employee employee;
   final String Authorization;
@@ -19,7 +20,6 @@ class ChallengeStartTime extends StatefulWidget {
 
 class _ChallengeStartTimeState extends State<ChallengeStartTime>
     with WidgetsBindingObserver {
-  List<GetChallenge> getChallenges = [];
   final TextEditingController _searchController = TextEditingController();
   Map<String, String> statusOptions = {};
   String formattedDate = '';
@@ -309,7 +309,25 @@ class _ChallengeStartTimeState extends State<ChallengeStartTime>
       itemBuilder: (context, index) {
         final challenge = filteredChallenges[index];
         return InkWell(
-          onTap: () => btnGetchalleng(challenge),
+          // onTap: () => btnGetchalleng(challenge),
+          onTap: () {
+            if (challenge.challenge_status != 'doing' ||
+                challenge.challenge_status != 'not_start') {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => ChallengePage(
+                    employee: widget.employee,
+                    Authorization: widget.Authorization,
+                    initialMinutes:
+                        double.tryParse(challenge.challenge_minute) ?? 0,
+                    getchallenge: challenge,
+                    logo: widget.logo,
+                  ),
+                ),
+              );
+            }
+          },
           child: Container(
             decoration: BoxDecoration(
               color: Colors.white,
@@ -447,7 +465,25 @@ class _ChallengeStartTimeState extends State<ChallengeStartTime>
       itemBuilder: (context, index) {
         final challenge = filteredChallenges[index];
         return InkWell(
-          onTap: () => btnGetchalleng(challenge),
+          // onTap: () => btnGetchalleng(challenge),
+          onTap: () {
+            if (challenge.challenge_status != 'doing' ||
+                challenge.challenge_status != 'not_start') {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => ChallengePage(
+                    employee: widget.employee,
+                    Authorization: widget.Authorization,
+                    initialMinutes:
+                        double.tryParse(challenge.challenge_minute) ?? 0,
+                    getchallenge: challenge,
+                    logo: widget.logo,
+                  ),
+                ),
+              );
+            }
+          },
           child: Container(
             decoration: BoxDecoration(
               color: Colors.white,
@@ -616,8 +652,7 @@ class _ChallengeStartTimeState extends State<ChallengeStartTime>
     String? challengeStartStr = challenge.challenge_start;
     String? challengeEndStr = challenge.challenge_end;
 
-    if (challengeStartStr.isNotEmpty &&
-        challengeEndStr.isNotEmpty) {
+    if (challengeStartStr.isNotEmpty && challengeEndStr.isNotEmpty) {
       DateTime dateStartChallenge =
           DateFormat('yyyy-MM-dd').parse(challengeStartStr);
       DateTime dateEndChallenge =
@@ -642,77 +677,11 @@ class _ChallengeStartTimeState extends State<ChallengeStartTime>
                   Authorization: widget.Authorization,
                   initialMinutes:
                       double.tryParse(challenge.challenge_minute) ?? 0,
-                  getchallenge: challenge, logo: widget.logo,
+                  getchallenge: challenge,
+                  logo: widget.logo,
                 ),
               ),
             );
-          } else {
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) => ChallengePage(
-                  employee: widget.employee,
-                  Authorization: widget.Authorization,
-                  initialMinutes:
-                      double.tryParse(challenge.challenge_minute) ?? 0,
-                  getchallenge: challenge, logo: widget.logo,
-                ),
-              ),
-            );
-            // showCustomDialog(context, challenge);
-            // QuickAlert.show(
-            //   context: context,
-            //   type: QuickAlertType.confirm,
-            //   title: '$AreYouReadyTS',
-            //   width: MediaQuery.of(context).size.width > 600 ? 590 : 400,
-            //   confirmBtnText: '$startTS',
-            //   confirmBtnColor: Colors.blue,
-            //   confirmBtnTextStyle: const TextStyle(
-            //     fontSize: 18,
-            //     color: Colors.white,
-            //     fontWeight: FontWeight.w700,
-            //   ),
-            //   cancelBtnText: '$CancelTS',
-            //   cancelBtnTextStyle: const TextStyle(
-            //     fontSize: 18,
-            //     color: Colors.grey,
-            //     fontWeight: FontWeight.w700,
-            //   ),
-            //   customAsset: 'assets/images/learning/student.png',
-            //   onConfirmBtnTap: () {
-            //     if (mounted) {
-            //       Navigator.pop(context); // ปิด QuickAlert ก่อน
-            //       // ใช้ Navigator.push แทน pushReplacement
-            //       Navigator.push(
-            //         context,
-            //         MaterialPageRoute(
-            //           builder: (context) => ChallengePage(
-            //             employee: widget.employee,
-            //             Authorization: widget.Authorization,
-            //             initialMinutes:
-            //                 double.tryParse(challenge.challenge_duration) ?? 0,
-            //             getchallenge: challenge,
-            //           ),
-            //         ),
-            //       );
-            //     }
-            //   },
-            //   widget: Column(
-            //     crossAxisAlignment: CrossAxisAlignment.start,
-            //     children: [
-            //       SizedBox(height: 8),
-            //       _textWidget('$challengeTS:', challenge.challenge_name),
-            //       _textWidget(
-            //           '$DescriptionTS:', challenge.challenge_description),
-            //       _textWidget('$RuleTS:', challenge.challenge_rule),
-            //       _textWidget(
-            //           '$DurationTS ($MinTS):', challenge.challenge_duration),
-            //       _textWidget('$PartTS:', challenge.challenge_question_part),
-            //       _textWidget('$NumberQuestionsTS:',
-            //           '${challenge.specific_question} $questionTS'),
-            //     ],
-            //   ),
-            // );
           }
         } else {
           // Handle different cases
@@ -747,101 +716,6 @@ class _ChallengeStartTimeState extends State<ChallengeStartTime>
       print("challenge_start หรือ challenge_end เป็นค่า null หรือว่าง");
     }
   }
-
-  // void showCustomDialog(BuildContext context, GetChallenge challenge) {
-  //   showDialog(
-  //     context: context,
-  //     barrierDismissible: false, // Prevent dismissing by tapping outside
-  //     builder: (BuildContext context) {
-  //       return AlertDialog(
-  //         title: Column(
-  //           children: [
-  //             Text(
-  //               '$AreYouReadyTS', // Title of the dialog
-  //               style: TextStyle(
-  //                   fontFamily: 'Arial',
-  //                   fontSize: 20,
-  //                   fontWeight: FontWeight.bold),
-  //             ),
-  //             // SizedBox(height: ),
-  //             Padding(
-  //               padding: const EdgeInsets.all(16.0),
-  //               child: SizedBox(
-  //                 width: isMobile ? 400 : 580,
-  //                 child: Column(
-  //                   crossAxisAlignment: CrossAxisAlignment.start,
-  //                   children: [
-  //                     // Image (similar to customAsset)
-  //                     Image.asset(
-  //                       'assets/images/learning/student.png',
-  //                       height: 180,
-  //                       width: double.infinity,
-  //                       fit: BoxFit.cover,
-  //                     ),
-  //                     SizedBox(height: 16),
-  //                     _textWidget2('$challengeTS:', challenge.challenge_name),
-  //                     _textWidget2(
-  //                         '$DescriptionTS:', challenge.challenge_description),
-  //                     _textWidget2('$RuleTS:', challenge.challenge_rule),
-  //                     _textWidget2('$DurationTS ($MinTS):',
-  //                         challenge.challenge_duration),
-  //                     _textWidget2(
-  //                         '$PartTS:', challenge.challenge_question_part),
-  //                     _textWidget2('$NumberQuestionsTS:',
-  //                         '${challenge.specific_question} $questionTS'),
-  //                   ],
-  //                 ),
-  //               ),
-  //             ),
-  //           ],
-  //         ),
-  //         actions: [
-  //           // Cancel Button
-  //           TextButton(
-  //             onPressed: () {
-  //               Navigator.pop(context); // Close the dialog
-  //             },
-  //             child: Text(
-  //               '$CancelTS',
-  //               style: TextStyle(
-  //                 fontSize: 14,
-  //                 color: Colors.grey,
-  //                 fontWeight: FontWeight.w700,
-  //               ),
-  //             ),
-  //           ),
-  //           // Confirm Button
-  //           TextButton(
-  //             onPressed: () {
-  //               // Navigator.pop(context); // Close the dialog
-  //               // Navigate to the next screen
-  //               Navigator.push(
-  //                 context,
-  //                 MaterialPageRoute(
-  //                   builder: (context) => ChallengePage(
-  //                     employee: widget.employee,
-  //                     Authorization: widget.Authorization,
-  //                     initialMinutes:
-  //                         double.tryParse(challenge.challenge_duration) ?? 0,
-  //                     getchallenge: challenge,
-  //                   ),
-  //                 ),
-  //               );
-  //             },
-  //             child: Text(
-  //               '$startTS',
-  //               style: TextStyle(
-  //                 fontSize: 16,
-  //                 color: Colors.orange,
-  //                 // fontWeight: FontWeight.w700,
-  //               ),
-  //             ),
-  //           ),
-  //         ],
-  //       );
-  //     },
-  //   );
-  // }
 
   Widget _DropdownStatus(String value) {
     return Column(
@@ -931,7 +805,7 @@ class _ChallengeStartTimeState extends State<ChallengeStartTime>
         'comp_id': widget.employee.comp_id,
         'challenge_status': challenge_status ?? '',
         'search': search,
-        'page': pages,
+        'page': (search != '') ? '1' : pages,
       },
     );
     if (response.statusCode == 200) {
@@ -939,11 +813,12 @@ class _ChallengeStartTimeState extends State<ChallengeStartTime>
       // ตรวจสอบว่ามีคีย์ 'academy_data' และไม่เป็น null
       if (jsonResponse['status'] == 200) {
         final List<dynamic> challengeJson = jsonResponse['challenge_data'];
-        total_items = jsonResponse['total_items'];
+        total_items = jsonResponse['total_items']; // จำนวนทั้งหมด
         total_pages = jsonResponse['total_pages']; // หน้าทั้งหมด
         current_page = jsonResponse['current_page']; // หน้าปัจจุบัน
-        return getChallenges =
-            challengeJson.map((json) => GetChallenge.fromJson(json)).toList();
+        return challengeJson
+            .map((json) => GetChallenge.fromJson(json))
+            .toList();
       } else {
         print('No challenge data available.');
         return [];
