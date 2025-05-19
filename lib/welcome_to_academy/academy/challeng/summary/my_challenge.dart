@@ -81,7 +81,7 @@ class _MyChallengeState extends State<MyChallenge> {
                                       Top_ChallengeTS,
                                       style: TextStyle(
                                         fontFamily: 'Arial',
-                                        fontSize: isMobile ? 16 : 24,
+                                        fontSize: 16,
                                         color: Color(0xFF555555),
                                         fontWeight: FontWeight.w500,
                                       ),
@@ -152,9 +152,8 @@ class _MyChallengeState extends State<MyChallenge> {
                           Expanded(
                             flex: 1,
                             child: Image.network(topUsers.avatar,
-                                height: isMobile
-                                    ? MediaQuery.of(context).size.width * 0.25
-                                    : MediaQuery.of(context).size.width * 0.18,
+                                height:
+                                    MediaQuery.of(context).size.width * 0.25,
                                 width: double.infinity,
                                 fit: BoxFit.contain,
                                 errorBuilder: (context, error, stackTrace) =>
@@ -171,7 +170,7 @@ class _MyChallengeState extends State<MyChallenge> {
                           width: 8,
                         ),
                         Expanded(
-                          flex: (isMobile) ? 3 : 5,
+                          flex: 3,
                           child: classList(topUsers, index),
                         ),
                       ],
@@ -194,14 +193,14 @@ class _MyChallengeState extends State<MyChallenge> {
           '${topUsers.firstname} ${topUsers.lastname}',
           style: TextStyle(
             fontFamily: 'Arial',
-            fontSize: isMobile ? 18 : 28,
+            fontSize: 18,
             color: Color(0xFF555555),
             fontWeight: FontWeight.w700,
           ),
           overflow: TextOverflow.ellipsis,
         ),
         SizedBox(
-          height: isMobile ? 10 : 18,
+          height: 10,
         ),
         Row(
           crossAxisAlignment: CrossAxisAlignment.end,
@@ -210,9 +209,9 @@ class _MyChallengeState extends State<MyChallenge> {
               '$correctAnswerTS : ',
               style: TextStyle(
                 fontFamily: 'Arial',
-                fontSize: isMobile ? 14 : 24,
+                fontSize: 14,
                 color: Color(0xFF555555),
-                fontWeight: isMobile ? FontWeight.w700 : FontWeight.w500,
+                fontWeight: FontWeight.w700,
               ),
               overflow: TextOverflow.ellipsis,
               maxLines: 1,
@@ -222,7 +221,7 @@ class _MyChallengeState extends State<MyChallenge> {
                 topUsers.point,
                 style: TextStyle(
                   fontFamily: 'Arial',
-                  fontSize: isMobile ? 14 : 24,
+                  fontSize: 14,
                   color: Color(0xFF555555),
                   fontWeight: FontWeight.w500,
                 ),
@@ -231,7 +230,7 @@ class _MyChallengeState extends State<MyChallenge> {
           ],
         ),
         SizedBox(
-          height: isMobile ? 10 : 18,
+          height: 10,
         ),
         Row(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -240,9 +239,9 @@ class _MyChallengeState extends State<MyChallenge> {
               '$timeUsedTS : ',
               style: TextStyle(
                 fontFamily: 'Arial',
-                fontSize: isMobile ? 14 : 24,
+                fontSize: 14,
                 color: Color(0xFF555555),
-                fontWeight: isMobile ? FontWeight.w700 : FontWeight.w500,
+                fontWeight: FontWeight.w700,
               ),
               overflow: TextOverflow.ellipsis,
               maxLines: 1,
@@ -252,7 +251,7 @@ class _MyChallengeState extends State<MyChallenge> {
                 topUsers.time_used,
                 style: TextStyle(
                   fontFamily: 'Arial',
-                  fontSize: isMobile ? 14 : 24,
+                  fontSize: 14,
                   color: Color(0xFF555555),
                   fontWeight: FontWeight.w500,
                 ),
@@ -356,13 +355,12 @@ class _MyChallengeState extends State<MyChallenge> {
                     ],
                   ),
                   Divider(),
-                  if (!isMobile) SizedBox(height: 16),
                   Container(
                     height: (40 * 2) + 16,
                     child: SingleChildScrollView(
                       child: Wrap(
-                        spacing: isMobile ? 8 : 16,
-                        runSpacing: isMobile ? 8 : 16,
+                        spacing: 8,
+                        runSpacing: 8,
                         children:
                             List.generate(widget.isQuestion.length, (index) {
                           final dataQ = widget.isQuestion[index];
@@ -379,8 +377,8 @@ class _MyChallengeState extends State<MyChallenge> {
                               _showDialog(widget.isQuestion);
                             },
                             child: Container(
-                              height: isMobile ? 40 : 80,
-                              width: isMobile ? 40 : 80,
+                              height: 40,
+                              width: 40,
                               alignment: Alignment.center,
                               decoration: BoxDecoration(
                                 color: cardColor,
@@ -390,7 +388,7 @@ class _MyChallengeState extends State<MyChallenge> {
                                 '${index + 1}',
                                 style: TextStyle(
                                   fontFamily: 'Arial',
-                                  fontSize: isMobile ? 16 : 20,
+                                  fontSize: 16,
                                   color: Colors.white,
                                   fontWeight: FontWeight.w700,
                                 ),
@@ -450,7 +448,7 @@ class _MyChallengeState extends State<MyChallenge> {
                               "$challengeSectionTS",
                               style: TextStyle(
                                 fontFamily: 'Arial',
-                                fontSize: isMobile ? 20 : 30,
+                                fontSize: 20,
                                 fontWeight: FontWeight.w700,
                                 color: Color(0xFF555555),
                               ),
@@ -461,7 +459,7 @@ class _MyChallengeState extends State<MyChallenge> {
                               "$questionTS: ${isQuestion.length}",
                               style: TextStyle(
                                 fontFamily: 'Arial',
-                                fontSize: isMobile ? 16 : 24,
+                                fontSize: 16,
                                 color: Color(0xFF555555),
                               ),
                               textAlign: TextAlign.center,
@@ -473,8 +471,8 @@ class _MyChallengeState extends State<MyChallenge> {
                                     MediaQuery.of(context).size.width * 0.8,
                               ),
                               child: Wrap(
-                                  spacing: isMobile ? 8 : 16,
-                                  runSpacing: isMobile ? 8 : 16,
+                                  spacing: 8,
+                                  runSpacing: 8,
                                   children:
                                       List.generate(isQuestion.length, (index) {
                                     final dataQ = isQuestion[index];
@@ -508,8 +506,8 @@ class _MyChallengeState extends State<MyChallenge> {
                                         );
                                       },
                                       child: Container(
-                                        height: isMobile ? 40 : 80,
-                                        width: isMobile ? 40 : 80,
+                                        height: 40,
+                                        width: 40,
                                         alignment: Alignment.center,
                                         decoration: BoxDecoration(
                                           color: cardColor,
@@ -520,7 +518,7 @@ class _MyChallengeState extends State<MyChallenge> {
                                           '${index + 1}',
                                           style: TextStyle(
                                             fontFamily: 'Arial',
-                                            fontSize: isMobile ? 16 : 20,
+                                            fontSize: 16,
                                             color: Colors.white,
                                             fontWeight: FontWeight.w700,
                                           ),
@@ -557,7 +555,7 @@ class _MyChallengeState extends State<MyChallenge> {
                           padding: const EdgeInsets.only(right: 4, top: 4),
                           child: Icon(
                             Icons.clear,
-                            size: isMobile ? 22 : 45,
+                            size: 22,
                             color: Colors.red,
                           ),
                         )),
@@ -594,14 +592,14 @@ class _MyChallengeState extends State<MyChallenge> {
           text,
           style: TextStyle(
             fontFamily: 'Arial',
-            fontSize: isMobile ? 16 : 24,
+            fontSize: 16,
             color: Color(0xFF555555),
             fontWeight: FontWeight.w500,
           ),
           overflow: TextOverflow.ellipsis,
           maxLines: 1,
         ),
-        SizedBox(height: isMobile ? 8 : 32),
+        SizedBox(height: 8),
       ],
     );
   }
@@ -638,7 +636,7 @@ class _MyChallengeState extends State<MyChallenge> {
               timeStatusTS,
               style: TextStyle(
                 fontFamily: 'Arial',
-                fontSize: isMobile ? 16 : 28,
+                fontSize: 16,
                 color: Color(0xFF555555),
                 fontWeight: FontWeight.w500,
               ),
@@ -649,7 +647,7 @@ class _MyChallengeState extends State<MyChallenge> {
               time_used,
               style: TextStyle(
                 fontFamily: 'Arial',
-                fontSize: isMobile ? 32 : 48,
+                fontSize: 32,
                 color: Colors.green,
                 fontWeight: FontWeight.w500,
               ),
@@ -693,7 +691,7 @@ class _MyChallengeState extends State<MyChallenge> {
               '$examDurationTS: ${widget.duration}',
               style: TextStyle(
                 fontFamily: 'Arial',
-                fontSize: isMobile ? 16 : 24,
+                fontSize: 16,
                 color: Color(0xFF555555),
                 fontWeight: FontWeight.w300,
               ),

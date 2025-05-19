@@ -197,9 +197,7 @@ class _EvaluateModuleState extends State<EvaluateModule>
             return Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                (isMobile)
-                    ? _headerMobile(headerData, fastView)
-                    : _headerMobileN(headerData, fastView),
+                _headerMobile(headerData, fastView),
                 Expanded(child: _bodyAcademy()),
               ],
             );
@@ -253,8 +251,9 @@ class _EvaluateModuleState extends State<EvaluateModule>
                                 });
                               },
                               child: Icon(Icons.favorite,
-                                  color:
-                                      _isClick ? Colors.red : Colors.grey.shade500,
+                                  color: _isClick
+                                      ? Colors.red
+                                      : Colors.grey.shade500,
                                   size: 22),
                             ),
                           ),
@@ -332,7 +331,8 @@ class _EvaluateModuleState extends State<EvaluateModule>
                                           fontWeight: FontWeight.w500,
                                           color: Color(0xFF555555),
                                         ),
-                                        strutStyle: StrutStyle(fontSize: 14, height: 1.5),
+                                        strutStyle: StrutStyle(
+                                            fontSize: 14, height: 1.5),
                                       ),
                                       SizedBox(height: 6),
                                       Padding(
@@ -638,14 +638,14 @@ class _EvaluateModuleState extends State<EvaluateModule>
                                     fastView.fastview_text,
                                     style: TextStyle(
                                       fontFamily: 'Arial',
-                                      fontSize: (isMobile) ? 14 : 18,
+                                      fontSize: 14,
                                       fontWeight: FontWeight.w500,
                                       color: Color(0xFF555555),
                                     ),
                                     maxLines: 3,
                                     overflow: TextOverflow.ellipsis,
                                   ),
-                                  SizedBox(height: (isMobile) ? 6 : 10),
+                                  SizedBox(height: 6),
                                   // Row(
                                   //   children: [
                                   //     Text(
@@ -720,8 +720,7 @@ class _EvaluateModuleState extends State<EvaluateModule>
                                                 "$EnrollTS",
                                                 style: TextStyle(
                                                   fontFamily: 'Arial',
-                                                  fontSize:
-                                                      (isMobile) ? 12 : 16,
+                                                  fontSize: 12,
                                                   color: Colors.white,
                                                 ),
                                               ),

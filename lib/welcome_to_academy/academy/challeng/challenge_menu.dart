@@ -112,9 +112,7 @@ class _ChallengeStartTimeState extends State<ChallengeStartTime>
                     return SingleChildScrollView(
                       child: Column(
                         children: [
-                          isMobile
-                              ? _challengeListSlim(challengeList)
-                              : _challengeListBig(challengeList),
+                          _challengeListSlim(challengeList),
                           (current_page == total_pages)
                               ? Container()
                               : Column(
@@ -274,17 +272,17 @@ class _ChallengeStartTimeState extends State<ChallengeStartTime>
                   title,
                   style: TextStyle(
                     fontFamily: 'Arial',
-                    fontSize: (!isMobile) ? 20 : 14,
+                    fontSize: 14,
                     color: Colors.black54,
                     fontWeight: FontWeight.w700,
                   ),
                 ),
-                SizedBox(height: (!isMobile) ? 8 : 2),
+                SizedBox(height: 2),
                 Text(
                   subject,
                   style: TextStyle(
                     fontFamily: 'Arial',
-                    fontSize: (!isMobile) ? 20 : 14,
+                    fontSize: 14,
                     color: Colors.black45,
                   ),
                   maxLines: 6,

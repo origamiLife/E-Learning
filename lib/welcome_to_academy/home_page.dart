@@ -1,6 +1,7 @@
 import 'package:http/http.dart' as http;
 import 'package:html/parser.dart' show parse;
 import 'package:carousel_slider/carousel_slider.dart';
+import '../job/job.dart';
 import 'academy/challeng/challenge_menu.dart';
 import 'academy/evaluate/evaluate_module.dart';
 import 'export.dart';
@@ -48,9 +49,6 @@ class _AcademyHomePageState extends State<AcademyHomePage> {
   void initState() {
     super.initState();
     learnin_page = widget.learnin_page;
-    print('isAndroid : $isAndroid');
-    print('isIPhone : $isIPhone');
-    print('object : $isMobile');
     if (learnin_page == 'challenge') {
       _selectedIndex = 1;
     }
@@ -171,6 +169,12 @@ class _AcademyHomePageState extends State<AcademyHomePage> {
                       logo: widget.logo,
                     ),
                   )
+                // ?Expanded(
+                //   child: JobPage(
+                //     employee: widget.employee,
+                //     Authorization: widget.Authorization,
+                //   ),
+                // )
                 : Expanded(child: _buildPopularEvents()),
           ],
         ),
@@ -225,7 +229,7 @@ class _AcademyHomePageState extends State<AcademyHomePage> {
                   'E-Learning',
                   style: TextStyle(
                     fontFamily: 'Arial',
-                    fontSize: isMobile ? 24 : 28,
+                    fontSize: 24,
                     color: Color(0xFFFF9900),
                     fontWeight: FontWeight.w700,
                   ),
@@ -383,72 +387,72 @@ class _AcademyHomePageState extends State<AcademyHomePage> {
               children: [
                 _buildAcademyListView(myLearning),
                 // if (pagination.page != pagination.total_pages)
-                  Column(
-                    children: [
-                      Divider(),
-                      Row(
-                        children: [
-                          InkWell(
-                            onTap: () {
-                              if (pagination.page > 1) {
-                                setState(() {
-                                  pages = (pagination.page - 1).toString();
-                                });
-                              }
-                            },
-                            child: Padding(
-                              padding: const EdgeInsets.only(
-                                  left: 8, right: 8, top: 8, bottom: 12),
-                              child: Text(
-                                'ก่อนหน้า',
-                                style: TextStyle(
-                                  fontFamily: 'Arial',
-                                  fontSize: 16.0,
-                                  color: (pagination.page <= 1)
-                                      ? Colors.grey
-                                      : Color(0xFF555555),
-                                  fontWeight: FontWeight.w700,
-                                ),
+                Column(
+                  children: [
+                    Divider(),
+                    Row(
+                      children: [
+                        InkWell(
+                          onTap: () {
+                            if (pagination.page > 1) {
+                              setState(() {
+                                pages = (pagination.page - 1).toString();
+                              });
+                            }
+                          },
+                          child: Padding(
+                            padding: const EdgeInsets.only(
+                                left: 8, right: 8, top: 8, bottom: 12),
+                            child: Text(
+                              'ก่อนหน้า',
+                              style: TextStyle(
+                                fontFamily: 'Arial',
+                                fontSize: 16.0,
+                                color: (pagination.page <= 1)
+                                    ? Colors.grey
+                                    : Color(0xFF555555),
+                                fontWeight: FontWeight.w700,
                               ),
                             ),
                           ),
-                          Spacer(),
-                          Text(
-                            '${pagination.page} / ${pagination.total_pages}',
-                            style: TextStyle(
-                              fontFamily: 'Arial',
-                              fontSize: 16.0,
-                              color: Colors.grey,
-                              fontWeight: FontWeight.w500,
-                            ),
+                        ),
+                        Spacer(),
+                        Text(
+                          '${pagination.page} / ${pagination.total_pages}',
+                          style: TextStyle(
+                            fontFamily: 'Arial',
+                            fontSize: 16.0,
+                            color: Colors.grey,
+                            fontWeight: FontWeight.w500,
                           ),
-                          Spacer(),
-                          InkWell(
-                            onTap: () {
-                              if (pagination.page >= pagination.total_pages) {
-                                setState(() {
-                                  pages = (pagination.page + 1).toString();
-                                });
-                              }
-                            },
-                            child: Padding(
-                              padding: const EdgeInsets.only(
-                                  left: 8, right: 8, top: 8, bottom: 12),
-                              child: Text(
-                                'ถัดไป',
-                                style: TextStyle(
-                                  fontFamily: 'Arial',
-                                  fontSize: 16.0,
-                                  color: Colors.grey,
-                                  fontWeight: FontWeight.w700,
-                                ),
+                        ),
+                        Spacer(),
+                        InkWell(
+                          onTap: () {
+                            if (pagination.page >= pagination.total_pages) {
+                              setState(() {
+                                pages = (pagination.page + 1).toString();
+                              });
+                            }
+                          },
+                          child: Padding(
+                            padding: const EdgeInsets.only(
+                                left: 8, right: 8, top: 8, bottom: 12),
+                            child: Text(
+                              'ถัดไป',
+                              style: TextStyle(
+                                fontFamily: 'Arial',
+                                fontSize: 16.0,
+                                color: Colors.grey,
+                                fontWeight: FontWeight.w700,
                               ),
                             ),
                           ),
-                        ],
-                      )
-                    ],
-                  ),
+                        ),
+                      ],
+                    )
+                  ],
+                ),
               ],
             ),
           )
@@ -456,11 +460,12 @@ class _AcademyHomePageState extends State<AcademyHomePage> {
   }
 
   Widget _buildAcademyListView(List<AcademyModel> myLearning) {
-    if (isMobile) {
-      return _buildAcademyList(myLearning);
-    } else {
-      return _buildAcademyList2(myLearning);
-    }
+    return _buildAcademyList(myLearning);
+    // if (isMobile) {
+    //   return _buildAcademyList(myLearning);
+    // } else {
+    //   return _buildAcademyList2(myLearning);
+    // }
   }
 
   Widget _buildNotFoundText() {
@@ -686,47 +691,47 @@ class _AcademyHomePageState extends State<AcademyHomePage> {
   Widget _favoriteWidget(
       AcademyModel academylist, double widthArea, int index) {
     return InkWell(
-            onTap: () async {
-              setState(() {
-                sendFavorite(academylist.academy_id, academylist.academy_type);
-              });
-            },
-            child: Container(
-              width: widthArea * 0.12,
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(10),
-                border: Border.all(
-                  color: (academylist.academy_favorite == 'Y')
-                      ? Colors.red
-                      : Colors.grey, // สีขอบ
-                  width: 2.0, // ความหนาของขอบ
-                ),
-              ),
-              padding: EdgeInsets.only(top: 8, bottom: 8, right: 6, left: 6),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Text(
-                    'Favorite',
-                    style: TextStyle(
-                      fontFamily: 'Arial',
-                      fontSize: 14,
-                      color: (academylist.academy_favorite == 'Y')
-                          ? Colors.red
-                          : Colors.grey,
-                    ),
-                  ),
-                  SizedBox(width: 4),
-                  Icon(Icons.favorite,
-                      color: (academylist.academy_favorite == 'Y')
-                          ? Colors.red
-                          : Colors.grey,
-                      size: 20),
-                ],
+      onTap: () async {
+        setState(() {
+          sendFavorite(academylist.academy_id, academylist.academy_type);
+        });
+      },
+      child: Container(
+        width: widthArea * 0.12,
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(10),
+          border: Border.all(
+            color: (academylist.academy_favorite == 'Y')
+                ? Colors.red
+                : Colors.grey, // สีขอบ
+            width: 2.0, // ความหนาของขอบ
+          ),
+        ),
+        padding: EdgeInsets.only(top: 8, bottom: 8, right: 6, left: 6),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Text(
+              'Favorite',
+              style: TextStyle(
+                fontFamily: 'Arial',
+                fontSize: 14,
+                color: (academylist.academy_favorite == 'Y')
+                    ? Colors.red
+                    : Colors.grey,
               ),
             ),
-          );
+            SizedBox(width: 4),
+            Icon(Icons.favorite,
+                color: (academylist.academy_favorite == 'Y')
+                    ? Colors.red
+                    : Colors.grey,
+                size: 20),
+          ],
+        ),
+      ),
+    );
   }
 
   Widget _enrollWidget(AcademyModel academylist, double widthArea) {
@@ -1024,13 +1029,13 @@ class _AcademyHomePageState extends State<AcademyHomePage> {
               borderRadius: BorderRadius.circular(50),
               child: Image.network(
                 coach.coach_image,
-                height: isMobile ? 32 : 36,
-                width: isMobile ? 32 : 36,
+                height: 32,
+                width: 32,
                 fit: BoxFit.contain,
                 errorBuilder: (context, error, stackTrace) => Image.network(
                   coach.coach_image_error,
-                  height: isMobile ? 32 : 36,
-                  width: isMobile ? 32 : 36,
+                  height: 32,
+                  width: 32,
                   fit: BoxFit.contain,
                 ),
               ),
@@ -1043,7 +1048,7 @@ class _AcademyHomePageState extends State<AcademyHomePage> {
                   coach.coach_name,
                   style: TextStyle(
                     fontFamily: 'Arial',
-                    fontSize: isMobile ? 14 : 18,
+                    fontSize: 14,
                     fontWeight: FontWeight.w500,
                     color: Color(0xFF555555),
                   ),

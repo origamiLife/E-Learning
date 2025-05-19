@@ -2,7 +2,12 @@ import 'package:academy/welcome_to_academy/export.dart';
 import 'package:http/http.dart' as http;
 
 class AttachFile extends StatefulWidget {
-  AttachFile({super.key, required this.employee, required this.academy, required this.Authorization, });
+  AttachFile({
+    super.key,
+    required this.employee,
+    required this.academy,
+    required this.Authorization,
+  });
   final Employee employee;
   final AcademyModel academy;
   final String Authorization;
@@ -11,7 +16,6 @@ class AttachFile extends StatefulWidget {
 }
 
 class _AttachFileState extends State<AttachFile> {
-
   @override
   void initState() {
     super.initState();
@@ -46,27 +50,27 @@ class _AttachFileState extends State<AttachFile> {
         } else if (snapshot.hasError) {
           return Center(
               child: Text(
-                'Error: ${snapshot.error}',
-                style: TextStyle(
-                  fontFamily: 'Arial',
-                  fontSize: 16,
-                  fontWeight: FontWeight.w500,
-                  color: Color(0xFF555555),
-                ),
-              ));
+            'Error: ${snapshot.error}',
+            style: TextStyle(
+              fontFamily: 'Arial',
+              fontSize: 16,
+              fontWeight: FontWeight.w500,
+              color: Color(0xFF555555),
+            ),
+          ));
         } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
           return Center(
               child: Text(
-                NotFoundDataTS,
-                style: TextStyle(
-                  fontFamily: 'Arial',
-                  fontSize: 16.0,
-                  color: const Color(0xFF555555),
-                  fontWeight: FontWeight.w700,
-                ),
-                overflow: TextOverflow.ellipsis,
-                maxLines: 1,
-              ));
+            NotFoundDataTS,
+            style: TextStyle(
+              fontFamily: 'Arial',
+              fontSize: 16.0,
+              color: const Color(0xFF555555),
+              fontWeight: FontWeight.w700,
+            ),
+            overflow: TextOverflow.ellipsis,
+            maxLines: 1,
+          ));
         } else {
           return _getContentWidget(snapshot.data!);
         }
@@ -85,185 +89,186 @@ class _AttachFileState extends State<AttachFile> {
     return Container(
       color: Colors.grey.shade50,
       child: Padding(
-        padding: const EdgeInsets.only(left: 8,right: 8),
+        padding: const EdgeInsets.only(left: 8, right: 8),
         child: SingleChildScrollView(
             child: Column(
-              children: [
-                Column(
-                  children: List.generate(attachFiles.first.file_data.length, (index) {
-                    final attach = attachFiles.first.file_data[index];
-                    return Card(
-                      color: Color(0xFFF5F5F5),
-                      child: InkWell(
-                        onTap: (){
-                          // final Uri _url = Uri.parse(certification_file);
-                          setState(() {
-                            _launchUrl(attach.files_path);
-                          });
-                        },
-                        child: Container(
-                          decoration: BoxDecoration(
-                            color: Colors.white,
-                            borderRadius: BorderRadius.circular(10),
-                            boxShadow: [
-                              BoxShadow(
-                                color: Colors.grey.withOpacity(0.5),
-                                spreadRadius: 0,
-                                blurRadius: 2,
-                                offset: Offset(0, 3), // x, y
-                              ),
-                            ],
+          children: [
+            Column(
+              children:
+                  List.generate(attachFiles.first.file_data.length, (index) {
+                final attach = attachFiles.first.file_data[index];
+                return Card(
+                  color: Color(0xFFF5F5F5),
+                  child: InkWell(
+                    onTap: () {
+                      // final Uri _url = Uri.parse(certification_file);
+                      setState(() {
+                        _launchUrl(attach.files_path);
+                      });
+                    },
+                    child: Container(
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(10),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.grey.withOpacity(0.5),
+                            spreadRadius: 0,
+                            blurRadius: 2,
+                            offset: Offset(0, 3), // x, y
                           ),
-                          child: Padding(
-                            padding: const EdgeInsets.all(8.0),
-                            child: Row(
-                              children: [
-                                Expanded(
-                                  flex: isMobile ? 2 : 1,
-                                  child: Image.network(
-                                    _getCertificateImage(attach.files_ext),
-                                    width: double.infinity,
-                                    height: (isMobile)?110:180,
-                                    fit: BoxFit.contain,
+                        ],
+                      ),
+                      child: Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: Row(
+                          children: [
+                            Expanded(
+                              flex: 2,
+                              child: Image.network(
+                                _getCertificateImage(attach.files_ext),
+                                width: double.infinity,
+                                height: 110,
+                                fit: BoxFit.contain,
+                              ),
+                            ),
+                            SizedBox(
+                              width: 8,
+                            ),
+                            Expanded(
+                              flex: 3,
+                              child: Column(
+                                mainAxisAlignment: MainAxisAlignment.start,
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    attach.files_name,
+                                    style: TextStyle(
+                                      fontFamily: 'Arial',
+                                      fontSize: 16.0,
+                                      color: Color(0xFF555555),
+                                      fontWeight: FontWeight.w700,
+                                    ),
+                                    maxLines: 2,
                                   ),
-                                ),
-                                SizedBox(
-                                  width: 8,
-                                ),
-                                Expanded(
-                                  flex: isMobile ? 3 : 5,
-                                  child: Column(
-                                    mainAxisAlignment: MainAxisAlignment.start,
-                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                  SizedBox(height: 12),
+                                  Row(
                                     children: [
-                                      Text(
-                                        attach.files_name,
-                                        style: TextStyle(
-                                          fontFamily: 'Arial',
-                                          fontSize: 16.0,
-                                          color: Color(0xFF555555),
-                                          fontWeight: FontWeight.w700,
+                                      FaIcon(
+                                        FontAwesomeIcons.tags,
+                                        color: Colors.amber,
+                                        size: 20,
+                                      ),
+                                      SizedBox(
+                                        width: 8,
+                                      ),
+                                      Flexible(
+                                        child: Text(
+                                          attachFiles.first.course_name,
+                                          style: TextStyle(
+                                            fontFamily: 'Arial',
+                                            fontSize: 14.0,
+                                            color: Color(0xFF555555),
+                                            fontWeight: FontWeight.w500,
+                                          ),
+                                          maxLines: 2,
                                         ),
-                                        maxLines: 2,
-                                      ),
-                                      SizedBox(height: 12),
-                                      Row(
-                                        children: [
-                                          FaIcon(
-                                            FontAwesomeIcons.tags,
-                                            color: Colors.amber,
-                                            size: 20,
-                                          ),
-                                          SizedBox(
-                                            width: 8,
-                                          ),
-                                          Flexible(
-                                            child: Text(
-                                              attachFiles.first.course_name,
-                                              style: TextStyle(
-                                                fontFamily: 'Arial',
-                                                fontSize: 14.0,
-                                                color: Color(0xFF555555),
-                                                fontWeight: FontWeight.w500,
-                                              ),
-                                              maxLines: 2,
-                                            ),
-                                          ),
-                                        ],
-                                      ),
-                                      SizedBox(height: 8),
-                                      Row(
-                                        children: [
-                                          Icon(
-                                            Icons.calendar_month,
-                                            color: Colors.amber,
-                                          ),
-                                          SizedBox(
-                                            width: 8,
-                                          ),
-                                          Flexible(
-                                            child: Text(
-                                              attach.files_date,
-                                              style: TextStyle(
-                                                fontFamily: 'Arial',
-                                                color: Color(0xFF555555),
-                                              ),
-                                              maxLines: 2,
-                                            ),
-                                          ),
-                                        ],
-                                      ),
-                                      SizedBox(height: 8),
-                                      Row(
-                                        children: [
-                                          Expanded(
-                                            child: SingleChildScrollView(
-                                              scrollDirection: Axis.horizontal,
-                                              child: Row(
-                                                children: [
-                                                  Icon(
-                                                    Icons.remove_red_eye_outlined,
-                                                    color: Colors.amber,
-                                                  ),
-                                                  SizedBox(
-                                                    width: 4,
-                                                  ),
-                                                  Text(
-                                                    '${attach.count_down}',
-                                                    style: TextStyle(
-                                                      fontFamily: 'Arial',
-                                                      color: Color(0xFF555555),
-                                                    ),
-                                                  )
-                                                ],
-                                              ),
-                                            ),
-                                          ),
-                                          Expanded(
-                                            child: SingleChildScrollView(
-                                              scrollDirection: Axis.horizontal,
-                                              child: Row(
-                                                children: [
-                                                  Icon(
-                                                    Icons.cloud_download,
-                                                    color: Colors.amber,
-                                                  ),
-                                                  SizedBox(
-                                                    width: 4,
-                                                  ),
-                                                  Text(
-                                                    '${attach.count_view}',
-                                                    style: TextStyle(
-                                                      fontFamily: 'Arial',
-                                                      color: Color(0xFF555555),
-                                                    ),
-                                                  )
-                                                ],
-                                              ),
-                                            ),
-                                          ),
-                                        ],
                                       ),
                                     ],
                                   ),
-                                ),
-                              ],
+                                  SizedBox(height: 8),
+                                  Row(
+                                    children: [
+                                      Icon(
+                                        Icons.calendar_month,
+                                        color: Colors.amber,
+                                      ),
+                                      SizedBox(
+                                        width: 8,
+                                      ),
+                                      Flexible(
+                                        child: Text(
+                                          attach.files_date,
+                                          style: TextStyle(
+                                            fontFamily: 'Arial',
+                                            color: Color(0xFF555555),
+                                          ),
+                                          maxLines: 2,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                  SizedBox(height: 8),
+                                  Row(
+                                    children: [
+                                      Expanded(
+                                        child: SingleChildScrollView(
+                                          scrollDirection: Axis.horizontal,
+                                          child: Row(
+                                            children: [
+                                              Icon(
+                                                Icons.remove_red_eye_outlined,
+                                                color: Colors.amber,
+                                              ),
+                                              SizedBox(
+                                                width: 4,
+                                              ),
+                                              Text(
+                                                '${attach.count_down}',
+                                                style: TextStyle(
+                                                  fontFamily: 'Arial',
+                                                  color: Color(0xFF555555),
+                                                ),
+                                              )
+                                            ],
+                                          ),
+                                        ),
+                                      ),
+                                      Expanded(
+                                        child: SingleChildScrollView(
+                                          scrollDirection: Axis.horizontal,
+                                          child: Row(
+                                            children: [
+                                              Icon(
+                                                Icons.cloud_download,
+                                                color: Colors.amber,
+                                              ),
+                                              SizedBox(
+                                                width: 4,
+                                              ),
+                                              Text(
+                                                '${attach.count_view}',
+                                                style: TextStyle(
+                                                  fontFamily: 'Arial',
+                                                  color: Color(0xFF555555),
+                                                ),
+                                              )
+                                            ],
+                                          ),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ],
+                              ),
                             ),
-                          ),
+                          ],
                         ),
                       ),
-                    );
-                  }),
-                ),
-                SizedBox(
-                  height: 8,
-                ),
-                Divider(),
-                SizedBox(
-                  height: 8,
-                ),
-              ],
-            )),
+                    ),
+                  ),
+                );
+              }),
+            ),
+            SizedBox(
+              height: 8,
+            ),
+            Divider(),
+            SizedBox(
+              height: 8,
+            ),
+          ],
+        )),
       ),
     );
   }
@@ -282,7 +287,8 @@ class _AttachFileState extends State<AttachFile> {
   }
 
   Future<List<AttachFileModel>> fetchAttach() async {
-    final uri = Uri.parse("$host/api/origami/e-learning/academy/study/attachfiles.php");
+    final uri =
+        Uri.parse("$host/api/origami/e-learning/academy/study/attachfiles.php");
     final response = await http.post(
       uri,
       headers: {'Authorization': 'Bearer $authorization'},
@@ -307,7 +313,6 @@ class _AttachFileState extends State<AttachFile> {
       throw Exception('Failed to load instructors');
     }
   }
-
 }
 
 class AttachFileModel {

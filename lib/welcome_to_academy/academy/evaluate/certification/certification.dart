@@ -67,39 +67,39 @@ class _CertificationState extends State<Certification> {
         } else if (snapshot.hasError) {
           return Center(
               child: Text(
-                'Error: ${snapshot.error}',
-                style: TextStyle(
-                  fontFamily: 'Arial',
-                  color: Color(0xFF555555),
-                ),
-              ));
+            'Error: ${snapshot.error}',
+            style: TextStyle(
+              fontFamily: 'Arial',
+              color: Color(0xFF555555),
+            ),
+          ));
         } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
           return Center(
               child: Text(
-                NotFoundDataTS,
-                style: TextStyle(
-                  fontFamily: 'Arial',
-                  fontSize: 16.0,
-                  color: const Color(0xFF555555),
-                  fontWeight: FontWeight.w700,
-                ),
-                overflow: TextOverflow.ellipsis,
-                maxLines: 1,
-              ));
+            NotFoundDataTS,
+            style: TextStyle(
+              fontFamily: 'Arial',
+              fontSize: 16.0,
+              color: const Color(0xFF555555),
+              fontWeight: FontWeight.w700,
+            ),
+            overflow: TextOverflow.ellipsis,
+            maxLines: 1,
+          ));
         } else {
           return (snapshot.data!.isEmpty)
               ? Center(
-              child: Text(
-                NotFoundDataTS,
-                style: TextStyle(
-                  fontFamily: 'Arial',
-                  fontSize: 16.0,
-                  color: const Color(0xFF555555),
-                  fontWeight: FontWeight.w700,
-                ),
-                overflow: TextOverflow.ellipsis,
-                maxLines: 1,
-              ))
+                  child: Text(
+                  NotFoundDataTS,
+                  style: TextStyle(
+                    fontFamily: 'Arial',
+                    fontSize: 16.0,
+                    color: const Color(0xFF555555),
+                    fontWeight: FontWeight.w700,
+                  ),
+                  overflow: TextOverflow.ellipsis,
+                  maxLines: 1,
+                ))
               : _getContentWidget(snapshot.data!);
         }
       },
@@ -110,7 +110,7 @@ class _CertificationState extends State<Certification> {
     return Container(
       color: Colors.grey.shade50,
       child: Padding(
-        padding: const EdgeInsets.only(left: 8,right: 8),
+        padding: const EdgeInsets.only(left: 8, right: 8),
         child: SingleChildScrollView(
           child: Column(
             children: List.generate(Certifications.length, (index) {
@@ -126,66 +126,66 @@ class _CertificationState extends State<Certification> {
                     },
                     child: (isSwitch == true)
                         ? Card(
-                      color: Colors.white,
-                      child: Container(
-                        padding: EdgeInsets.only(
-                            left: 6, right: 6, top: 10, bottom: 10),
-                        decoration: BoxDecoration(
-                          color: Colors.white,
-                          borderRadius: BorderRadius.circular(10),
-                        ),
-                        child: Row(
-                          children: [
-                            Expanded(
-                              child: Text(
-                                certification.course_name,
-                                style: TextStyle(
-                                  fontFamily: 'Arial',
-                                  fontSize: 18.0,
-                                  color: Color(0xFF555555),
-                                  fontWeight: FontWeight.w700,
-                                ),
+                            color: Colors.white,
+                            child: Container(
+                              padding: EdgeInsets.only(
+                                  left: 6, right: 6, top: 10, bottom: 10),
+                              decoration: BoxDecoration(
+                                color: Colors.white,
+                                borderRadius: BorderRadius.circular(10),
+                              ),
+                              child: Row(
+                                children: [
+                                  Expanded(
+                                    child: Text(
+                                      certification.course_name,
+                                      style: TextStyle(
+                                        fontFamily: 'Arial',
+                                        fontSize: 18.0,
+                                        color: Color(0xFF555555),
+                                        fontWeight: FontWeight.w700,
+                                      ),
+                                    ),
+                                  ),
+                                  Icon(
+                                    Icons.keyboard_arrow_down,
+                                    color: Color(0xFF555555),
+                                    size: 30,
+                                  )
+                                ],
                               ),
                             ),
-                            Icon(
-                              Icons.keyboard_arrow_down,
-                              color: Color(0xFF555555),
-                              size: 30,
-                            )
-                          ],
-                        ),
-                      ),
-                    )
+                          )
                         : Container(
-                      padding: EdgeInsets.all(8),
-                      // color: Colors.transparent,
-                      decoration: BoxDecoration(
-                        color: Colors.transparent,
-                        borderRadius: BorderRadius.circular(20),
-                      ),
-                      child: Row(
-                        children: [
-                          Expanded(
-                            child: Text(
-                              certification.course_name,
-                              style: TextStyle(
-                                fontFamily: 'Arial',
-                                fontSize: 16,
-                                color: Color(0xFF555555),
-                                fontWeight: FontWeight.w700,
-                              ),
-                              overflow: TextOverflow.ellipsis,
-                              maxLines: 1,
+                            padding: EdgeInsets.all(8),
+                            // color: Colors.transparent,
+                            decoration: BoxDecoration(
+                              color: Colors.transparent,
+                              borderRadius: BorderRadius.circular(20),
+                            ),
+                            child: Row(
+                              children: [
+                                Expanded(
+                                  child: Text(
+                                    certification.course_name,
+                                    style: TextStyle(
+                                      fontFamily: 'Arial',
+                                      fontSize: 16,
+                                      color: Color(0xFF555555),
+                                      fontWeight: FontWeight.w700,
+                                    ),
+                                    overflow: TextOverflow.ellipsis,
+                                    maxLines: 1,
+                                  ),
+                                ),
+                                Icon(
+                                  Icons.keyboard_arrow_down,
+                                  color: Color(0xFF555555),
+                                  size: 30,
+                                )
+                              ],
                             ),
                           ),
-                          Icon(
-                            Icons.keyboard_arrow_down,
-                            color: Color(0xFF555555),
-                            size: 30,
-                          )
-                        ],
-                      ),
-                    ),
                   ),
                   if (!isSwitch) _buildCertificationList(certification),
                   SizedBox(height: 8),
@@ -250,10 +250,10 @@ class _CertificationState extends State<Certification> {
               child: Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Expanded(flex: isMobile ? 2 : 1, child: _buildCertificateImage(certificate)),
+                  Expanded(flex: 2, child: _buildCertificateImage(certificate)),
                   SizedBox(width: 8),
                   Expanded(
-                      flex: isMobile ? 3 : 5, child: _buildCertificateDetails(certificate)),
+                      flex: 3, child: _buildCertificateDetails(certificate)),
                 ],
               ),
             ),
@@ -314,13 +314,13 @@ class _CertificationState extends State<Certification> {
           style: _getTextStyle(14.0, FontWeight.w600, Color(0xFF555555)),
         ),
         SizedBox(height: 8),
-        if(certificate.content_pass != '')
-        _buildCertificationConditions(certificate.content_pass),
-        if(certificate.video_quality != '')
+        if (certificate.content_pass != '')
+          _buildCertificationConditions(certificate.content_pass),
+        if (certificate.video_quality != '')
           _buildCertificationConditions(certificate.video_quality),
-        if(certificate.challenge_pass != '')
+        if (certificate.challenge_pass != '')
           _buildCertificationConditions(certificate.challenge_pass),
-        if(certificate.event_pass != '')
+        if (certificate.event_pass != '')
           _buildCertificationConditions(certificate.event_pass),
       ],
     );
@@ -339,8 +339,7 @@ class _CertificationState extends State<Certification> {
               scrollDirection: Axis.horizontal,
               child: Text(
                 persen,
-                style:
-                _getTextStyle(14.0, FontWeight.w400, Color(0xFF555555)),
+                style: _getTextStyle(14.0, FontWeight.w400, Color(0xFF555555)),
                 // overflow: TextOverflow.ellipsis,
                 maxLines: 1,
               ),
@@ -397,7 +396,8 @@ class _CertificationState extends State<Certification> {
   }
 
   Future<List<CertificationModel>> fetchCertification() async {
-    final uri = Uri.parse("$host/api/origami/e-learning/academy/study/get.certificate.php");
+    final uri = Uri.parse(
+        "$host/api/origami/e-learning/academy/study/get.certificate.php");
     final response = await http.post(
       uri,
       headers: {'Authorization': 'Bearer $authorization'},
@@ -426,7 +426,8 @@ class _CertificationState extends State<Certification> {
   Future<void> ViewCertification() async {
     try {
       final response = await http.post(
-        Uri.parse('$host/api/origami/e-learning/academy/study/view.certificate.php'),
+        Uri.parse(
+            '$host/api/origami/e-learning/academy/study/view.certificate.php'),
         body: {
           'auth_password': authorization,
           'emp_id': widget.employee.emp_id,
@@ -472,8 +473,8 @@ class CertificationModel {
     return CertificationModel(
       course_name: json['course_name'] ?? '',
       certificate_data: (json['certificate_data'] as List?)
-          ?.map((item) => CertificateData.fromJson(item))
-          .toList() ??
+              ?.map((item) => CertificateData.fromJson(item))
+              .toList() ??
           [],
     );
   }

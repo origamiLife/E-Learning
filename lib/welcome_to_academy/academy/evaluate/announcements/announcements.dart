@@ -44,27 +44,27 @@ class _AnnouncementsState extends State<Announcements> {
         } else if (snapshot.hasError) {
           return Center(
               child: Text(
-                'Error: ${snapshot.error}',
-                style: TextStyle(
-                  fontFamily: 'Arial',
-                  fontSize: 16,
-                  fontWeight: FontWeight.w500,
-                  color: Color(0xFF555555),
-                ),
-              ));
+            'Error: ${snapshot.error}',
+            style: TextStyle(
+              fontFamily: 'Arial',
+              fontSize: 16,
+              fontWeight: FontWeight.w500,
+              color: Color(0xFF555555),
+            ),
+          ));
         } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
           return Center(
               child: Text(
-                NotFoundDataTS,
-                style: TextStyle(
-                  fontFamily: 'Arial',
-                  fontSize: 16.0,
-                  color: const Color(0xFF555555),
-                  fontWeight: FontWeight.w700,
-                ),
-                overflow: TextOverflow.ellipsis,
-                maxLines: 1,
-              ));
+            NotFoundDataTS,
+            style: TextStyle(
+              fontFamily: 'Arial',
+              fontSize: 16.0,
+              color: const Color(0xFF555555),
+              fontWeight: FontWeight.w700,
+            ),
+            overflow: TextOverflow.ellipsis,
+            maxLines: 1,
+          ));
         } else {
           return _getContentWidget(snapshot.data!);
         }
@@ -83,192 +83,188 @@ class _AnnouncementsState extends State<Announcements> {
     return Container(
       color: Colors.grey.shade50,
       child: Padding(
-        padding: const EdgeInsets.only(left: 8,right: 8),
+        padding: const EdgeInsets.only(left: 8, right: 8),
         child: SingleChildScrollView(
             child: Column(
-              children: [
-                Column(
-                  children: List.generate(announcements.length, (index) {
-                    final announce = announcements[index];
-                    return Card(
-                      color: Color(0xFFF5F5F5),
-                      child: InkWell(
-                        onTap: (){
-
-                        },
-                        child: Container(
-                          decoration: BoxDecoration(
-                            color: Colors.white,
-                            borderRadius: BorderRadius.circular(10),
-                            boxShadow: [
-                              BoxShadow(
-                                color: Colors.grey.withOpacity(0.5),
-                                spreadRadius: 0,
-                                blurRadius: 2,
-                                offset: Offset(0, 3), // x, y
-                              ),
-                            ],
+          children: [
+            Column(
+              children: List.generate(announcements.length, (index) {
+                final announce = announcements[index];
+                return Card(
+                  color: Color(0xFFF5F5F5),
+                  child: InkWell(
+                    onTap: () {},
+                    child: Container(
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(10),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.grey.withOpacity(0.5),
+                            spreadRadius: 0,
+                            blurRadius: 2,
+                            offset: Offset(0, 3), // x, y
                           ),
-                          child: Padding(
-                            padding: const EdgeInsets.all(8.0),
-                            child: Row(
-                              children: [
-                                Expanded(
-                                  flex: isMobile ? 2 : 1,
-                                  child: Image.network(
-                                    _getCertificateImage(announce.creator_img),
+                        ],
+                      ),
+                      child: Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: Row(
+                          children: [
+                            Expanded(
+                              flex: 2,
+                              child: Image.network(
+                                _getCertificateImage(announce.creator_img),
+                                width: double.infinity,
+                                height: 120,
+                                fit: BoxFit.contain,
+                                errorBuilder: (context, error, stackTrace) {
+                                  return Image.network(
+                                    'https://webcodeft.com/wp-content/uploads/2021/11/dummy-user.png',
+                                    height: 120,
                                     width: double.infinity,
-                                    height: (isMobile)?120:180,
                                     fit: BoxFit.contain,
-                                    errorBuilder:
-                                        (context, error, stackTrace) {
-                                      return Image.network(
-                                        'https://webcodeft.com/wp-content/uploads/2021/11/dummy-user.png',
-                                        height:
-                                        (isMobile) ? 120 : 180,
-                                        width: double.infinity,
-                                        fit: BoxFit.contain,
-                                      );
-                                    },
+                                  );
+                                },
+                              ),
+                            ),
+                            SizedBox(
+                              width: 8,
+                            ),
+                            Expanded(
+                              flex: 3,
+                              child: Column(
+                                mainAxisAlignment: MainAxisAlignment.start,
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    announce.creator_name,
+                                    style: TextStyle(
+                                      fontFamily: 'Arial',
+                                      fontSize: 16.0,
+                                      color: Color(0xFF555555),
+                                      fontWeight: FontWeight.w700,
+                                    ),
+                                    maxLines: 2,
                                   ),
-                                ),
-                                SizedBox(
-                                  width: 8,
-                                ),
-                                Expanded(
-                                  flex: isMobile ? 3 : 5,
-                                  child: Column(
-                                    mainAxisAlignment: MainAxisAlignment.start,
-                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                  SizedBox(height: 12),
+                                  Row(
                                     children: [
-                                      Text(
-                                        announce.creator_name,
-                                        style: TextStyle(
-                                          fontFamily: 'Arial',
-                                          fontSize: 16.0,
-                                          color: Color(0xFF555555),
-                                          fontWeight: FontWeight.w700,
+                                      FaIcon(
+                                        FontAwesomeIcons.tags,
+                                        color: Colors.amber,
+                                        size: 20,
+                                      ),
+                                      SizedBox(
+                                        width: 8,
+                                      ),
+                                      Flexible(
+                                        child: Text(
+                                          '${announce.announce_subject}\n${announce.announce_description}',
+                                          style: TextStyle(
+                                            fontFamily: 'Arial',
+                                            fontSize: 14.0,
+                                            color: Color(0xFF555555),
+                                            fontWeight: FontWeight.w500,
+                                          ),
+                                          maxLines: 2,
                                         ),
-                                        maxLines: 2,
                                       ),
-                                      SizedBox(height: 12),
-                                      Row(
-                                        children: [
-                                          FaIcon(
-                                            FontAwesomeIcons.tags,
-                                            color: Colors.amber,
-                                            size: 20,
-                                          ),
-                                          SizedBox(
-                                            width: 8,
-                                          ),
-                                          Flexible(
-                                            child: Text(
-                                              '${announce.announce_subject}\n${announce.announce_description}',
-                                              style: TextStyle(
-                                                fontFamily: 'Arial',
-                                                fontSize: 14.0,
-                                                color: Color(0xFF555555),
-                                                fontWeight: FontWeight.w500,
-                                              ),
-                                              maxLines: 2,
-                                            ),
-                                          ),
-                                        ],
-                                      ),
-                                      SizedBox(height: 8),
-                                      Row(
-                                        children: [
-                                          Icon(
-                                            Icons.calendar_month,
-                                            color: Colors.amber,
-                                          ),
-                                          SizedBox(
-                                            width: 8,
-                                          ),
-                                          Flexible(
-                                            child: Text(
-                                              announce.announce_date,
-                                              style: TextStyle(
-                                                fontFamily: 'Arial',
-                                                color: Color(0xFF555555),
-                                              ),
-                                              maxLines: 2,
-                                            ),
-                                          ),
-                                        ],
-                                      ),
-                                      SizedBox(height: 8),
-                                      // Row(
-                                      //   children: [
-                                      //     Expanded(
-                                      //       child: SingleChildScrollView(
-                                      //         scrollDirection: Axis.horizontal,
-                                      //         child: Row(
-                                      //           children: [
-                                      //             Icon(
-                                      //               Icons.remove_red_eye_outlined,
-                                      //               color: Colors.amber,
-                                      //             ),
-                                      //             SizedBox(
-                                      //               width: 4,
-                                      //             ),
-                                      //             Text(
-                                      //               '${attach.count_down}',
-                                      //               style: TextStyle(
-                                      //                 fontFamily: 'Arial',
-                                      //                 color: Color(0xFF555555),
-                                      //               ),
-                                      //             )
-                                      //           ],
-                                      //         ),
-                                      //       ),
-                                      //     ),
-                                      //     Expanded(
-                                      //       child: SingleChildScrollView(
-                                      //         scrollDirection: Axis.horizontal,
-                                      //         child: Row(
-                                      //           children: [
-                                      //             Icon(
-                                      //               Icons.cloud_download,
-                                      //               color: Colors.amber,
-                                      //             ),
-                                      //             SizedBox(
-                                      //               width: 4,
-                                      //             ),
-                                      //             Text(
-                                      //               '${attach.count_view}',
-                                      //               style: TextStyle(
-                                      //                 fontFamily: 'Arial',
-                                      //                 color: Color(0xFF555555),
-                                      //               ),
-                                      //             )
-                                      //           ],
-                                      //         ),
-                                      //       ),
-                                      //     ),
-                                      //   ],
-                                      // ),
                                     ],
                                   ),
-                                ),
-                              ],
+                                  SizedBox(height: 8),
+                                  Row(
+                                    children: [
+                                      Icon(
+                                        Icons.calendar_month,
+                                        color: Colors.amber,
+                                      ),
+                                      SizedBox(
+                                        width: 8,
+                                      ),
+                                      Flexible(
+                                        child: Text(
+                                          announce.announce_date,
+                                          style: TextStyle(
+                                            fontFamily: 'Arial',
+                                            color: Color(0xFF555555),
+                                          ),
+                                          maxLines: 2,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                  SizedBox(height: 8),
+                                  // Row(
+                                  //   children: [
+                                  //     Expanded(
+                                  //       child: SingleChildScrollView(
+                                  //         scrollDirection: Axis.horizontal,
+                                  //         child: Row(
+                                  //           children: [
+                                  //             Icon(
+                                  //               Icons.remove_red_eye_outlined,
+                                  //               color: Colors.amber,
+                                  //             ),
+                                  //             SizedBox(
+                                  //               width: 4,
+                                  //             ),
+                                  //             Text(
+                                  //               '${attach.count_down}',
+                                  //               style: TextStyle(
+                                  //                 fontFamily: 'Arial',
+                                  //                 color: Color(0xFF555555),
+                                  //               ),
+                                  //             )
+                                  //           ],
+                                  //         ),
+                                  //       ),
+                                  //     ),
+                                  //     Expanded(
+                                  //       child: SingleChildScrollView(
+                                  //         scrollDirection: Axis.horizontal,
+                                  //         child: Row(
+                                  //           children: [
+                                  //             Icon(
+                                  //               Icons.cloud_download,
+                                  //               color: Colors.amber,
+                                  //             ),
+                                  //             SizedBox(
+                                  //               width: 4,
+                                  //             ),
+                                  //             Text(
+                                  //               '${attach.count_view}',
+                                  //               style: TextStyle(
+                                  //                 fontFamily: 'Arial',
+                                  //                 color: Color(0xFF555555),
+                                  //               ),
+                                  //             )
+                                  //           ],
+                                  //         ),
+                                  //       ),
+                                  //     ),
+                                  //   ],
+                                  // ),
+                                ],
+                              ),
                             ),
-                          ),
+                          ],
                         ),
                       ),
-                    );
-                  }),
-                ),
-                SizedBox(
-                  height: 8,
-                ),
-                Divider(),
-                SizedBox(
-                  height: 8,
-                ),
-              ],
-            )),
+                    ),
+                  ),
+                );
+              }),
+            ),
+            SizedBox(
+              height: 8,
+            ),
+            Divider(),
+            SizedBox(
+              height: 8,
+            ),
+          ],
+        )),
       ),
     );
   }
@@ -287,7 +283,8 @@ class _AnnouncementsState extends State<Announcements> {
   }
 
   Future<List<AnnouncementModel>> fetchAnnouncement() async {
-    final uri = Uri.parse("$host/api/origami/e-learning/academy/study/announcement.php");
+    final uri = Uri.parse(
+        "$host/api/origami/e-learning/academy/study/announcement.php");
     final response = await http.post(
       uri,
       headers: {'Authorization': 'Bearer $authorization'},
@@ -303,9 +300,7 @@ class _AnnouncementsState extends State<Announcements> {
       // เข้าถึงข้อมูลในคีย์ 'instructors'
       final List<dynamic> dataJson = jsonResponse['announement_data'];
       // แปลงข้อมูลจาก JSON เป็น List<Instructor>
-      return dataJson
-          .map((json) => AnnouncementModel.fromJson(json))
-          .toList();
+      return dataJson.map((json) => AnnouncementModel.fromJson(json)).toList();
     } else {
       throw Exception('Failed to load instructors');
     }
@@ -396,7 +391,6 @@ class _AnnouncementsState extends State<Announcements> {
   //     ),
   //   );
   // }
-
 }
 
 class AnnouncementModel {

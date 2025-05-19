@@ -96,7 +96,7 @@ class _CurriculumState extends State<Curriculum> {
     return Container(
       color: Colors.grey.shade50,
       child: Padding(
-        padding: const EdgeInsets.only(left: 8,right: 8),
+        padding: const EdgeInsets.only(left: 8, right: 8),
         child: SingleChildScrollView(
           child: Column(
             children: List.generate(curriculum.curriculumData.length, (index) {
@@ -211,14 +211,14 @@ class _CurriculumState extends State<Curriculum> {
                                           CrossAxisAlignment.start,
                                       children: [
                                         Expanded(
-                                          flex: isMobile ? 2 : 1,
+                                          flex: 2,
                                           child: ClipRRect(
                                             borderRadius:
                                                 BorderRadius.circular(8),
                                             child: Image.network(
                                               topic.topicCover,
                                               width: double.infinity,
-                                              height: (isMobile)?100:150,
+                                              height: 100,
                                               fit: BoxFit.cover,
                                               errorBuilder:
                                                   (context, error, stackTrace) {
@@ -232,7 +232,7 @@ class _CurriculumState extends State<Curriculum> {
                                           width: 8,
                                         ),
                                         Expanded(
-                                          flex: (isMobile)?3:5,
+                                          flex: 3,
                                           child: classList(topic),
                                         ),
                                       ],

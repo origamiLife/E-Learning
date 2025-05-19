@@ -187,18 +187,17 @@ class _InstructorsState extends State<Instructors> {
                                       child: Row(
                                         children: [
                                           Expanded(
-                                            flex: isMobile ? 2 : 1,
+                                            flex: 2,
                                             child: Image.network(
                                               coach_data.coach_image,
-                                              height: (isMobile) ? 120 : 180,
+                                              height: 120,
                                               width: double.infinity,
                                               fit: BoxFit.contain,
                                               errorBuilder:
                                                   (context, error, stackTrace) {
                                                 return Image.network(
                                                   coach_data.coach_image_error,
-                                                  height:
-                                                      (isMobile) ? 120 : 180,
+                                                  height: 120,
                                                   width: double.infinity,
                                                   fit: BoxFit.contain,
                                                 );
@@ -209,7 +208,7 @@ class _InstructorsState extends State<Instructors> {
                                             width: 8,
                                           ),
                                           Expanded(
-                                            flex: (isMobile) ? 3 : 5,
+                                            flex: 3,
                                             child: Column(
                                               mainAxisAlignment:
                                                   MainAxisAlignment.start,

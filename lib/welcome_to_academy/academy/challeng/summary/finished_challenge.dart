@@ -44,8 +44,7 @@ class _FinishedChallengeState extends State<FinishedChallenge> {
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     CircularProgressIndicator(color: Color(0xFFFF9900)),
-                    SizedBox(
-                        height: 12),
+                    SizedBox(height: 12),
                     Text(
                       '$loadingTS...',
                       style: TextStyle(
@@ -63,8 +62,7 @@ class _FinishedChallengeState extends State<FinishedChallenge> {
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    const Icon(Icons.error,
-                        color: Colors.red, size: 48),
+                    const Icon(Icons.error, color: Colors.red, size: 48),
                     const SizedBox(height: 12),
                     Text(
                       'Error: ${snapshot.error}',
@@ -142,7 +140,7 @@ class _FinishedChallengeState extends State<FinishedChallenge> {
                                 history.challenge_name,
                                 style: TextStyle(
                                   fontFamily: 'Arial',
-                                  fontSize: isMobile?16:24,
+                                  fontSize: 16,
                                   color: Color(0xFF555555),
                                   fontWeight: FontWeight.w500,
                                 ),
@@ -156,10 +154,11 @@ class _FinishedChallengeState extends State<FinishedChallenge> {
                           Center(
                             child: Text(
                               // No need for ConstrainedBox if data is short
-                              history.correct, // Consider making this dynamic if available
+                              history
+                                  .correct, // Consider making this dynamic if available
                               style: TextStyle(
                                 fontFamily: 'Arial',
-                                fontSize: isMobile?16:24,
+                                fontSize: 16,
                                 color: Color(0xFF555555),
                                 fontWeight: FontWeight.w500,
                               ),
@@ -169,10 +168,11 @@ class _FinishedChallengeState extends State<FinishedChallenge> {
                         DataCell(
                           Center(
                             child: Text(
-                              history.used_point, // Consider making this dynamic if available
+                              history
+                                  .used_point, // Consider making this dynamic if available
                               style: TextStyle(
                                 fontFamily: 'Arial',
-                                fontSize: isMobile?16:24,
+                                fontSize: 16,
                                 color: Color(0xFF555555),
                                 fontWeight: FontWeight.w500,
                               ),
@@ -185,7 +185,7 @@ class _FinishedChallengeState extends State<FinishedChallenge> {
                               history.challenge_start,
                               style: TextStyle(
                                 fontFamily: 'Arial',
-                                fontSize: isMobile?16:24,
+                                fontSize: 16,
                                 color: Color(0xFF555555),
                                 fontWeight: FontWeight.w500,
                               ),
@@ -198,7 +198,7 @@ class _FinishedChallengeState extends State<FinishedChallenge> {
                               history.challenge_end,
                               style: TextStyle(
                                 fontFamily: 'Arial',
-                                fontSize: isMobile?16:24,
+                                fontSize: 16,
                                 color: Color(0xFF555555),
                                 fontWeight: FontWeight.w500,
                               ),
@@ -208,10 +208,11 @@ class _FinishedChallengeState extends State<FinishedChallenge> {
                         DataCell(
                           Center(
                             child: Text(
-                              history.challenge_duration, // Consider making this dynamic if available
+                              history
+                                  .challenge_duration, // Consider making this dynamic if available
                               style: TextStyle(
                                 fontFamily: 'Arial',
-                                fontSize: isMobile?16:24,
+                                fontSize: 16,
                                 color: Color(0xFF555555),
                                 fontWeight: FontWeight.w500,
                               ),
@@ -236,7 +237,7 @@ class _FinishedChallengeState extends State<FinishedChallenge> {
         label,
         style: TextStyle(
           fontFamily: 'Arial',
-          fontSize: isMobile?16:24,
+          fontSize: 16,
           color: Color(0xFF555555),
           fontWeight: FontWeight.w700,
         ),

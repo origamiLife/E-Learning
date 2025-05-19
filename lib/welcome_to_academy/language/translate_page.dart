@@ -6,7 +6,8 @@ import 'package:academy/welcome_to_academy/language/translate.dart';
 class TranslatePage extends StatefulWidget {
   const TranslatePage({
     Key? key,
-    required this.employee, required this.Authorization,
+    required this.employee,
+    required this.Authorization,
   }) : super(key: key);
   final Employee employee;
   final String Authorization;
@@ -58,9 +59,7 @@ class _TranslatePageState extends State<TranslatePage> {
         foregroundColor: Color(0xFFFF9900),
         backgroundColor: Colors.white,
         title: Container(
-          alignment: isMobile
-              ? Alignment.centerLeft
-              : Alignment.center,
+          alignment: Alignment.centerLeft,
           child: Text(
             languageTS,
             style: TextStyle(
@@ -103,13 +102,13 @@ class _TranslatePageState extends State<TranslatePage> {
                               children: [
                                 (selectedRadio == 1)
                                     ? Icon(
-                                  Icons.radio_button_on,
-                                  color: Color(0xFFFF9900),
-                                )
+                                        Icons.radio_button_on,
+                                        color: Color(0xFFFF9900),
+                                      )
                                     : Icon(
-                                  Icons.radio_button_off,
-                                  color: Color(0xFFFF9900),
-                                ),
+                                        Icons.radio_button_off,
+                                        color: Color(0xFFFF9900),
+                                      ),
                                 SizedBox(
                                   width: 8,
                                 ),
@@ -144,13 +143,13 @@ class _TranslatePageState extends State<TranslatePage> {
                               children: [
                                 (selectedRadio == 2)
                                     ? Icon(
-                                  Icons.radio_button_on,
-                                  color: Color(0xFFFF9900),
-                                )
+                                        Icons.radio_button_on,
+                                        color: Color(0xFFFF9900),
+                                      )
                                     : Icon(
-                                  Icons.radio_button_off,
-                                  color: Color(0xFFFF9900),
-                                ),
+                                        Icons.radio_button_off,
+                                        color: Color(0xFFFF9900),
+                                      ),
                                 SizedBox(
                                   width: 8,
                                 ),
@@ -179,4 +178,3 @@ class _TranslatePageState extends State<TranslatePage> {
     );
   }
 }
-

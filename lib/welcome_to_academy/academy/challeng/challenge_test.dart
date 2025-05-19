@@ -15,7 +15,8 @@ class ChallengePage extends StatefulWidget {
     required this.employee,
     required this.Authorization,
     required this.initialMinutes,
-    required this.getchallenge, required this.logo,
+    required this.getchallenge,
+    required this.logo,
   });
   final Employee employee;
   final String Authorization;
@@ -76,7 +77,8 @@ class _ChallengePageState extends State<ChallengePage> {
                 initialMinutes: widget.initialMinutes,
                 challenge: widget.getchallenge,
                 questionList: questionList,
-                isQuestion: checkAllChallenge, logo: widget.logo,
+                isQuestion: checkAllChallenge,
+                logo: widget.logo,
               ),
             ),
           );
@@ -205,7 +207,8 @@ class _ChallengePageState extends State<ChallengePage> {
                       initialMinutes: widget.initialMinutes,
                       challenge: widget.getchallenge,
                       questionList: questionList,
-                      isQuestion: checkAllChallenge, logo: widget.logo,
+                      isQuestion: checkAllChallenge,
+                      logo: widget.logo,
                     ),
                   ),
                 );
@@ -260,7 +263,8 @@ class _ChallengePageState extends State<ChallengePage> {
                 initialMinutes: widget.initialMinutes,
                 challenge: widget.getchallenge,
                 questionList: questionList,
-                isQuestion: checkAllChallenge, logo: widget.logo,
+                isQuestion: checkAllChallenge,
+                logo: widget.logo,
               ),
             ),
           );
@@ -344,54 +348,53 @@ class _ChallengePageState extends State<ChallengePage> {
       },
       child: (getStatus == 'doing' || getStatus == 'not_start')
           ? Scaffold(
-        backgroundColor: Colors.white,
-        appBar: AppBar(
-          // elevation: 1,
-          foregroundColor: Colors.white,
-          backgroundColor: Color(0xFFFF9900),
-          title: RichText(
-            text: TextSpan(
-              text: '$timeTS: ',
-              style: TextStyle(
-                fontFamily: 'Arial',
-                fontSize: (!isMobile) ? 38 : 28,
-                color: Colors.white, // สีส้มสำหรับ 'Time:'
-                fontWeight: FontWeight.w500,
-              ),
-              children: [
-                TextSpan(
-                  text:
-                  '${formatTime(_progress.toInt())}', // ส่วนข้อความที่เหลือ
-                  style: TextStyle(
-                    fontFamily: 'Arial',
-                    fontSize: (!isMobile) ? 38 : 28,
-                    color: Colors.white, // สีแดงสำหรับเวลา
-                    fontWeight: FontWeight.w700,
+              backgroundColor: Colors.white,
+              appBar: AppBar(
+                // elevation: 1,
+                foregroundColor: Colors.white,
+                backgroundColor: Color(0xFFFF9900),
+                title: RichText(
+                  text: TextSpan(
+                    text: '$timeTS: ',
+                    style: TextStyle(
+                      fontFamily: 'Arial',
+                      fontSize: 28,
+                      color: Colors.white, // สีส้มสำหรับ 'Time:'
+                      fontWeight: FontWeight.w500,
+                    ),
+                    children: [
+                      TextSpan(
+                        text:
+                            '${formatTime(_progress.toInt())}', // ส่วนข้อความที่เหลือ
+                        style: TextStyle(
+                          fontFamily: 'Arial',
+                          fontSize: 28,
+                          color: Colors.white, // สีแดงสำหรับเวลา
+                          fontWeight: FontWeight.w700,
+                        ),
+                      ),
+                    ],
                   ),
                 ),
-              ],
-            ),
-          ),
-          leading: IconButton(
-            icon:
-            Icon(null, color: Colors.white, size: 24),
-            onPressed: () {
-              // Navigator.pushReplacement(
-              //   context,
-              //   MaterialPageRoute(
-              //     builder: (context) => AcademyHomePage(
-              //       employee: widget.employee,
-              //       Authorization: widget.Authorization,
-              //       learnin_page: 'challenge', logo: widget.logo,
-              //     ),
-              //   ),
-              // );
-            },
-          ),
-          // leading: Icon(null),
-        ),
-        body: _getContentWidget(),
-      )
+                leading: IconButton(
+                  icon: Icon(null, color: Colors.white, size: 24),
+                  onPressed: () {
+                    // Navigator.pushReplacement(
+                    //   context,
+                    //   MaterialPageRoute(
+                    //     builder: (context) => AcademyHomePage(
+                    //       employee: widget.employee,
+                    //       Authorization: widget.Authorization,
+                    //       learnin_page: 'challenge', logo: widget.logo,
+                    //     ),
+                    //   ),
+                    // );
+                  },
+                ),
+                // leading: Icon(null),
+              ),
+              body: _getContentWidget(),
+            )
           : Scaffold(backgroundColor: Colors.white, body: _loadingWidget()),
     );
   }
@@ -399,7 +402,7 @@ class _ChallengePageState extends State<ChallengePage> {
   Widget _getContentWidget() {
     return SafeArea(
       child: Padding(
-        padding: EdgeInsets.all(!isMobile ? 24 : 16),
+        padding: EdgeInsets.all(16),
         child: Column(
           children: [
             ClipRRect(
@@ -410,7 +413,7 @@ class _ChallengePageState extends State<ChallengePage> {
                     value: widget.initialMinutes * 60,
                     backgroundColor: Colors.grey.shade300,
                     valueColor:
-                    AlwaysStoppedAnimation<Color>(Colors.grey.shade300),
+                        AlwaysStoppedAnimation<Color>(Colors.grey.shade300),
                     minHeight: 10,
                   ),
                   ShaderMask(
@@ -488,7 +491,6 @@ class _ChallengePageState extends State<ChallengePage> {
                       child: Column(
                         children: [
                           _questionRow(questionData),
-                          if (!isMobile) SizedBox(height: 28),
                           _imageCarousel(questionData),
                           SizedBox(height: 8),
                           _choice(questionData.question.choice, isQuestion,
@@ -535,7 +537,7 @@ class _ChallengePageState extends State<ChallengePage> {
           'Q${questionData.question.question_seq}. ',
           style: TextStyle(
               fontFamily: 'Arial',
-              fontSize: (!isMobile) ? 32 : 18,
+              fontSize: 18,
               color: Color(0xFF555555),
               fontWeight: FontWeight.w700),
         ),
@@ -544,7 +546,7 @@ class _ChallengePageState extends State<ChallengePage> {
             questionData.question.question_text,
             style: TextStyle(
                 fontFamily: 'Arial',
-                fontSize: (!isMobile) ? 24 : 16,
+                fontSize: 16,
                 color: Color(0xFF555555),
                 fontWeight: FontWeight.w700),
             overflow: TextOverflow.ellipsis,
@@ -585,8 +587,7 @@ class _ChallengePageState extends State<ChallengePage> {
               ),
               itemBuilder: (context, index, realIndex) {
                 return Padding(
-                  padding: EdgeInsets.symmetric(
-                      vertical: !isMobile ? 24 : 12),
+                  padding: EdgeInsets.symmetric(vertical: 12),
                   child: GestureDetector(
                     onTap: () {
                       _showFullScreenImage(
@@ -649,7 +650,7 @@ class _ChallengePageState extends State<ChallengePage> {
           //     ?
           _actionButton(
               (questionData.question.question_seq ==
-                  questionList.length.toString())
+                      questionList.length.toString())
                   ? "${FinishTS}"
                   : "${nextTS}", () {
             if (questionData.question.choice_choose == []) {
@@ -704,7 +705,7 @@ class _ChallengePageState extends State<ChallengePage> {
           label,
           style: TextStyle(
               fontFamily: 'Arial',
-              fontSize: (!isMobile) ? 24 : 16,
+              fontSize: 16,
               color: Colors.white,
               fontWeight: FontWeight.w500),
         ),
@@ -720,18 +721,18 @@ class _ChallengePageState extends State<ChallengePage> {
       child: Column(
         children: List.generate(choiceList.length, (index1) {
           final isSelected =
-          _manyChoiceSet.contains(choiceList[index1].choice_id);
+              _manyChoiceSet.contains(choiceList[index1].choice_id);
           final choice = choiceList[index1];
           return Row(
             children: [
               Expanded(
                 child:
-                // nChoice(choice, isSelected, isQuestion)
-                (choice_choose.isEmpty ||
-                    choice_choose.first.choice_no.isEmpty)
-                    ? nChoice(choice, isSelected, isQuestion)
-                    : yChoice(
-                    choice, isSelected, isQuestion, choice_choose),
+                    // nChoice(choice, isSelected, isQuestion)
+                    (choice_choose.isEmpty ||
+                            choice_choose.first.choice_no.isEmpty)
+                        ? nChoice(choice, isSelected, isQuestion)
+                        : yChoice(
+                            choice, isSelected, isQuestion, choice_choose),
               ),
             ],
           );
@@ -771,7 +772,7 @@ class _ChallengePageState extends State<ChallengePage> {
                 choice.choice_text,
                 style: TextStyle(
                   fontFamily: 'Arial',
-                  fontSize: (!isMobile) ? 24 : 16,
+                  fontSize: 16,
                   color: Color(0xFF555555),
                   fontWeight: FontWeight.w500,
                 ),
@@ -784,12 +785,12 @@ class _ChallengePageState extends State<ChallengePage> {
         leading: (choiceNo > 1)
             ? manyChoice(choice, isSelected, isQuestion)
             : Radio<String>(
-          value: choice.choice_no,
-          groupValue: choice_choose.first.choice_no,
-          hoverColor: Color(0xFF555555),
-          activeColor: Color(0xFF555555),
-          onChanged: (String? value) {},
-        ),
+                value: choice.choice_no,
+                groupValue: choice_choose.first.choice_no,
+                hoverColor: Color(0xFF555555),
+                activeColor: Color(0xFF555555),
+                onChanged: (String? value) {},
+              ),
       ),
     );
   }
@@ -870,7 +871,7 @@ class _ChallengePageState extends State<ChallengePage> {
             choice.choice_text,
             style: TextStyle(
               fontFamily: 'Arial',
-              fontSize: (!isMobile) ? 24 : 16,
+              fontSize: 16,
               color: Color(0xFF555555),
               fontWeight: FontWeight.w500,
             ),
@@ -878,17 +879,17 @@ class _ChallengePageState extends State<ChallengePage> {
           leading: (choiceNo > 1)
               ? manyChoice(choice, isSelected, isQuestion)
               : Radio<String>(
-            value: choice.choice_id,
-            groupValue: _oneChoice,
-            hoverColor: Color(0xFF555555),
-            activeColor: Color(0xFF555555),
-            onChanged: (String? value) {
-              setState(() {
-                _oneChoice = value!;
-                choice_correct = choice.choice_correct;
-              });
-            },
-          ),
+                  value: choice.choice_id,
+                  groupValue: _oneChoice,
+                  hoverColor: Color(0xFF555555),
+                  activeColor: Color(0xFF555555),
+                  onChanged: (String? value) {
+                    setState(() {
+                      _oneChoice = value!;
+                      choice_correct = choice.choice_correct;
+                    });
+                  },
+                ),
         ),
       ),
     );
@@ -954,7 +955,7 @@ class _ChallengePageState extends State<ChallengePage> {
                               "$challengeSectionTS",
                               style: TextStyle(
                                 fontFamily: 'Arial',
-                                fontSize: isMobile ? 20 : 30,
+                                fontSize: 20,
                                 fontWeight: FontWeight.w700,
                                 color: Color(0xFF555555),
                               ),
@@ -965,7 +966,7 @@ class _ChallengePageState extends State<ChallengePage> {
                               "$questionTS: ${isQuestion.length}",
                               style: TextStyle(
                                 fontFamily: 'Arial',
-                                fontSize: isMobile ? 16 : 24,
+                                fontSize: 16,
                                 color: Color(0xFF555555),
                               ),
                               textAlign: TextAlign.center,
@@ -974,13 +975,13 @@ class _ChallengePageState extends State<ChallengePage> {
                             ConstrainedBox(
                               constraints: BoxConstraints(
                                 maxWidth:
-                                MediaQuery.of(context).size.width * 0.8,
+                                    MediaQuery.of(context).size.width * 0.8,
                               ),
                               child: Wrap(
-                                  spacing: isMobile ? 8 : 16,
-                                  runSpacing: isMobile ? 8 : 16,
+                                  spacing: 8,
+                                  runSpacing: 8,
                                   children:
-                                  List.generate(isQuestion.length, (index) {
+                                      List.generate(isQuestion.length, (index) {
                                     final dataQ = isQuestion[index];
                                     Color cardColor;
                                     if (dataQ.question_status == 'Y') {
@@ -1000,23 +1001,19 @@ class _ChallengePageState extends State<ChallengePage> {
                                         }
                                       },
                                       child: Container(
-                                        height:
-                                        isMobile ? 40 : 80,
-                                        width:
-                                        isMobile ? 40 : 80,
+                                        height: 40,
+                                        width: 40,
                                         alignment: Alignment.center,
                                         decoration: BoxDecoration(
                                           color: cardColor,
                                           borderRadius:
-                                          BorderRadius.circular(10),
+                                              BorderRadius.circular(10),
                                         ),
                                         child: Text(
                                           '${index + 1}',
                                           style: TextStyle(
                                             fontFamily: 'Arial',
-                                            fontSize: isMobile
-                                                ? 16
-                                                : 20,
+                                            fontSize: 16,
                                             color: Colors.white,
                                             fontWeight: FontWeight.w700,
                                           ),
@@ -1045,9 +1042,7 @@ class _ChallengePageState extends State<ChallengePage> {
                                           '$correctTS',
                                           style: TextStyle(
                                             fontFamily: 'Arial',
-                                            fontSize: isMobile
-                                                ? 14
-                                                : 20,
+                                            fontSize: 14,
                                             color: Color(0xFF555555),
                                             fontWeight: FontWeight.w700,
                                           ),
@@ -1071,9 +1066,7 @@ class _ChallengePageState extends State<ChallengePage> {
                                           '$incorrectTS',
                                           style: TextStyle(
                                             fontFamily: 'Arial',
-                                            fontSize: isMobile
-                                                ? 14
-                                                : 20,
+                                            fontSize: 14,
                                             color: Color(0xFF555555),
                                             fontWeight: FontWeight.w700,
                                           ),
@@ -1097,9 +1090,7 @@ class _ChallengePageState extends State<ChallengePage> {
                                           '$noResultTS',
                                           style: TextStyle(
                                             fontFamily: 'Arial',
-                                            fontSize: isMobile
-                                                ? 14
-                                                : 20,
+                                            fontSize: 14,
                                             color: Color(0xFF555555),
                                             fontWeight: FontWeight.w700,
                                           ),
@@ -1128,7 +1119,7 @@ class _ChallengePageState extends State<ChallengePage> {
                           padding: const EdgeInsets.only(right: 4, top: 4),
                           child: Icon(
                             Icons.clear,
-                            size: isMobile ? 22 : 45,
+                            size: 22,
                             color: Colors.red,
                           ),
                         )),
@@ -1429,12 +1420,12 @@ class Question {
       show_answer: json['show_answer'] ?? '',
       question_seq: json['question_seq'] ?? '',
       choice_choose: (json['choice_choose'] as List?)
-          ?.map((e) => ChoiceChoose.fromJson(e))
-          .toList() ??
+              ?.map((e) => ChoiceChoose.fromJson(e))
+              .toList() ??
           [],
       choice:
-      (json['choice'] as List?)?.map((e) => Choice.fromJson(e)).toList() ??
-          [],
+          (json['choice'] as List?)?.map((e) => Choice.fromJson(e)).toList() ??
+              [],
       correct: json['correct'] ?? '',
     );
   }
@@ -1491,8 +1482,8 @@ class TopChallenge {
   factory TopChallenge.fromJson(Map<String, dynamic> json) {
     return TopChallenge(
       topUsers: (json['top_challenge'] as List?)
-          ?.map((user) => TopUser.fromJson(user))
-          .toList() ??
+              ?.map((user) => TopUser.fromJson(user))
+              .toList() ??
           [],
     );
   }
@@ -1546,4 +1537,3 @@ class CheckAllChallenge {
     );
   }
 }
-

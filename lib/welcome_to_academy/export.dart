@@ -38,3 +38,4 @@ export 'package:quickalert/quickalert.dart';
 export 'package:academy/welcome_to_academy/language/translate.dart';
 // export 'package:google_mlkit_barcode_scanning/google_mlkit_barcode_scanning.dart';
 export 'package:animated_custom_dropdown/custom_dropdown.dart';
+export 'package:carousel_slider/carousel_slider.dart';

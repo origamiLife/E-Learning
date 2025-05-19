@@ -9,11 +9,11 @@ import 'package:hive_flutter/hive_flutter.dart';
 String host = 'https://www.origami.life';
 String authorization = 'ori20#17gami';
 int selectedRadio = 2;
-bool isAndroid = false;
-bool isTablet = false;
-bool isIPad = false;
-bool isIPhone = false;
-bool isMobile = false;
+// bool isAndroid = false;
+// bool isTablet = false;
+// bool isIPad = false;
+// bool isIPhone = false;
+// bool isMobile = false;
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized(); // รอการ initialize
@@ -105,10 +105,10 @@ class _LoginPageState extends State<LoginPage> {
     _fetchComponent();
     allTranslate();
     loadCredentials();
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      checkDeviceType(context);
-      getDeviceInfo(context: context);
-    });
+    // WidgetsBinding.instance.addPostFrameCallback((_) {
+    //   checkDeviceType(context);
+    //   getDeviceInfo(context: context);
+    // });
     // WidgetsBinding.instance.addPostFrameCallback((_) {
     //   getDeviceInfo(context: context);
     // });
@@ -164,104 +164,104 @@ class _LoginPageState extends State<LoginPage> {
     print('Password: $password');
   }
 
-  Future<void> checkDeviceType(BuildContext? context) async {
-    try {
-      // รีเซ็ตค่าตัวแปรทั้งหมด
-      isAndroid = false;
-      isTablet = false;
-      isIPad = false;
-      isIPhone = false;
+  // Future<void> checkDeviceType(BuildContext? context) async {
+  //   try {
+  //     // รีเซ็ตค่าตัวแปรทั้งหมด
+  //     isAndroid = false;
+  //     isTablet = false;
+  //     isIPad = false;
+  //     isIPhone = false;
+  //
+  //     if (Platform.isAndroid) {
+  //       DeviceInfoPlugin deviceInfo = DeviceInfoPlugin();
+  //       isAndroid = true;
+  //
+  //       final shortestSide = context != null
+  //           ? MediaQuery.of(context).size.shortestSide
+  //           : WidgetsBinding.instance.platformDispatcher.views.first
+  //                   .physicalSize.shortestSide /
+  //               WidgetsBinding
+  //                   .instance.platformDispatcher.views.first.devicePixelRatio;
+  //
+  //       isTablet = shortestSide >= 600; // เช็คว่าเป็น Tablet หรือไม่
+  //
+  //       if (isTablet) {
+  //         isAndroid = false; // ถ้าเป็น Tablet ให้ reset ค่า isAndroid
+  //       }
+  //     } else if (Platform.isIOS) {
+  //       final deviceInfo = DeviceInfoPlugin();
+  //       final iosInfo = await deviceInfo.iosInfo;
+  //       final model = iosInfo.model?.toLowerCase() ?? '';
+  //
+  //       if (model.contains("ipad")) {
+  //         isIPad = true;
+  //         isTablet = true; // ถ้าเป็น iPad ให้ตั้งค่า isTablet = true
+  //       } else if (model.contains("iphone")) {
+  //         isIPhone = true;
+  //       }
+  //     }
+  //
+  //     // ถ้าเป็น iPad ให้ตั้งค่าอื่นๆ เป็น false
+  //     if (isIPad) {
+  //       isAndroid = false;
+  //       isIPhone = false;
+  //       isTablet = false; // ทำให้ตัวแปรอื่นๆ เป็น false เมื่อเป็น iPad
+  //     }
+  //
+  //     print(
+  //         'isAndroid: $isAndroid, isIPhone: $isIPhone, isTablet: $isTablet, isIPad: $isIPad');
+  //   } catch (e) {
+  //     print("Error checking device type: $e");
+  //   }
+  // }
 
-      if (Platform.isAndroid) {
-        DeviceInfoPlugin deviceInfo = DeviceInfoPlugin();
-        isAndroid = true;
-
-        final shortestSide = context != null
-            ? MediaQuery.of(context).size.shortestSide
-            : WidgetsBinding.instance.platformDispatcher.views.first
-                    .physicalSize.shortestSide /
-                WidgetsBinding
-                    .instance.platformDispatcher.views.first.devicePixelRatio;
-
-        isTablet = shortestSide >= 600; // เช็คว่าเป็น Tablet หรือไม่
-
-        if (isTablet) {
-          isAndroid = false; // ถ้าเป็น Tablet ให้ reset ค่า isAndroid
-        }
-      } else if (Platform.isIOS) {
-        final deviceInfo = DeviceInfoPlugin();
-        final iosInfo = await deviceInfo.iosInfo;
-        final model = iosInfo.model?.toLowerCase() ?? '';
-
-        if (model.contains("ipad")) {
-          isIPad = true;
-          isTablet = true; // ถ้าเป็น iPad ให้ตั้งค่า isTablet = true
-        } else if (model.contains("iphone")) {
-          isIPhone = true;
-        }
-      }
-
-      // ถ้าเป็น iPad ให้ตั้งค่าอื่นๆ เป็น false
-      if (isIPad) {
-        isAndroid = false;
-        isIPhone = false;
-        isTablet = false; // ทำให้ตัวแปรอื่นๆ เป็น false เมื่อเป็น iPad
-      }
-
-      print(
-          'isAndroid: $isAndroid, isIPhone: $isIPhone, isTablet: $isTablet, isIPad: $isIPad');
-    } catch (e) {
-      print("Error checking device type: $e");
-    }
-  }
-
-  Future<void> getDeviceInfo({BuildContext? context}) async {
-    try {
-      final DeviceInfoPlugin deviceInfo = DeviceInfoPlugin();
-
-      if (Platform.isAndroid) {
-        AndroidDeviceInfo androidInfo = await deviceInfo.androidInfo;
-
-        // ใช้ MediaQuery ถ้ามี context
-        bool isTablet = false;
-        if (context != null) {
-          isTablet = MediaQuery.of(context).size.shortestSide >= 600;
-        } else {
-          // ใช้ WidgetsBinding ถ้าไม่มี context (เช่นเรียกใน initState)
-          final shortestSide =
-              WidgetsBinding.instance.window.physicalSize.shortestSide /
-                  WidgetsBinding.instance.window.devicePixelRatio;
-          isTablet = shortestSide >= 600;
-        }
-
-        debugPrint("📱 Android Device Info:");
-        debugPrint("Brand: ${androidInfo.brand}");
-        debugPrint("Model: ${androidInfo.model}");
-        debugPrint("Android Version: ${androidInfo.version.release}");
-        debugPrint(isTablet ? "📲 เป็น Tablet" : "📱 เป็น Phone");
-      } else if (Platform.isIOS) {
-        IosDeviceInfo iosInfo = await deviceInfo.iosInfo;
-
-        // ตรวจสอบว่าเป็น iPad
-        bool isIPad = iosInfo.model.toLowerCase().contains("ipad");
-
-        debugPrint("🍏 iOS Device Info:");
-        debugPrint("Model: ${iosInfo.model}");
-        debugPrint("System Name: ${iosInfo.systemName}");
-        debugPrint("iOS Version: ${iosInfo.systemVersion}");
-        debugPrint(isIPad ? "📲 เป็น iPad🍏" : "📲 เป็น iPhone🍏");
-        if (isAndroid == true || isIPhone == true) {
-          isMobile = true;
-        } else {
-          isMobile = false;
-        }
-      } else {
-        debugPrint("❌ ไม่รองรับอุปกรณ์นี้");
-      }
-    } catch (e) {
-      debugPrint("⚠️ Error checking device type: $e");
-    }
-  }
+  // Future<void> getDeviceInfo({BuildContext? context}) async {
+  //   try {
+  //     final DeviceInfoPlugin deviceInfo = DeviceInfoPlugin();
+  //
+  //     if (Platform.isAndroid) {
+  //       AndroidDeviceInfo androidInfo = await deviceInfo.androidInfo;
+  //
+  //       // ใช้ MediaQuery ถ้ามี context
+  //       bool isTablet = false;
+  //       if (context != null) {
+  //         isTablet = MediaQuery.of(context).size.shortestSide >= 600;
+  //       } else {
+  //         // ใช้ WidgetsBinding ถ้าไม่มี context (เช่นเรียกใน initState)
+  //         final shortestSide =
+  //             WidgetsBinding.instance.window.physicalSize.shortestSide /
+  //                 WidgetsBinding.instance.window.devicePixelRatio;
+  //         isTablet = shortestSide >= 600;
+  //       }
+  //
+  //       debugPrint("📱 Android Device Info:");
+  //       debugPrint("Brand: ${androidInfo.brand}");
+  //       debugPrint("Model: ${androidInfo.model}");
+  //       debugPrint("Android Version: ${androidInfo.version.release}");
+  //       debugPrint(isTablet ? "📲 เป็น Tablet" : "📱 เป็น Phone");
+  //     } else if (Platform.isIOS) {
+  //       IosDeviceInfo iosInfo = await deviceInfo.iosInfo;
+  //
+  //       // ตรวจสอบว่าเป็น iPad
+  //       bool isIPad = iosInfo.model.toLowerCase().contains("ipad");
+  //
+  //       debugPrint("🍏 iOS Device Info:");
+  //       debugPrint("Model: ${iosInfo.model}");
+  //       debugPrint("System Name: ${iosInfo.systemName}");
+  //       debugPrint("iOS Version: ${iosInfo.systemVersion}");
+  //       debugPrint(isIPad ? "📲 เป็น iPad🍏" : "📲 เป็น iPhone🍏");
+  //       if (isAndroid == true || isIPhone == true) {
+  //         isMobile = true;
+  //       } else {
+  //         isMobile = false;
+  //       }
+  //     } else {
+  //       debugPrint("❌ ไม่รองรับอุปกรณ์นี้");
+  //     }
+  //   } catch (e) {
+  //     debugPrint("⚠️ Error checking device type: $e");
+  //   }
+  // }
 
   Future<void> _loadBegin() async {
     await Future.delayed(Duration(seconds: 5));
@@ -340,9 +340,9 @@ class _LoginPageState extends State<LoginPage> {
                   decoration: BoxDecoration(
                     image: backgroudComponent.isNotEmpty
                         ? DecorationImage(
-                      image: NetworkImage(backgroudComponent),
-                      fit: BoxFit.cover,
-                    )
+                            image: NetworkImage(backgroudComponent),
+                            fit: BoxFit.cover,
+                          )
                         : null, // หรือใช้ภาพจาก assets แทน
                   ),
                 ),
@@ -385,50 +385,66 @@ class _LoginPageState extends State<LoginPage> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              if (isMobile)
-                Image.network(
-                  logoComponent, // ใส่โลโก้
-                  width: 300,
-                  fit: BoxFit.contain,
-                  errorBuilder: (context, error, stackTrace) {
-                    return Container(
-                      color: Colors.transparent,
-                      child: Center(
-                        child: LoadingAnimationWidget.horizontalRotatingDots(
-                          size: 65,
-                          color: Colors.orange,
-                        ),
+              // if (isMobile)
+              //   Image.network(
+              //     logoComponent, // ใส่โลโก้
+              //     width: 300,
+              //     fit: BoxFit.contain,
+              //     errorBuilder: (context, error, stackTrace) {
+              //       return Container(
+              //         color: Colors.transparent,
+              //         child: Center(
+              //           child: LoadingAnimationWidget.horizontalRotatingDots(
+              //             size: 65,
+              //             color: Colors.orange,
+              //           ),
+              //         ),
+              //       );
+              //     },
+              //   )
+              // else
+              //   Image.network(
+              //     logoComponent, // ใส่โลโก้
+              //     width: 400,
+              //     fit: BoxFit.contain,
+              //     errorBuilder: (context, error, stackTrace) {
+              //       return Container(
+              //         color: Colors.transparent,
+              //         child: Center(
+              //           child: LoadingAnimationWidget.horizontalRotatingDots(
+              //             size: 65,
+              //             color: Colors.orange,
+              //           ),
+              //         ),
+              //       );
+              //     },
+              //   ),
+              // if (isMobile)
+              Image.network(
+                logoComponent, // ใส่โลโก้
+                width: 300,
+                fit: BoxFit.contain,
+                errorBuilder: (context, error, stackTrace) {
+                  return Container(
+                    color: Colors.transparent,
+                    child: Center(
+                      child: LoadingAnimationWidget.horizontalRotatingDots(
+                        size: 65,
+                        color: Colors.orange,
                       ),
-                    );
-                  },
-                )
-              else
-                Image.network(
-                  logoComponent, // ใส่โลโก้
-                  width: 400,
-                  fit: BoxFit.contain,
-                  errorBuilder: (context, error, stackTrace) {
-                    return Container(
-                      color: Colors.transparent,
-                      child: Center(
-                        child: LoadingAnimationWidget.horizontalRotatingDots(
-                          size: 65,
-                          color: Colors.orange,
-                        ),
-                      ),
-                    );
-                  },
+                    ),
+                  );
+                },
+              ),
+              Text(
+                titleComponent,
+                style: const TextStyle(
+                  fontFamily: 'Arial',
+                  color: Colors.white,
+                  fontWeight: FontWeight.w500,
+                  fontSize: 40,
                 ),
-              if (isMobile)
-                Text(
-                  titleComponent,
-                  style: const TextStyle(
-                    fontFamily: 'Arial',
-                    color: Colors.white,
-                    fontWeight: FontWeight.w500,
-                    fontSize: 40,
-                  ),
-                ),
+              ),
               // if (isMobile)
               //   Text(
               //     'ACADEMY',
@@ -530,7 +546,7 @@ class _LoginPageState extends State<LoginPage> {
                       style: TextStyle(
                         fontFamily: 'Arial',
                         color: Colors.white,
-                        fontSize: !isMobile ? constraints.maxWidth * 0.05 : 24,
+                        fontSize: 24,
                         fontWeight: FontWeight.w500,
                       ),
                     ),
@@ -542,8 +558,7 @@ class _LoginPageState extends State<LoginPage> {
                         style: TextStyle(
                           fontFamily: 'Arial',
                           color: Colors.orange.shade50,
-                          fontSize:
-                              !isMobile ? constraints.maxWidth * 0.02 : 16,
+                          fontSize: 16,
                           fontWeight: FontWeight.w400,
                         ),
                       ),
@@ -715,7 +730,7 @@ class _LoginPageState extends State<LoginPage> {
                 physics: const NeverScrollableScrollPhysics(),
                 itemCount: employee.length,
                 gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                  crossAxisCount: isMobile ? 2 : 3, // 2 รูปต่อแถว
+                  crossAxisCount: 2, // 2 รูปต่อแถว
                   crossAxisSpacing: 8,
                   mainAxisSpacing: 8,
                   childAspectRatio: 1, // อัตราส่วนกว้าง/สูง (ปรับได้ตามต้องการ)
@@ -807,11 +822,11 @@ class _LoginPageState extends State<LoginPage> {
             context,
             MaterialPageRoute(
               builder: (context) => AcademyHomePage(
-                employee: employee[widget.company_id??0],
+                employee: employee[widget.company_id ?? 0],
                 Authorization: authorization,
                 learnin_page: 'course',
                 logo: logoComponent,
-                company_id: widget.company_id??0,
+                company_id: widget.company_id ?? 0,
               ),
             ),
           );
@@ -892,7 +907,6 @@ class _LoginPageState extends State<LoginPage> {
           titleComponent = jsonResponse['title'];
           backgroudComponent = jsonResponse['backgroud'];
         });
-
       } else {
         final message = jsonResponse['message'];
         ScaffoldMessenger.of(context).showSnackBar(
@@ -911,7 +925,6 @@ class _LoginPageState extends State<LoginPage> {
       throw Exception('Failed to load projects');
     }
   }
-
 }
 
 class Employee {

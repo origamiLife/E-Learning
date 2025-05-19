@@ -23,7 +23,6 @@ class _DiscussionState extends State<Discussion> {
   final TextEditingController _commentControllerA = TextEditingController();
   final TextEditingController _commentControllerB = TextEditingController();
 
-
   String _commentA = "";
   String _commentB = "";
 
@@ -79,16 +78,16 @@ class _DiscussionState extends State<Discussion> {
         } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
           return Center(
               child: Text(
-                NotFoundDataTS,
-                style: TextStyle(
-                  fontFamily: 'Arial',
-                  fontSize: 16.0,
-                  color: const Color(0xFF555555),
-                  fontWeight: FontWeight.w700,
-                ),
-                overflow: TextOverflow.ellipsis,
-                maxLines: 1,
-              ));
+            NotFoundDataTS,
+            style: TextStyle(
+              fontFamily: 'Arial',
+              fontSize: 16.0,
+              color: const Color(0xFF555555),
+              fontWeight: FontWeight.w700,
+            ),
+            overflow: TextOverflow.ellipsis,
+            maxLines: 1,
+          ));
         } else {
           return _getContentWidget(snapshot.data!);
         }
@@ -99,15 +98,15 @@ class _DiscussionState extends State<Discussion> {
   String _disccusion(String htmlString) {
     final unescape = HtmlUnescape();
     String decoded = unescape.convert(htmlString); // แปลงเป็น <p>Title 1</p>
-    final document = parse(decoded);               // แปลง HTML เป็น document
-    return document.body?.text.trim() ?? '';       // ดึงเฉพาะข้อความใน tag
+    final document = parse(decoded); // แปลง HTML เป็น document
+    return document.body?.text.trim() ?? ''; // ดึงเฉพาะข้อความใน tag
   }
 
   Widget _getContentWidget(List<DiscussionData> discussion) {
     return Container(
       color: Colors.grey.shade50,
       child: Padding(
-        padding: const EdgeInsets.only(left: 8,right: 8),
+        padding: const EdgeInsets.only(left: 8, right: 8),
         child: SingleChildScrollView(
           child: Column(
             children: List.generate(discussion.length, (index) {
@@ -151,11 +150,11 @@ class _DiscussionState extends State<Discussion> {
                           child: Row(
                             children: [
                               Expanded(
-                                flex: isMobile ? 2 : 1,
+                                flex: 2,
                                 child: Image.network(
                                   disc.disccusion_emp_image,
                                   width: double.infinity,
-                                  height: (isMobile)?100:180,
+                                  height: 100,
                                   fit: BoxFit.contain,
                                   errorBuilder: (context, error, stackTrace) {
                                     return Icon(Icons.info, size: 40);
@@ -166,7 +165,7 @@ class _DiscussionState extends State<Discussion> {
                                 width: 8,
                               ),
                               Expanded(
-                                flex: isMobile ? 3 : 5,
+                                flex: 3,
                                 child: Column(
                                   mainAxisAlignment: MainAxisAlignment.start,
                                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -184,7 +183,8 @@ class _DiscussionState extends State<Discussion> {
                                     ),
                                     SizedBox(height: 8),
                                     Row(
-                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
                                       children: [
                                         Icon(
                                           Icons.people_alt_outlined,
@@ -211,7 +211,8 @@ class _DiscussionState extends State<Discussion> {
                                     ),
                                     SizedBox(height: 8),
                                     Row(
-                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
                                       children: [
                                         Icon(
                                           Icons.calendar_month,
@@ -223,7 +224,7 @@ class _DiscussionState extends State<Discussion> {
                                         ),
                                         Flexible(
                                           child: Text(
-                                        _disccusion(disc.disccusion_date),
+                                            _disccusion(disc.disccusion_date),
                                             style: TextStyle(
                                               fontFamily: 'Arial',
                                               fontSize: 14.0,
@@ -238,7 +239,10 @@ class _DiscussionState extends State<Discussion> {
                                     ),
                                     SizedBox(height: 8),
                                     Text(
-                                      parse(disc.discussion_description).body?.text ?? '',
+                                      parse(disc.discussion_description)
+                                              .body
+                                              ?.text ??
+                                          '',
                                       // disc.discussion_description,
                                       style: TextStyle(
                                         fontFamily: 'Arial',
@@ -328,11 +332,11 @@ class _DiscussionState extends State<Discussion> {
                   child: Column(
                     children: [
                       _buildTextField(_commentControllerA, '$ExplainTS...',
-                              (value) {
-                            setState(() {
-                              _commentA = value;
-                            });
-                          }),
+                          (value) {
+                        setState(() {
+                          _commentA = value;
+                        });
+                      }),
                       SizedBox(height: 8),
                       Container(
                           width: double.infinity,
@@ -379,40 +383,40 @@ class _DiscussionState extends State<Discussion> {
                     if (snapshot.connectionState == ConnectionState.waiting) {
                       return Center(
                           child: Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              CircularProgressIndicator(
-                                color: Color(0xFFFF9900),
-                              ),
-                              SizedBox(
-                                width: 12,
-                              ),
-                              Text(
-                                '$loadingTS...',
-                                style: TextStyle(
-                                  fontFamily: 'Arial',
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.w700,
-                                  color: Color(0xFF555555),
-                                ),
-                              ),
-                            ],
-                          ));
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          CircularProgressIndicator(
+                            color: Color(0xFFFF9900),
+                          ),
+                          SizedBox(
+                            width: 12,
+                          ),
+                          Text(
+                            '$loadingTS...',
+                            style: TextStyle(
+                              fontFamily: 'Arial',
+                              fontSize: 16,
+                              fontWeight: FontWeight.w700,
+                              color: Color(0xFF555555),
+                            ),
+                          ),
+                        ],
+                      ));
                     } else if (snapshot.hasError) {
                       return Center(child: Text('Error: ${snapshot.error}'));
                     } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
                       return Center(
                           child: Text(
-                            NotFoundDataTS,
-                            style: TextStyle(
-                              fontFamily: 'Arial',
-                              fontSize: 16.0,
-                              color: const Color(0xFF555555),
-                              fontWeight: FontWeight.w700,
-                            ),
-                            overflow: TextOverflow.ellipsis,
-                            maxLines: 1,
-                          ));
+                        NotFoundDataTS,
+                        style: TextStyle(
+                          fontFamily: 'Arial',
+                          fontSize: 16.0,
+                          color: const Color(0xFF555555),
+                          fontWeight: FontWeight.w700,
+                        ),
+                        overflow: TextOverflow.ellipsis,
+                        maxLines: 1,
+                      ));
                     } else {
                       return _bodyReply(snapshot.data!);
                     }
@@ -843,11 +847,11 @@ class _DiscussionState extends State<Discussion> {
   }
 
   Future<void> DiscussionSave(
-      String discussion_id,
-      String method,
-      String reply_id,
-      String reply_comment,
-      ) async {
+    String discussion_id,
+    String method,
+    String reply_id,
+    String reply_comment,
+  ) async {
     try {
       final response = await http.post(
         Uri.parse('$host/api/origami/academy/discussionSave.php'),
